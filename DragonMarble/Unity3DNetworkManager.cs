@@ -6,7 +6,7 @@ using System.Threading;
 
 namespace DragonMarble
 {
-    public class Unity3DNetworkManager
+    public class Unity3DNetworkManager : IDisposable
     {
         private readonly IMessageParser _messageParser;
         private readonly IEnumerable<GameMessage> _receiveMessages = new Queue<GameMessage>();
@@ -25,18 +25,14 @@ namespace DragonMarble
             _messageParser = messageParser;
             Start();
         }
-        
+
         public string IpAddress { get; set; }
         public int Port { get; set; }
         public bool OnLine { get; set; }
 
-        public static void Log(string message, Object context = null)
+        public void Dispose()
         {
-#if UNITY_EDITOR
-    Debug.Log(message, context);
-#else
-            Console.WriteLine(message, context);
-#endif
+            Shutdown();
         }
 
         private void Start()
@@ -70,39 +66,37 @@ namespace DragonMarble
 
         private void CompleteReceive(IAsyncResult ar)
         {
+            if (!OnLine) return;
             try
             {
-                if (!OnLine) return;
-                var message = (byte[]) ar.AsyncState;
                 // Read data from the remote device.
                 int bytesRead = _socket.EndReceive(ar);
 
                 if (bytesRead > 0)
                 {
                     // There might be more data, so store the data received so far.
-                    String a = Encoding.ASCII.GetString(message, 0, bytesRead);
+                    String a = Encoding.ASCII.GetString((byte[]) ar.AsyncState, 0, bytesRead);
 
                     _messageParser.SetMessage(a);
                 }
             }
             catch (Exception e)
             {
-                Log(e.ToString());
+                Console.WriteLine(e.ToString());
             }
         }
 
         private void CompleteSend(IAsyncResult ar)
         {
+            if (!OnLine) return;
             try
             {
-                if (!OnLine) return;
                 // Complete sending the data to the remote device.
                 int bytesSent = _socket.EndSend(ar);
-                Log("Sent {0} bytes to server.", bytesSent);
             }
             catch (Exception e)
             {
-                Log(e.ToString());
+                Console.WriteLine(e.ToString());
             }
         }
 
@@ -122,32 +116,24 @@ namespace DragonMarble
             {
                 // Complete the connection.
                 _socket.EndConnect(ar);
-                Log("Connected.");
                 OnLine = true;
                 _receiveCheck = new Thread(ReceiveCheck);
-                _receiveCheck.Start();
                 _sendCheck = new Thread(SendCheck);
+                _receiveCheck.Start();
                 _sendCheck.Start();
             }
             catch (Exception e)
             {
-                Log(e.ToString());
+                Console.WriteLine(e.ToString());
             }
         }
 
         public void Shutdown()
         {
-            Log("shutdown");
-            _receiveCheck.Abort();
-            _sendCheck.Abort();
-            Log("abort");
             OnLine = false;
-            _socket.Close();
+            if (null != _sendCheck && _sendCheck.IsAlive) _sendCheck.Abort();
+            if (null != _receiveCheck && _receiveCheck.IsAlive) _receiveCheck.Abort();
+            if (null != _socket) _socket.Close();
         }
-    }
-
-    public interface IMessageParser
-    {
-        void SetMessage(string message);
     }
 }
