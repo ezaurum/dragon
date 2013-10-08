@@ -1,21 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading;
+using Dragon.Interfaces;
 
-namespace DragonMarble
+namespace Dragon.Client
 {
-    public class Unity3DNetworkManager : IDisposable
+    public class Unity3DNetworkManager : NetworkManager
     {
-        private readonly IMessageParser _messageParser;
-        private readonly IEnumerable<GameMessage> _receiveMessages = new Queue<GameMessage>();
-        private readonly Queue<GameMessage> _sendMessages = new Queue<GameMessage>();
+        
+        private readonly byte[] _buffer;
+        private readonly IMessageProcessor _messageProcessor;
         private readonly Socket _socket;
-        private Thread _receiveCheck;
-        private Thread _sendCheck;
+        private readonly Queue<IGameMessage> _sendingMessages = new Queue<IGameMessage>();
+        
+        private bool _started;
 
-        public Unity3DNetworkManager(string ipAddress, int port, IMessageParser messageParser)
+        public Unity3DNetworkManager(string ipAddress, int port, IMessageParser messageParser,
+            IMessageProcessor messageProcessor, bool startWhenMade = true)
         {
             _socket = new Socket(AddressFamily.InterNetwork,
                 SocketType.Stream, ProtocolType.Tcp);
@@ -23,45 +24,36 @@ namespace DragonMarble
             IpAddress = ipAddress;
             Port = port;
             _messageParser = messageParser;
-            Start();
+            _messageProcessor = messageProcessor;
+            _buffer = new byte[1024];
+            if (startWhenMade) Start();
         }
 
         public string IpAddress { get; set; }
         public int Port { get; set; }
         public bool OnLine { get; set; }
 
-        public void Dispose()
+        public void Start()
         {
-            Shutdown();
-        }
-
-        private void Start()
-        {
+            if (_started) return;
+            _started = true;
             Connect();
         }
 
         private void ReceiveCheck()
         {
-            while (OnLine)
-            {
-                var m = new byte[1024];
-                _socket.BeginReceive(m, 0, 1024, SocketFlags.None, CompleteReceive, m);
-
-                Thread.Sleep(300);
-            }
+            if (!OnLine) return;
+            //TODO something WTF
+            var m = new byte[1024];
+            _socket.BeginReceive(m, 0, 1024, SocketFlags.None, CompleteReceive, m);
         }
 
         private void SendCheck()
         {
-            while (OnLine)
-            {
-                if (_sendMessages.Count < 1) continue;
-
-                byte[] bytes = _sendMessages.Dequeue().Contents;
-                _socket.BeginSend(bytes, 0, bytes.Length, SocketFlags.None, CompleteSend, _socket);
-
-                Thread.Sleep(300);
-            }
+            if (_sendingMessages.Count < 1) return;
+            byte[] bytes = _sendingMessages.Dequeue().ToByteArray();
+            Console.WriteLine(bytes);
+            _socket.BeginSend(bytes, 0, bytes.Length, SocketFlags.None, CompleteSend, _socket);
         }
 
         private void CompleteReceive(IAsyncResult ar)
@@ -74,16 +66,21 @@ namespace DragonMarble
 
                 if (bytesRead > 0)
                 {
-                    // There might be more data, so store the data received so far.
-                    String a = Encoding.ASCII.GetString((byte[]) ar.AsyncState, 0, bytesRead);
+                    ((byte[]) ar.AsyncState).CopyTo(_buffer, _offset);
+                    _offset += bytesRead;
 
-                    _messageParser.SetMessage(a);
+                    foreach (IGameMessage gameMessage in ToMessages(_buffer, _offset, bytesRead))
+                    {
+                        _messageProcessor.ProcessMessage(gameMessage);
+                    }
                 }
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.ToString());
             }
+
+            ReceiveCheck();
         }
 
         private void CompleteSend(IAsyncResult ar)
@@ -92,17 +89,20 @@ namespace DragonMarble
             try
             {
                 // Complete sending the data to the remote device.
-                int bytesSent = _socket.EndSend(ar);
+                _socket.EndSend(ar);
             }
             catch (Exception e)
             {
+                //TODO WTF exception 
                 Console.WriteLine(e.ToString());
             }
         }
 
-        public void SendMessage(GameMessage message)
+
+        public void SendMessage(IGameMessage gameMessage)
         {
-            _sendMessages.Enqueue(message);
+            _sendingMessages.Enqueue(gameMessage);
+            SendCheck();
         }
 
         public void Connect()
@@ -117,13 +117,10 @@ namespace DragonMarble
                 // Complete the connection.
                 _socket.EndConnect(ar);
                 OnLine = true;
-                _receiveCheck = new Thread(ReceiveCheck);
-                _sendCheck = new Thread(SendCheck);
-                _receiveCheck.Start();
-                _sendCheck.Start();
             }
             catch (Exception e)
             {
+                //TODO WTF exception 
                 Console.WriteLine(e.ToString());
             }
         }
@@ -131,9 +128,14 @@ namespace DragonMarble
         public void Shutdown()
         {
             OnLine = false;
-            if (null != _sendCheck && _sendCheck.IsAlive) _sendCheck.Abort();
-            if (null != _receiveCheck && _receiveCheck.IsAlive) _receiveCheck.Abort();
             if (null != _socket) _socket.Close();
         }
+
+        public byte[] ToByte(IGameMessage message)
+        {
+            return message.ToByteArray();
+        }
+
+        
+        }
     }
-}
