@@ -24,7 +24,7 @@ namespace Dragon.Interfaces
     public interface IMessageParser
     {
         IGameMessage MakeNewMessage<T, TD>(T messageType, TD messageData);
-        IGameMessage MakeNewMessage(byte[] buffer, int offset, short messageLength);
+        IGameMessage MakeNewMessage(byte[] buffer, int offset, int messageLength);
     }
 
     public interface IMessageProcessor

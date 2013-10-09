@@ -4,16 +4,16 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{CF240925-F622-49AB-A322-E94C08BFE1B9}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{5ADEAF33-F8F8-4DBC-B69D-D6051232DB77}</ProjectGuid>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>DragonMarble</RootNamespace>
-    <AssemblyName>DragonMarbleGameMessage</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <AssemblyName>DragonMarbleServer</AssemblyName>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -23,6 +23,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -31,6 +32,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DragonMarble, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>.\DragonMarble.DLL</HintPath>
+    </Reference>
+    <Reference Include="log4net, Version=1.2.12.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>lib\log4net.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -40,13 +49,46 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Message\GameMessage.cs" />
+    <Compile Include="GameAction.cs" />
+    <Compile Include="GameActionResult.cs" />
+    <Compile Include="GameActionResultType.cs" />
+    <Compile Include="GameActionType.cs" />
+    <Compile Include="GameMaster.cs" />
+    <Compile Include="GameMessage.cs" />
+    <Compile Include="GamePlayer.cs" />
+    <Compile Include="MessageParser.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StageManager.cs" />
+    <Compile Include="StageTile.cs" />
+    <Compile Include="StageUnit.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="data_chance.xml" />
+    <Content Include="data_stage.xml" />
+    <Content Include="DragonMarble.DLL" />
+    <Content Include="lib\log4net.dll" />
+    <Content Include="lib\log4net.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DragonMarbleGameMessage\DragonMarbleGameMessage.csproj">
+      <Project>{cf240925-f622-49ab-a322-e94c08bfe1b9}</Project>
+      <Name>DragonMarbleGameMessage</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GameUtils\GameUtils.csproj">
+      <Project>{cb0a9f6c-d5af-4d74-9a77-b491a17b964e}</Project>
+      <Name>GameUtils</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Interfaces\Interfaces.csproj">
       <Project>{6a94673f-ae42-4a0d-badc-83933c0976c1}</Project>
       <Name>Interfaces</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Server\ServerNetworkManager.csproj">
+      <Project>{ee7bcf44-88e4-48e6-a821-ef8243aba197}</Project>
+      <Name>ServerNetworkManager</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

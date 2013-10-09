@@ -1,7 +1,7 @@
 ﻿using System;
 using Dragon.Interfaces;
 
-namespace DragonMarble
+namespace DragonMarble.Message
 {
     public class GameMessage : IGameMessage
     {

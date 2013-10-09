@@ -1,8 +1,7 @@
 ﻿using System;
 using Dragon.Client;
 using Dragon.Interfaces;
-
-using DragonMarble;
+using DragonMarble.Message;
 
 namespace ConsoleTest
 {
@@ -20,7 +19,7 @@ namespace ConsoleTest
                 return new GameMessage();
             }
 
-            public IGameMessage MakeNewMessage(byte[] buffer, int offset, short messageLength)
+            public IGameMessage MakeNewMessage(byte[] buffer, int offset, int messageLength)
             {
                 throw new NotImplementedException();
             }

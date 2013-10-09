@@ -3,11 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientNetworkManager", "DragonMarble\ClientNetworkManager.csproj", "{E797A74B-09D9-4D8F-823B-42B532215BA0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleTest", "ConsoleTest\ConsoleTest\ConsoleTest.csproj", "{039BDECD-3A79-4DC7-9BCD-329C1AB2855B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientConsoleTest", "ConsoleTest\ConsoleTest\ClientConsoleTest.csproj", "{039BDECD-3A79-4DC7-9BCD-329C1AB2855B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Interfaces", "Interfaces\Interfaces.csproj", "{6A94673F-AE42-4A0D-BADC-83933C0976C1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DragonMarbleGameMessage", "DragonMarbleGameMessage\DragonMarbleGameMessage.csproj", "{CF240925-F622-49AB-A322-E94C08BFE1B9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerNetworkManager", "Server\ServerNetworkManager.csproj", "{EE7BCF44-88E4-48E6-A821-EF8243ABA197}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DragonMarbleServer", "DragonMarbleServer\DragonMarbleServer.csproj", "{5ADEAF33-F8F8-4DBC-B69D-D6051232DB77}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameUtils", "GameUtils\GameUtils.csproj", "{CB0A9F6C-D5AF-4D74-9A77-B491A17B964E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,6 +37,18 @@ Global
 		{CF240925-F622-49AB-A322-E94C08BFE1B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CF240925-F622-49AB-A322-E94C08BFE1B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CF240925-F622-49AB-A322-E94C08BFE1B9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EE7BCF44-88E4-48E6-A821-EF8243ABA197}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EE7BCF44-88E4-48E6-A821-EF8243ABA197}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EE7BCF44-88E4-48E6-A821-EF8243ABA197}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EE7BCF44-88E4-48E6-A821-EF8243ABA197}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5ADEAF33-F8F8-4DBC-B69D-D6051232DB77}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5ADEAF33-F8F8-4DBC-B69D-D6051232DB77}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5ADEAF33-F8F8-4DBC-B69D-D6051232DB77}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5ADEAF33-F8F8-4DBC-B69D-D6051232DB77}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CB0A9F6C-D5AF-4D74-9A77-B491A17B964E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CB0A9F6C-D5AF-4D74-9A77-B491A17B964E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CB0A9F6C-D5AF-4D74-9A77-B491A17B964E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CB0A9F6C-D5AF-4D74-9A77-B491A17B964E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
