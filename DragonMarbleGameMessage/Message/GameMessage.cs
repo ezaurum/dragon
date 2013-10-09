@@ -20,7 +20,6 @@ namespace DragonMarble.Message
         public const Int16 LengthMarkerLength = sizeof(Int16);
         public const Int16 FirstGuidIndex = LengthMarkerLength;
         public const Int16 SecondGuidIndex = LengthMarkerLength + 16;
-        public Int16 Length { get; set; }
         public Guid From { get; set; }
         public Guid To { get; set; }
         public const Int16 HeaderLength = SecondGuidIndex + 16;
@@ -28,15 +27,46 @@ namespace DragonMarble.Message
 
         public byte[] ToByteArray(byte[] bytes)
         {
-            BitConverter.GetBytes(Length).CopyTo(bytes, 0);
+            MessageLength = (short) bytes.Length;
+            BitConverter.GetBytes(MessageLength).CopyTo(bytes, 0);
             From.ToByteArray().CopyTo(bytes, LengthMarkerLength);
             To.ToByteArray().CopyTo(bytes, SecondGuidIndex);
             return bytes;
         }
 
+        public short MessageLength { get; set; }
+
         public byte[] ToByteArray()
         {
             return ToByteArray(new byte[HeaderLength]);
         }
+    }
+
+    public class GameMessageBody : IGameMessageBody
+    {
+        public GameMessageType MessageType { get; set; }
+        public IGameMessageContent Content { get; set; }
+
+        private const int MessageTypeSize = sizeof(Int32);
+        
+        public byte[] ToByteArray()
+        {
+            byte[] contents = Content.ToByteArray();
+            byte[] bytes = new byte[contents.Length + GameMessageHeader.HeaderLength + MessageTypeSize];
+            
+            BitConverter.GetBytes((int)MessageType).CopyTo(bytes, GameMessageHeader.HeaderLength);
+            contents.CopyTo(bytes, GameMessageHeader.HeaderLength + MessageTypeSize);
+            return bytes;
+        }
+    }
+
+    public interface IGameMessageContent
+    {
+        byte[] ToByteArray();
+    }
+
+    public enum GameMessageType
+    {
+        Roll = 0, InitilizeBoard = 1001
     }
 }

@@ -16,7 +16,20 @@ namespace ConsoleTest
 
             public IGameMessage MakeNewMessage<T, TD>(T messageType, TD messageData)
             {
-                return new GameMessage();
+                GameMessage message = new GameMessage();
+                message.Header = new GameMessageHeader()
+                {
+                    From = Guid.NewGuid(),
+                    To = Guid.NewGuid()
+
+                };
+                message.Body = new GameMessageBody()
+                {
+                    MessageType = GameMessageType.Roll,
+                    Content = new RollMoveDiceContentC2S()
+                };
+                
+                return message;
             }
 
             public IGameMessage MakeNewMessage(byte[] buffer, int offset, int messageLength)

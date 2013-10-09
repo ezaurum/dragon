@@ -16,7 +16,7 @@ namespace Dragon.Interfaces
 
     public interface IGameMessageHeader
     {
-        Int16 Length { get; set; }
+        Int16 MessageLength { get; }
         byte[] ToByteArray();
         byte[] ToByteArray(byte[] bytes);
     }

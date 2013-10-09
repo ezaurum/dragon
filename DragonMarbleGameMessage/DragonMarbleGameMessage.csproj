@@ -41,6 +41,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Message\GameMessage.cs" />
+    <Compile Include="Message\C2SMessages.cs" />
+    <Compile Include="Message\S2CMessages.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
