@@ -1,4 +1,5 @@
 ﻿using System;
+using Dragon;
 using Dragon.Client;
 using Dragon.Interfaces;
 using DragonMarble.Message;
@@ -41,7 +42,7 @@ namespace ConsoleTest
         {
             IMessageParser parser = new TestParser();
             IMessageProcessor processor = new TestProcessor();
-            Unity3DNetworkManager nm = new Unity3DNetworkManager("localhost", 10008, parser, processor);
+            Unity3DNetworkManager nm = new Unity3DNetworkManager("localhost", 10008);
             IGameMessageBody body = new TestGameMessageBody();
 
             IGameMessage gameMessage = parser.MakeNewMessage(0,"test");

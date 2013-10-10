@@ -5,33 +5,113 @@ using Dragon.Interfaces;
 
 namespace Dragon.Client
 {
-    public class Unity3DNetworkManager : NetworkManager
+    public class NetworkEventArgs : EventArgs
     {
-        
-        private readonly byte[] _buffer;
-        private readonly IMessageProcessor _messageProcessor;
-        private readonly Socket _socket;
-        private readonly Queue<IGameMessage> _sendingMessages = new Queue<IGameMessage>();
-        
-        private bool _started;
+        public IGameMessage Message { get; set; }
+        public short MessageLength { get; set; }
+        public byte[] Buffer { get; set; }
+        public int Offset { get; set; }
+    }
 
-        public Unity3DNetworkManager(string ipAddress, int port, IMessageParser messageParser,
-            IMessageProcessor messageProcessor, bool startWhenMade = true)
+    public delegate void MessageReceiveEventHandler(object sender, NetworkEventArgs args);
+
+    public delegate void MessageSendEventHandler(object sender, NetworkEventArgs args);
+
+    public class Unity3DNetworkManager
+    {
+        private const int ResetValue = -1;
+        private readonly byte[] _buffer;
+        private readonly NetworkEventArgs _receiveEventArgs = new NetworkEventArgs();
+        private readonly NetworkEventArgs _sendingEventArgs = new NetworkEventArgs();
+        private readonly Queue<IGameMessage> _sendingMessages = new Queue<IGameMessage>();
+        private readonly Socket _socket;
+        private int _bytesTransferred;
+        private Int16 _messageLength;
+        private int _messageStartOffset;
+        private bool _parsing;
+
+        private bool _started;
+        private int _offset;
+        
+        public string IpAddress { get; set; }
+        public int Port { get; set; }
+        public bool OnLine { get; set; }
+        public event MessageReceiveEventHandler OnMessageReceived;
+        public event MessageSendEventHandler OnMessageSeding;
+
+        public Unity3DNetworkManager(string ipAddress, int port, bool startWhenMade = true)
         {
             _socket = new Socket(AddressFamily.InterNetwork,
                 SocketType.Stream, ProtocolType.Tcp);
 
             IpAddress = ipAddress;
             Port = port;
-            _messageParser = messageParser;
-            _messageProcessor = messageProcessor;
             _buffer = new byte[1024];
             if (startWhenMade) Start();
         }
+        public IEnumerable<IGameMessage> ToMessages(byte[] buffer, int offset, int bytesTransferred)
+        {
+            var messages = new List<IGameMessage>();
 
-        public string IpAddress { get; set; }
-        public int Port { get; set; }
-        public bool OnLine { get; set; }
+            while (true)
+            {
+                //start new message
+                IGameMessage message = ToMessage(buffer, ref offset, ref bytesTransferred);
+                if (null == message) break;
+                messages.Add(message);
+            }
+
+            return messages;
+        }
+
+        private IGameMessage ToMessage(byte[] buffer, ref int offset, ref int bytesTransferred)
+        {
+            while (true)
+            {
+                if (_parsing)
+                {
+                    offset = _messageStartOffset;
+                    bytesTransferred += _bytesTransferred;
+                    continue;
+                }
+
+                _parsing = true;
+                _messageStartOffset = offset;
+                _bytesTransferred = bytesTransferred;
+
+                //message length is not sufficient
+                if (bytesTransferred < 2)
+                {
+                    return null;
+                }
+                _messageLength = BitConverter.ToInt16(buffer, offset);
+
+                //message not transferred all
+                if (_messageLength > _bytesTransferred)
+                {
+                    return null;
+                }
+
+                //make new game message
+
+                _receiveEventArgs.Buffer = buffer;
+                _receiveEventArgs.Offset = offset;
+                _receiveEventArgs.MessageLength = _messageLength;
+
+                OnMessageReceived(this, _receiveEventArgs);
+
+                bytesTransferred -= _messageLength;
+                offset += _messageLength;
+
+                //reset message offes and etc.
+                _messageLength = ResetValue;
+                _messageStartOffset = ResetValue;
+                _bytesTransferred = ResetValue;
+                _parsing = false;
+
+                return _receiveEventArgs.Message;
+            }
+        }
 
         public void Start()
         {
@@ -68,11 +148,6 @@ namespace Dragon.Client
                 {
                     ((byte[]) ar.AsyncState).CopyTo(_buffer, _offset);
                     _offset += bytesRead;
-
-                    foreach (IGameMessage gameMessage in ToMessages(_buffer, _offset, bytesRead))
-                    {
-                        _messageProcessor.ProcessMessage(gameMessage);
-                    }
                 }
             }
             catch (Exception e)
@@ -99,9 +174,11 @@ namespace Dragon.Client
         }
 
 
+        //TODO this need to be async
         public void SendMessage(IGameMessage gameMessage)
         {
             _sendingMessages.Enqueue(gameMessage);
+
             SendCheck();
         }
 
@@ -135,7 +212,5 @@ namespace Dragon.Client
         {
             return message.ToByteArray();
         }
-
-        
-        }
     }
+}
