@@ -24,7 +24,7 @@ namespace DragonMarble.Message
             return bytes;
         }
 
-        public void FromByteArray(byte[] bytes, int index = 0)
+        public void FromByteArray(byte[] bytes, int index = 38)
         {
             _feeBoostedTiles = new int[4];
             BitConvertUtils.ReadBytes(bytes, ref index, ref _feeBoostedTiles[0]);
@@ -40,6 +40,12 @@ namespace DragonMarble.Message
         public bool DoublePip {get { return _doublePip; } set { _doublePip = value; }}
         public char[] Dices { get; set; }
         private char[] _dices;
+
+        public RollMoveDiceContentS2C(byte[] bytes)
+        {
+            FromByteArray(bytes);
+        }
+
         private const int ByteLength = sizeof(char) * 2 + sizeof(bool);
         public byte[] ToByteArray()
         {
@@ -50,7 +56,7 @@ namespace DragonMarble.Message
             return bytes;
         }
 
-        public void FromByteArray(byte[] bytes, int index = 0)
+        public void FromByteArray(byte[] bytes, int index = 38)
         {
             _dices = new char[2];
             BitConvertUtils.ReadBytes(bytes, ref index, ref _dices[0]);

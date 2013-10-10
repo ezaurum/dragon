@@ -104,13 +104,12 @@ namespace Dragon.Client
                     if (!_socket.ReceiveAsync(e))
                     {
                         OnAfterMessageReceive(this, e);
-                        sender = this;
                         continue;
                     }
                 }
                 else
                 {
-                    Console.WriteLine("socket error : {0}", e.SocketError);
+                    Console.WriteLine("read. socket error : {0}", e.SocketError);
                 }
                 break;
             }

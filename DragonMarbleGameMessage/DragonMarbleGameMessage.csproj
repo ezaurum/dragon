@@ -40,10 +40,15 @@
   <ItemGroup>
     <Compile Include="Message\GameMessage.cs" />
     <Compile Include="Message\C2SMessages.cs" />
+    <Compile Include="Message\GameMessageType.cs" />
     <Compile Include="Message\S2CMessages.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\GameUtils\GameUtils.csproj">
+      <Project>{cb0a9f6c-d5af-4d74-9a77-b491a17b964e}</Project>
+      <Name>GameUtils</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Interfaces\Interfaces.csproj">
       <Project>{6a94673f-ae42-4a0d-badc-83933c0976c1}</Project>
       <Name>Interfaces</Name>

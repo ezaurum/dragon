@@ -1,8 +1,15 @@
 ﻿using System;
+using System.Linq;
+using System.Net.Mime;
 using Dragon.Interfaces;
 
 namespace DragonMarble.Message
 {
+    public enum GameMessageFlowType
+    {
+        C2S, S2C
+    }
+
     public class GameMessage : IGameMessage
     {
         public IGameMessageHeader Header { get; set; }
@@ -31,6 +38,62 @@ namespace DragonMarble.Message
             set
             {
                 ((GameMessageBody)Body).Content = value;
+            }
+        }
+
+        public static GameMessage InitGameMessage(byte[] m, GameMessageFlowType flowType)
+        {
+            GameMessageType gameMessageType = (GameMessageType)BitConverter.ToInt32(m, GameMessageHeader.HeaderLength);
+
+            GameMessage initGameMessage = new GameMessage()
+            {
+                Header = new GameMessageHeader()
+                {
+                    MessageLength = (short) m.Length,
+                    From = new Guid(m.Skip(GameMessageHeader.FirstGuidIndex).Take(16).ToArray()),
+                    To = new Guid(m.Skip(GameMessageHeader.SecondGuidIndex).Take(16).ToArray())
+                },
+                Body = new GameMessageBody()
+                {
+                    MessageType = gameMessageType
+                }
+            };
+
+            if (flowType == GameMessageFlowType.C2S)
+            {
+                initGameMessage.Content = MakeC2SContent(m, gameMessageType);
+            }
+            else
+            {
+                initGameMessage.Content = MakeS2CContent(m, gameMessageType);
+            }
+
+            return initGameMessage;
+        }
+
+        private static IGameMessageContent MakeS2CContent(byte[] bytes, GameMessageType gameMessageType)
+        {
+            switch (gameMessageType)
+            {
+                case GameMessageType.Roll:
+                    return new RollMoveDiceContentS2C(bytes);
+                case GameMessageType.InitilizeBoard:
+                    return new InitializeContentS2C();
+                default:
+                    return null;
+            }
+        }
+
+        private static IGameMessageContent MakeC2SContent(byte[] m, GameMessageType gameMessageType)
+        {
+            switch (gameMessageType)
+            {
+                case GameMessageType.Roll:
+                    return new RollMoveDiceContentC2S(m);
+                case GameMessageType.InitilizeBoard:
+                    return new InitializeContentC2S();
+                default:
+                    return null;
             }
         }
     }
@@ -83,6 +146,8 @@ namespace DragonMarble.Message
     public interface IGameMessageContent
     {
         byte[] ToByteArray();
-        void FromByteArray(byte[] bytes, int index = 0);
+        void FromByteArray(byte[] bytes, int index =  GameMessageHeader.HeaderLength + 4);
     }
+
+    
 }
