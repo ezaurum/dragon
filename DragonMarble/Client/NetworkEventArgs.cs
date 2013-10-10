@@ -1,22 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Sockets;
 using Dragon.Interfaces;
 
 namespace Dragon.Client
 {
-    public class NetworkEventArgs : EventArgs
+    public class AsyncClientUserToken  
     {
         public Boolean Result { get; set; }
+        public Socket Socket { get; set; }
     }
 
-    public class SimpleNetworkEventArgs : NetworkEventArgs
+    public class SimpleAsyncClientUserToken : AsyncClientUserToken
     {
         public IGameMessage GameMessage { get; set; }
     }
 
-    public class QueueNetworkEventArgs : NetworkEventArgs
+    public class QueueAsyncClientUserToken : AsyncClientUserToken
     {
         private readonly Queue<IGameMessage> _messages = new Queue<IGameMessage>();
+        
 
         private const int ResetValue = -1;
         private int _bytesTransferred;
@@ -24,7 +27,7 @@ namespace Dragon.Client
         private int _messageStartOffset;
         private bool _parsing;
 
-        public QueueNetworkEventArgs()
+        public QueueAsyncClientUserToken()
         {
             Buffer = new byte[1024];
         }

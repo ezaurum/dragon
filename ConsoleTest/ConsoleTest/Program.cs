@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net.Sockets;
 using Dragon.Client;
 using DragonMarble.Message;
 
@@ -26,7 +27,16 @@ namespace ConsoleTest
 
             };    
 
-            Unity3DNetworkManager nm = new Unity3DNetworkManager("localhost", 10008);
+            Unity3DNetworkManager nm = new Unity3DNetworkManager("127.0.0.1", 10008);
+            nm.OnAfterMessageReceive +=
+                delegate(object o, SocketAsyncEventArgs eventArgs)
+                { Console.WriteLine("WTF?"); };
+            nm.OnAfterMessageSend += delegate(object sender, SocketAsyncEventArgs eventArgs)
+            {
+                Console.WriteLine("WTTTTTTTTTTTF");
+            };
+
+            nm.Start();
             
             while (true)
             {
@@ -43,6 +53,11 @@ namespace ConsoleTest
                     nm.SendMessage(rollMessage);
                 }
             }
+        }
+
+        static void nm_OnAfterMessageReceive(object sender, System.Net.Sockets.SocketAsyncEventArgs e)
+        {
+            
         }
     }
 }
