@@ -10,5 +10,10 @@ namespace DragonMarble.Message
         {
             return BitConverter.GetBytes(Pressed);
         }
+
+        public void FromByteArray(byte[] bytes, int index = 0)
+        {
+            Pressed = BitConverter.ToInt32(bytes, index);
+        }
     }
 }

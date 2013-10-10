@@ -13,6 +13,26 @@ namespace DragonMarble.Message
             byte[] result = Body.ToByteArray();
             return Header.ToByteArray(result);
         }
+
+        public GameMessageType MessageType
+        {
+            get
+            {
+                return ((GameMessageBody) Body).MessageType;
+            }
+        }
+
+        public IGameMessageContent Content
+        {
+            get
+            {
+                return ((GameMessageBody) Body).Content;
+            }
+            set
+            {
+                ((GameMessageBody)Body).Content = value;
+            }
+        }
     }
 
     public class GameMessageHeader : IGameMessageHeader
@@ -63,10 +83,6 @@ namespace DragonMarble.Message
     public interface IGameMessageContent
     {
         byte[] ToByteArray();
-    }
-
-    public enum GameMessageType
-    {
-        Roll = 0, InitilizeBoard = 1001
+        void FromByteArray(byte[] bytes, int index = 0);
     }
 }
