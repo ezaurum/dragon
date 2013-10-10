@@ -54,7 +54,6 @@
     <Compile Include="GameActionResultType.cs" />
     <Compile Include="GameActionType.cs" />
     <Compile Include="GameMaster.cs" />
-    <Compile Include="GameMessage.cs" />
     <Compile Include="GamePlayer.cs" />
     <Compile Include="MessageParser.cs" />
     <Compile Include="Program.cs" />

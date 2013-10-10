@@ -60,6 +60,8 @@ namespace Dragon.Server
             _listenSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         }
 
+        public event EventHandler<SocketAsyncEventArgs> OnReceiveBytes;
+
         // Starts the server such that it is listening for  
         // incoming connection requests.     
         // 
@@ -195,9 +197,12 @@ namespace Dragon.Server
                 if (Logger.IsDebugEnabled)
                 {
                     Logger.Debug(string.Format("The server has read a total of {0} bytes", _totalBytesRead));
+                    Logger.Debug(string.Format("The server has read {0} bytes", e.BytesTransferred));
+                    Logger.Debug(string.Format("The server has read {0} ", e.Offset));
+                    Logger.Debug(string.Format("The server has Length {0} ", e.Buffer.Length));
+                    Logger.Debug(string.Format("The server has Length {0} ", BitConverter.ToInt16(e.Buffer, e.Offset)));
                 }
-
-                token.Parser.MakeNewMessage(e.Buffer, e.Offset, e.BytesTransferred);
+                OnReceiveBytes(this, e);
 
                 bool willRaiseEvent = token.Socket.ReceiveAsync(e);
                 if (!willRaiseEvent)

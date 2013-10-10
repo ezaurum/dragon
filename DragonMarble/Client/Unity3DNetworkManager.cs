@@ -97,15 +97,22 @@ namespace Dragon.Client
 
         private void Read_Completed(object sender, SocketAsyncEventArgs e)
         {
-            if (e.SocketError != SocketError.Success)
+            while (true)
             {
-                Console.WriteLine("socket error : {0}",e.SocketError);
-                return;
-            }
-            if (!_socket.ReceiveAsync(e))
-            {
-                OnAfterMessageReceive(this, e);
-                Read_Completed(this, e);
+                if (e.SocketError == SocketError.Success && e.BytesTransferred > 0)
+                {
+                    if (!_socket.ReceiveAsync(e))
+                    {
+                        OnAfterMessageReceive(this, e);
+                        sender = this;
+                        continue;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("socket error : {0}", e.SocketError);
+                }
+                break;
             }
         }
 

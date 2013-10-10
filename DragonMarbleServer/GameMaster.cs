@@ -29,8 +29,6 @@ namespace DragonMarble {
             return gamePlayer;
         }
 
-        public IDisposable Unsubscribe { get; set; }
-
         public IDisposable Subscribe(IObserver<GameObject> observer)
         {
             lock (_players)

@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using Dragon.Interfaces;
 using Dragon.Server;
+using DragonMarble.Message;
 using log4net;
 
 namespace DragonMarble
 {
-    public class GamePlayer : AsyncUserToken, IObserver<GameObject>, IMessageParser
+    public class GamePlayer : AsyncUserToken, IObserver<GameObject>
     {
         private int _messageStartOffset;
         private int _bytesTransferred;
@@ -31,7 +32,6 @@ namespace DragonMarble
         public GamePlayer()
         {
             Unit = new StageUnit(StageUnitInfo.TEAM_COLOR.RED, 1000000, Guid.NewGuid().ToString());
-            Parser = this;
         }
 
         public void OnNext(GameObject value)
@@ -47,7 +47,7 @@ namespace DragonMarble
 
         public void OnCompleted()
         {
-            GameMaster.Unsubscribe.Dispose();
+            
         }
 
         public byte[] ToByte(IGameMessage message)
@@ -107,7 +107,7 @@ namespace DragonMarble
                 {
                     Header = new GameMessageHeader()
                     {
-                        Length = _messageLength,
+                        MessageLength = _messageLength,
                         From = new Guid(buffer.Skip(offset + GameMessageHeader.FirstGuidIndex).Take(16).ToArray()),
                         To = new Guid(buffer.Skip(offset + GameMessageHeader.SecondGuidIndex).Take(16).ToArray()),
                     },
@@ -127,16 +127,6 @@ namespace DragonMarble
 
                 return result;
             }
-        }
-
-        public Dragon.Interfaces.IGameMessage MakeNewMessage<T, TD>(T messageType, TD messageData)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Dragon.Interfaces.IGameMessage MakeNewMessage(byte[] buffer, int offset, int messageLength)
-        {
-            throw new NotImplementedException();
         }
     }
 }
