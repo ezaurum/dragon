@@ -8,9 +8,9 @@ namespace Dragon.Client
 
     public class Unity3DNetworkManager
     {
-        
-        private readonly NetworkEventArgs _receiveEventArgs = new NetworkEventArgs();
-        private readonly NetworkEventArgs _sendingEventArgs = new NetworkEventArgs();
+
+        private readonly QueueNetworkEventArgs _receiveEventArgs = new QueueNetworkEventArgs();
+        private readonly SimpleNetworkEventArgs _sendEventArgs = new SimpleNetworkEventArgs();
         private readonly Socket _socket;
         
         private bool _started;
@@ -19,12 +19,8 @@ namespace Dragon.Client
         public int Port { get; set; }
         public bool OnLine { get; set; }
         
-        public event MessageEventHandler OnBeforeMessageSend;
         public event MessageEventHandler OnAfterMessageSend;
-        public event MessageEventHandler OnBeforeMessageReceive;
         public event MessageEventHandler OnAfterMessageReceive;
-        public event MessageEventHandler OnMessageToBytes;
-        public event MessageEventHandler OnBytesToMessage;
 
         public Unity3DNetworkManager(string ipAddress, int port, bool startWhenMade = true)
         {
@@ -37,13 +33,10 @@ namespace Dragon.Client
         }
         
         public void SendMessage(IGameMessage gameMessage)
-        {
-            _sendingEventArgs.Message = gameMessage;
-            OnBeforeMessageSend(_socket, _sendingEventArgs);
-            OnMessageToBytes(_socket, _sendingEventArgs);
-
-            _socket.BeginSend(_sendingEventArgs.Buffer, 
-                _sendingEventArgs.Offset, _sendingEventArgs.MessageLength, 
+        {   
+            byte[] byteArray = gameMessage.ToByteArray();
+            _sendEventArgs.GameMessage = gameMessage;
+            _socket.BeginSend(byteArray, 0, byteArray.Length,
                 SocketFlags.None, CompleteSend, _socket);
         }
 
@@ -52,24 +45,23 @@ namespace Dragon.Client
             if (!OnLine) return;
             //Complete sending the data to the remote device.
             _socket.EndSend(ar);
-            OnAfterMessageSend(this, _sendingEventArgs);
+            _sendEventArgs.Result = ar.IsCompleted;
+            OnAfterMessageSend(this, _sendEventArgs);
         }
 
         public void Start()
         {
             if (_started) return;
-            
-            if (null == OnMessageToBytes || OnMessageToBytes.GetInvocationList().Length < 1)
+
+            if (null == OnAfterMessageReceive)
             {
-                throw new InvalidOperationException("OnMessageToBytes is not set.");
-            }
-            if (null == OnBytesToMessage || OnBytesToMessage.GetInvocationList().Length < 1)
-            {
-                throw new InvalidOperationException("OnBytesToMessage is not set.");
+                throw new InvalidOperationException("OnAfterMessageReceive is not setted.");
             }
 
-            _receiveEventArgs.OnEnqueue += OnAfterMessageReceive;
-            _sendingEventArgs.OnDequeue += OnAfterMessageSend;
+            if (null == OnAfterMessageSend)
+            {
+                throw new InvalidOperationException("OnAfterMessageSend is not setted.");
+            }
 
             _started = true;
             Connect();
@@ -78,7 +70,6 @@ namespace Dragon.Client
         private void ReceiveCheck()
         {
             if (!OnLine) return;
-            OnBeforeMessageReceive(this, _receiveEventArgs);
             _socket.BeginReceive(_receiveEventArgs.Buffer, _receiveEventArgs.Offset, 1024, 
                 SocketFlags.None, CompleteReceive, _receiveEventArgs.Buffer);
         }
@@ -92,7 +83,7 @@ namespace Dragon.Client
 
             if (bytesRead > 0)
             {
-                OnBytesToMessage(this, _receiveEventArgs);
+                OnAfterMessageReceive(this, _receiveEventArgs);
             }
             ReceiveCheck();
         }

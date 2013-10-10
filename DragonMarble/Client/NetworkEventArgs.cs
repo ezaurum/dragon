@@ -6,34 +6,39 @@ namespace Dragon.Client
 {
     public class NetworkEventArgs : EventArgs
     {
+        public Boolean Result { get; set; }
+    }
+
+    public class SimpleNetworkEventArgs : NetworkEventArgs
+    {
+        public IGameMessage GameMessage { get; set; }
+    }
+
+    public class QueueNetworkEventArgs : NetworkEventArgs
+    {
         private readonly Queue<IGameMessage> _messages = new Queue<IGameMessage>();
 
         private const int ResetValue = -1;
-        private readonly byte[] _buffer;
         private int _bytesTransferred;
         private Int16 _messageLength;
         private int _messageStartOffset;
         private bool _parsing;
 
-        public event MessageEventHandler OnEnqueue;
-        public event MessageEventHandler OnDequeue;
-
-        public NetworkEventArgs()
+        public QueueNetworkEventArgs()
         {
-            _buffer = new byte[1024];
+            Buffer = new byte[1024];
         }
 
         public IGameMessage Message
-        {
+        {   
             get
             {
-                OnDequeue(null, this);
+                if (IsEmpty()) return null;
                 return _messages.Dequeue();
             }
             set
             {
                 _messages.Enqueue(value);
-                OnEnqueue(null, this);
             }
         }
 
@@ -103,6 +108,16 @@ namespace Dragon.Client
 
                 return Message;
             }
+        }
+        
+        public void ToMessage()
+        {
+            
+        }
+
+        public bool IsEmpty()
+        {
+            return _messages.Count < 1;
         }
     }
 }
