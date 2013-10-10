@@ -133,6 +133,8 @@ namespace Dragon.Server
             token.ReadArg = readEventArgs;
             token.WriteArg = writeEventArgs;
 
+            OnAcceptConnection(this, e);
+
             // As soon as the client is connected, post a receive to the connection 
             bool willRaiseEvent = acceptedSocket.ReceiveAsync(readEventArgs);
             if (!willRaiseEvent)
@@ -280,5 +282,7 @@ namespace Dragon.Server
             // Free the SocketAsyncEventArg so they can be reused by another client
             _readWritePool.Push(e);
         }
+
+        public event EventHandler<SocketAsyncEventArgs> OnAcceptConnection;
     }
 }

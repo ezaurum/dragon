@@ -21,6 +21,8 @@ namespace DragonMarble
         private const int MaxConnection = 3000;
         private static readonly ILog Logger = LogManager.GetLogger(typeof(DragonMarbleServerProgram));
 
+        private static GameMaster gm;
+
         private static void Main(string[] args)
         {
             XmlConfigurator.Configure(new FileInfo("log4net.xml"));
@@ -29,15 +31,22 @@ namespace DragonMarble
 
             Logger.Debug("Start app.");
 
-            GameMaster gm = new GameMaster(tiles);
+            gm = new GameMaster(tiles);
 
             var server = new MultiClientServer(
                 MaxConnection, BufferSize, QueueNumber,
                 new IPEndPoint(IPAddress.Any, Port), gm);
             server.OnReceiveBytes += ConvertBytesToMessage;
+            server.OnAcceptConnection += AddPlayer;
             server.Start();
 
             Console.ReadKey();
+        }
+
+        private static void AddPlayer(object sender, SocketAsyncEventArgs eventArgs)
+        {   
+            Logger.Debug("connectecd.");
+            AsyncUserToken token = eventArgs.UserToken as AsyncUserToken;
         }
 
         private static void ConvertBytesToMessage(object sender, SocketAsyncEventArgs eventArgs)
