@@ -20,7 +20,6 @@ namespace DragonMarble
         private const int BufferSize = 1024;
         private const int MaxConnection = 3000;
         private static readonly ILog Logger = LogManager.GetLogger(typeof(DragonMarbleServerProgram));
-        
 
         private static void Main(string[] args)
         {
@@ -44,16 +43,11 @@ namespace DragonMarble
         private static void ConvertBytesToMessage(object sender, SocketAsyncEventArgs eventArgs)
         {
             AsyncUserToken token = eventArgs.UserToken as AsyncUserToken;
-
             short messageLength = BitConverter.ToInt16(eventArgs.Buffer, eventArgs.Offset);
             byte[] m = eventArgs.Buffer.Skip(eventArgs.Offset).Take(messageLength).ToArray();
-
-
             GameMessage gameMessage = GameMessage.InitGameMessage(m, GameMessageFlowType.C2S);
-            Console.WriteLine("receivec. {0}", gameMessage.MessageType);
-            Console.WriteLine("Pressed. {0}", ((RollMoveDiceContentC2S) gameMessage.Content).Pressed);
+            Logger.DebugFormat("receivec. {0}", gameMessage.MessageType);
             token.ReceivedMessage = gameMessage;
-
         }
     }
 
