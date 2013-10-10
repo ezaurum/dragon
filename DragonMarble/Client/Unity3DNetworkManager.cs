@@ -14,7 +14,7 @@ namespace Dragon.Client
         private SocketAsyncEventArgs _connectEventArgs;
         private SocketAsyncEventArgs _readEventArgs; 
         private SocketAsyncEventArgs _writeEventArgs;
-        private EndPoint _ipEndpoint;
+        private readonly EndPoint _ipEndpoint;
 
         public bool OnLine { get; set; }
         
@@ -32,15 +32,18 @@ namespace Dragon.Client
         public void SendMessage(IGameMessage gameMessage)
         {
             byte[] byteArray = gameMessage.ToByteArray();
+
+            Console.WriteLine("send {0} bytes.", byteArray.Length);
+
             byteArray.CopyTo(_writeEventArgs.Buffer, _writeEventArgs.Offset);
             
             if (!_socket.SendAsync(_writeEventArgs))
             {
-                CompleteSend(_writeEventArgs);
+                Send_Completed(_writeEventArgs);
             }
         }
 
-        private void CompleteSend(SocketAsyncEventArgs writeEventArgs)
+        private void Send_Completed(SocketAsyncEventArgs writeEventArgs)
         {
             OnAfterMessageSend(this, writeEventArgs);
         }
@@ -51,6 +54,11 @@ namespace Dragon.Client
 
             Init();
 
+            Connect();
+        }
+
+        private void Connect()
+        {
             if (!_socket.ConnectAsync(_connectEventArgs))
             {
                 Connect_Completed(this, _connectEventArgs);
@@ -89,7 +97,12 @@ namespace Dragon.Client
 
         private void Read_Completed(object sender, SocketAsyncEventArgs e)
         {
-            if (!((QueueAsyncClientUserToken) e.UserToken).Socket.ReceiveAsync(e))
+            if (e.SocketError != SocketError.Success)
+            {
+                Console.WriteLine("socket error : {0}",e.SocketError);
+                return;
+            }
+            if (!_socket.ReceiveAsync(e))
             {
                 OnAfterMessageReceive(this, e);
                 Read_Completed(this, e);
@@ -99,17 +112,20 @@ namespace Dragon.Client
         private void Connect_Completed(object sender, SocketAsyncEventArgs e)
         {
             OnLine = true;
-            
-            Socket socket = e.AcceptSocket;
-            QueueAsyncClientUserToken readClientUserTokent 
-                = new QueueAsyncClientUserToken {Socket = socket};
-            SimpleAsyncClientUserToken writeClientUserToken 
-                = new SimpleAsyncClientUserToken {Socket = socket};
-            _readEventArgs.UserToken = readClientUserTokent;
-            _writeEventArgs.UserToken = writeClientUserToken;
 
-            socket.ReceiveAsync(_readEventArgs);
-            socket.SendAsync(_writeEventArgs);
+            if (e.SocketError == SocketError.Success)
+            {
+                _readEventArgs.UserToken = new QueueAsyncClientUserToken() ;
+                _writeEventArgs.UserToken = new SimpleAsyncClientUserToken() ;
+
+                Read_Completed(this, _readEventArgs);
+            }
+        }
+
+        public void Reconnect()
+        {
+            _socket.Disconnect(true);
+            Connect();
         }
     }
 }

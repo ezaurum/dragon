@@ -5,7 +5,7 @@ using DragonMarble.Message;
 
 namespace ConsoleTest
 {
-    class Program
+    class ClientProgram
     {
         
                 
@@ -47,17 +47,18 @@ namespace ConsoleTest
                     return;
                 }
 
+                if (readLine.Contains("R"))
+                {
+
+                    nm.Reconnect();
+                }
+
                 if (readLine.Contains("D") )
                 {
 
                     nm.SendMessage(rollMessage);
                 }
             }
-        }
-
-        static void nm_OnAfterMessageReceive(object sender, System.Net.Sockets.SocketAsyncEventArgs e)
-        {
-            
         }
     }
 }
