@@ -3,6 +3,18 @@ using GameUtils;
 
 namespace DragonMarble.Message
 {
+    public class PlayersInformationContent : IGameMessageContent
+    {   
+        public byte[] ToByteArray()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void FromByteArray(byte[] bytes, int index = 38)
+        {
+            throw new NotImplementedException();
+        }
+    }
     public class InitializeContent : IGameMessageContent
     {
         private int[] _feeBoostedTiles =
@@ -38,8 +50,19 @@ namespace DragonMarble.Message
     {
         private bool _doublePip;
         public bool DoublePip {get { return _doublePip; } set { _doublePip = value; }}
-        public char[] Dices { get; set; }
         private char[] _dices;
+        public char[] Dices
+        {
+            get { return _dices; }
+        }
+
+        public RollMoveDiceResultContent(int[] dices)
+        {
+            _dices = new char[2];
+            _dices[0] = (char) dices[0];
+            _dices[1] = (char) dices[1];
+            if (dices[0] == dices[1]) DoublePip = true;
+        }
 
         public RollMoveDiceResultContent(byte[] bytes)
         {
@@ -50,8 +73,8 @@ namespace DragonMarble.Message
         public byte[] ToByteArray()
         {
             byte[] bytes = new byte[ByteLength];
-            BitConverter.GetBytes(Dices[0]).CopyTo(bytes,0);
-            BitConverter.GetBytes(Dices[1]).CopyTo(bytes,1);
+            BitConverter.GetBytes(_dices[0]).CopyTo(bytes,0);
+            BitConverter.GetBytes(_dices[1]).CopyTo(bytes,1);
             BitConverter.GetBytes(DoublePip).CopyTo(bytes,2);
             return bytes;
         }

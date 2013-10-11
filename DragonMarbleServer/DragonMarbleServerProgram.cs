@@ -50,7 +50,7 @@ namespace DragonMarble
             //initialize player
             InitializePlayer(token);
 
-            InitializeGame(token);
+            gm.StartGame();
         }
 
         private static void InitializePlayer(QueuedMessageProcessor token)
@@ -76,31 +76,18 @@ namespace DragonMarble
             //player is just object
             //TODO something should be done.
             token.Player = player;
+            player.Token = token;
+
 
             gm.Join(player);
-        }
 
-        private static void InitializeGame(QueuedMessageProcessor token)
-        {
-            //init game
-            GameMessage boardMessage = new GameMessage
-            {
-                Header = new GameMessageHeader
-                {
-                    From = Guid.NewGuid(),
-                    To = Guid.NewGuid()
-                },
-                Body = new GameMessageBody
-                {
-                    MessageType = GameMessageType.InitilizeBoard,
-                    Content = new InitializeContent()
-                    {
-                        FeeBoostedTiles = new[] {2, 3, 4, 4}
-                    }
-                }
-            };
-            token.SendingMessage = boardMessage;
+            GamePlayer player0 = new AIGamePlayer();
+            player0.Token = new QueuedMessageProcessor();
+            gm.Join(player0);
+
+
         }
+       
 
         private static void ConvertBytesToMessage(object sender, SocketAsyncEventArgs eventArgs)
         {
@@ -110,7 +97,27 @@ namespace DragonMarble
             GameMessage gameMessage = GameMessage.FromByteArray(m, GameMessageFlowType.C2S);
             Logger.DebugFormat("receivec. {0}", gameMessage.MessageType);
             token.ReceivedMessage = gameMessage;
+            if (gameMessage.MessageType == GameMessageType.RollMoveDice)
+            {
+                token.SendingMessage = new GameMessage()
+                {
+                    Header = new GameMessageHeader()
+                    {
+                        To = Guid.NewGuid(),
+                        From = Guid.NewGuid()
+                    },
+                    Body = new GameMessageBody()
+                    {
+                        MessageType = GameMessageType.RollMoveDice,
+                        Content = new RollMoveDiceResultContent(new[] {1, 1})
+                    }
+                };
+            }
         }
     }
 
+    internal class AIGamePlayer : GamePlayer
+    {
+
+    }
 }

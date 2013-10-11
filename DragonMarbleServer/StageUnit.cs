@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using DragonMarble.Message;
 
 namespace DragonMarble
 {
@@ -135,19 +136,19 @@ namespace DragonMarble
             Info.OwnTurn = false;
         }
 
-        public void StartTurn(int turn, GameActionType actionType,
+        public void StartTurn(int turn, GameMessageType actionType,
             bool active = true, GameActionResult result = null)
         {
             Info.OwnTurn = active;
 
             switch (actionType)
             {
-                case GameActionType.OrderCardSelect:
+                case GameMessageType.OrderCardSelect:
 
                     break;
-                case GameActionType.RollDice:
+                case GameMessageType.RollDice:
                     break;
-                case GameActionType.SelectDestination:
+                case GameMessageType.SelectDestination:
                     break;
             }
 

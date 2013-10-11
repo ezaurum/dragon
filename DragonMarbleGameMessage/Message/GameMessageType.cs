@@ -3,12 +3,22 @@
     public enum GameMessageType
     {
         //system message
-        InitUser = 0,
+        HeartBeat = 0,
+        InitUser = 1,
         
         //game 
         InitilizeBoard = 100,
 
         //user action
-        Roll = 1000, 
+        RollMoveDice = 1000,
+        OrderCardSelect,
+        RollDice,
+        RollAutoDice,
+        SelectDestination,
+        BuySite,
+        BuyBuilding,
+        TakeOverLand,
+        PayMethod,
+        AskYesNo,
     }
 }

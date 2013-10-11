@@ -51,8 +51,6 @@
   <ItemGroup>
     <Compile Include="GameAction.cs" />
     <Compile Include="GameActionResult.cs" />
-    <Compile Include="GameActionResultType.cs" />
-    <Compile Include="GameActionType.cs" />
     <Compile Include="GameMaster.cs" />
     <Compile Include="GamePlayer.cs" />
     <Compile Include="MessageParser.cs" />

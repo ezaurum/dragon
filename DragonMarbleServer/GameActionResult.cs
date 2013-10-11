@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using DragonMarble.Message;
 
 namespace DragonMarble
 {
@@ -9,8 +10,7 @@ namespace DragonMarble
             ActionType = action.Type;
         }
 
-        public GameActionType ActionType { get; set; }
-        public GameActionResultType Type { get; set; }
+        public GameMessageType ActionType { get; set; }
         public bool Success { get; set; }
         public ICollection<int> EffectedPlayers { get; set; }
 

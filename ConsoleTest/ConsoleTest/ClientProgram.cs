@@ -20,7 +20,7 @@ namespace ConsoleTest
                 },
                 Body = new GameMessageBody()
                 {
-                    MessageType = GameMessageType.Roll,
+                    MessageType = GameMessageType.RollMoveDice,
                     Content = new RollMoveDiceContent
                     {
                         Pressed = new Random().Next(0,int.MaxValue)

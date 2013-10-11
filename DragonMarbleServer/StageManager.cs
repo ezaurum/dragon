@@ -86,7 +86,7 @@ namespace DragonMarble
         
         public void InitGame()
         {
-            foreach (StageUnit stageUnit in _players)
+            foreach (GamePlayer stageUnit in _players)
             {   
                 stageUnit.StageManager = this;
                 //Subscribe(new GamePlayer(stageUnit));
@@ -107,20 +107,20 @@ namespace DragonMarble
             GameContinue = true;
 
             //order
-        //    OrderPlayers();
+            OrderPlayers();
             //play game
-          //  PlayGame();
+            PlayGame();
             //end game
-//            EndGame();
+            EndGame();
         }
 
         private void SendOrderMessageToPlayers()
         {
             Console.WriteLine("Ordering player");
             _state = StageState.OrderPlayers;
-            foreach (StageUnit stageUnit in _players)
+            foreach (GamePlayer stageUnit in _players)
             {
-                stageUnit.StartTurn(Turn, GameActionType.OrderCardSelect);
+                stageUnit.StartTurn(Turn, GameMessageType.OrderCardSelect);
             }
         }
 
@@ -128,7 +128,7 @@ namespace DragonMarble
         {
 
             //At first, select order
-            SendOrderMessageToPlayers();
+           /* SendOrderMessageToPlayers();
 
             int firstPlayerNumber = _first[new Random().Next(1, 5)];
 
@@ -142,7 +142,11 @@ namespace DragonMarble
                 {
                     firstPlayerNumber = 0;
                 }
-            }
+            }*/
+
+            //TODO dummy
+            _players[0].Order = 0;
+            _players[1].Order = 1;
 
             OrderedByTurnPlayers = (from player in _players orderby player.Order select player).ToArray();
             int j = 0;
@@ -173,8 +177,16 @@ namespace DragonMarble
                 Console.WriteLine("Here is ProcessAction");
                 CurrentAction = action;
 
-                Result.TargetUnits.ForEach(p=>p.Result = Result);
-                Result.TargetTiles.ForEach(t => t.Result = Result);
+                if (Result.TargetUnits != null)
+                {
+                    Result.TargetUnits.ForEach(p => p.Result = Result);
+                }
+
+                if (Result.TargetTiles != null)
+                {
+                    Result.TargetTiles.ForEach(t => t.Result = Result);
+                }
+                
                 
 
                 //need check game end
@@ -201,9 +213,9 @@ namespace DragonMarble
         {
             switch (action.Type)
             {
-                case GameActionType.OrderCardSelect:
+                case GameMessageType.OrderCardSelect:
                     return OrderPlayers(action);
-                case GameActionType.RollDice:
+                case GameMessageType.RollDice:
                     break;
             }
             return DoGameAction(action);

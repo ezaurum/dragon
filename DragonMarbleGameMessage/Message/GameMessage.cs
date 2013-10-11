@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Net.Mime;
 using Dragon.Interfaces;
 
 namespace DragonMarble.Message
@@ -75,7 +74,7 @@ namespace DragonMarble.Message
         {
             switch (gameMessageType)
             {
-                case GameMessageType.Roll:
+                case GameMessageType.RollMoveDice:
                     return new RollMoveDiceResultContent(bytes);
                 case GameMessageType.InitilizeBoard:
                     return new InitializeContent();
@@ -88,7 +87,7 @@ namespace DragonMarble.Message
         {
             switch (gameMessageType)
             {
-                case GameMessageType.Roll:
+                case GameMessageType.RollMoveDice:
                     return new RollMoveDiceContent(m);
                 case GameMessageType.InitilizeBoard:
                     return new InitializeContent();
