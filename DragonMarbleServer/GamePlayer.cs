@@ -7,7 +7,7 @@ using log4net;
 
 namespace DragonMarble
 {
-    public class GamePlayer : IObserver<GameObject>
+    public class GamePlayer :StageUnit
     {
         private int _messageStartOffset;
         private int _bytesTransferred;
@@ -17,41 +17,14 @@ namespace DragonMarble
         
         private static readonly ILog Logger = LogManager.GetLogger(typeof(GamePlayer));
 
-        public StageUnitInfo Info
-        {
-            get
-            {
-                return Unit.Info;
-            }
-        }
-
         public StageUnit Unit { get; set; }
         public GameMaster GameMaster { get; set; }
+        public Guid Id { get; set; }
 
-        public GamePlayer()
+        public GamePlayer() 
+            :base(StageUnitInfo.TEAM_COLOR.RED, 1000000)
         {
-            Unit = new StageUnit(StageUnitInfo.TEAM_COLOR.RED, 1000000, Guid.NewGuid().ToString());
-        }
-
-        public void OnNext(GameObject value)
-        {
-            
-        }
-
-        public void OnError(Exception error)
-        {
-            Logger.Debug("ERROR");
-            OnCompleted();
-        }
-
-        public void OnCompleted()
-        {
-            
-        }
-
-        public byte[] ToByte(IGameMessage message)
-        {
-            return message.ToByteArray();
+            Id = Guid.NewGuid();
         }
 
         public IEnumerable<IGameMessage> ToMessages(byte[] buffer, int offset, int bytesTransferred)

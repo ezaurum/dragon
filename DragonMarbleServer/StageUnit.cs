@@ -19,15 +19,11 @@ namespace DragonMarble
             }
         }
 
-
-        public StageUnit(StageUnitInfo.TEAM_COLOR teamColor, int initialCapital, string guid)
-        {
-            Id = guid;
+        public StageUnit(StageUnitInfo.TEAM_COLOR teamColor, int initialCapital)
+        {   
             Info = new StageUnitInfo(teamColor, initialCapital);
             Dice = new StageDiceInfo();
         }
-
-        public string Id { get; set; }
 
         public StageUnitInfo Info { get; set; }
 

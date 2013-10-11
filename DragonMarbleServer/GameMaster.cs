@@ -3,34 +3,28 @@ using System.Collections.Generic;
 
 namespace DragonMarble {
     public class GameMaster
-    {   
-        private IList<StageTile> _tiles;
-        private IList<GamePlayer> _players;        
+    {
+        private List<StageTile> _tiles;
+        private List<GamePlayer> _players;
+        private StageManager _stageManager;
 
-        public GameMaster(IList<StageTile> tiles)
+        public GameMaster(List<StageTile> tiles)
         {
-            Tiles = tiles;
+            Id = Guid.NewGuid();
+            _tiles = tiles;
             _players = new List<GamePlayer>();
         }
 
-        public IList<StageTile> Tiles
-        {   
-            set { _tiles = value; }
-        }
+        public Guid Id { get; set; }
 
-
-        public IDisposable Subscribe(IObserver<GameObject> observer)
+        public void StartGame()
         {
-            lock (_players)
-            {
-                _players.Add((GamePlayer) observer);
-            }
-            return null;
+            _stageManager = new StageManager(_tiles, _players);
         }
-    }
 
-    public class GameObject
-    {
-
+        public void Join(GamePlayer player)
+        {
+            _players.Add(player);
+        }
     }
 }

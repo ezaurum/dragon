@@ -38,7 +38,7 @@ namespace DragonMarble
 
         public GameActionResult Result { get; set; }
 
-        public static IList<StageTile> Parse(XDocument doc)
+        public static List<StageTile> Parse(XDocument doc)
         {
             // Query the data and write out a subset of contacts
             IEnumerable<StageTile> query = doc.Elements("Category").Elements("Stage").Select(c =>

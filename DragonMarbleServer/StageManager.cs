@@ -36,7 +36,7 @@ namespace DragonMarble
         private readonly IDictionary<int, int> _first 
             = new Dictionary<int, int>() 
             { { 1, -1 }, { 2, -1 }, { 3, -1 }, { 4, -1 } };
-        private readonly IList<StageUnit> _players;
+        private readonly List<GamePlayer> _players;
         private readonly IList<StageTile> _tiles;
         
         private StageUnit[] _availablePlayers;
@@ -75,7 +75,7 @@ namespace DragonMarble
         public StageUnit[] OrderedByCapitalPlayers { get; set; }
         public StageUnit[] OrderedByTurnPlayers { get; set; }
 
-        public StageManager(IList<StageTile> tiles, IList<StageUnit> players)
+        public StageManager(IList<StageTile> tiles, List<GamePlayer> players)
         {
             Console.WriteLine("Stage Manager start");
             _state = StageState.BeforeInit;
@@ -83,7 +83,7 @@ namespace DragonMarble
             _players = players;
             _id = Guid.NewGuid();
         }
-
+        
         public void InitGame()
         {
             foreach (StageUnit stageUnit in _players)

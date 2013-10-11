@@ -66,6 +66,8 @@ namespace Dragon.Server
                 _sendMessageWaitHandler.Set();
             }
         }
+
+        public object Player { get; set; }
     }
 
     public class MessageProcessorProvier : ITokenProvider

@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Runtime.Remoting.Contexts;
 using Dragon.Server;
 using DragonMarble.Message;
 using GameUtils;
@@ -27,7 +26,7 @@ namespace DragonMarble
         {
             XmlConfigurator.Configure(new FileInfo("log4net.xml"));
 
-            IList<StageTile> tiles = XmlUtils.LoadXml(@"data_stage.xml", StageTile.Parse);
+            List<StageTile> tiles = XmlUtils.LoadXml(@"data_stage.xml", StageTile.Parse);
 
             Logger.Debug("Start app.");
 
@@ -48,7 +47,43 @@ namespace DragonMarble
             Logger.Debug("connectecd.");
             QueuedMessageProcessor token = (QueuedMessageProcessor)eventArgs.UserToken;
 
+            //initialize player
+            InitializePlayer(token);
+
+            InitializeGame(token);
+        }
+
+        private static void InitializePlayer(QueuedMessageProcessor token)
+        {
+            GamePlayer player = new GamePlayer {Id = Guid.NewGuid()};
+            
+            //set initailize player message
             GameMessage idMessage = new GameMessage
+            {
+                Header = new GameMessageHeader
+                {
+                    From = Guid.NewGuid(),
+                    To = player.Id
+                },
+                Body = new GameMessageBody
+                {
+                    MessageType = GameMessageType.InitUser,
+                    Content = new InitUserContent()
+                }
+            };
+
+            token.SendingMessage = idMessage;
+            //player is just object
+            //TODO something should be done.
+            token.Player = player;
+
+            gm.Join(player);
+        }
+
+        private static void InitializeGame(QueuedMessageProcessor token)
+        {
+            //init game
+            GameMessage boardMessage = new GameMessage
             {
                 Header = new GameMessageHeader
                 {
@@ -57,14 +92,15 @@ namespace DragonMarble
                 },
                 Body = new GameMessageBody
                 {
-                    MessageType = GameMessageType.InitUser,
-                    Content = new InitUserContent()
+                    MessageType = GameMessageType.InitilizeBoard,
+                    Content = new InitializeContent()
+                    {
+                        FeeBoostedTiles = new[] {2, 3, 4, 4}
+                    }
                 }
-                
             };
 
-            token.SendingMessage = idMessage;
-
+            token.SendingMessage = boardMessage;
         }
 
         private static void ConvertBytesToMessage(object sender, SocketAsyncEventArgs eventArgs)
