@@ -17,6 +17,7 @@ namespace Dragon.Server
         // represents a large reusable set of buffers for all socket operations 
 
         private readonly IPEndPoint _ipEndpoint;
+        private readonly ITokenProvider _tokenProvider;
 
         private readonly Socket _listenSocket; // the socket used to listen for incoming connection requests 
         private readonly Semaphore _maxNumberAcceptedClients;
@@ -27,22 +28,19 @@ namespace Dragon.Server
         private int _numConnectedSockets; // the total number of clients connected to the server 
         private int _totalBytesRead; // counter of the total # bytes received by the server 
         
-        private readonly IActionRunner _actionRunner;
-
         // Create an uninitialized server instance.   
         // To start the server listening for connection requests 
         // call the Init method followed by Start method  
         // 
         // <param name="numConnections">the maximum number of connections the sample is designed to handle simultaneously</param>
         // <param name="receiveBufferSize">buffer size to use for each socket I/O operation</param>
-        public MultiClientServer(int numConnections, int receiveBufferSize, int backlog, IPEndPoint ipEndpoint, IActionRunner actionRunner)
-        {
+        public MultiClientServer(int numConnections, int receiveBufferSize, int backlog, IPEndPoint ipEndpoint, ITokenProvider tokenProvider){
             _totalBytesRead = 0;
             _numConnectedSockets = 0;
             _numConnections = numConnections;
             _backlog = backlog;
             _ipEndpoint = ipEndpoint;
-            _actionRunner = actionRunner;
+            _tokenProvider = tokenProvider;
 
             // allocate buffers such that the maximum number of sockets can have one outstanding read and  
             //write posted to the socket simultaneously  
@@ -124,7 +122,7 @@ namespace Dragon.Server
             SocketAsyncEventArgs writeEventArgs = _readWritePool.Pop(); ;
             Socket acceptedSocket= e.AcceptSocket;
 
-            AsyncUserToken token = _actionRunner.NewAsyncUserToken();
+            IAsyncUserToken token = _tokenProvider.NewAsyncUserToken();
             
             readEventArgs.UserToken = token;
             writeEventArgs.UserToken = token;
@@ -133,7 +131,7 @@ namespace Dragon.Server
             token.ReadArg = readEventArgs;
             token.WriteArg = writeEventArgs;
 
-            OnAcceptConnection(this, e);
+            OnAcceptConnection(this, writeEventArgs);
 
             // As soon as the client is connected, post a receive to the connection 
             bool willRaiseEvent = acceptedSocket.ReceiveAsync(readEventArgs);
@@ -191,7 +189,7 @@ namespace Dragon.Server
         private void ProcessReceive(SocketAsyncEventArgs e)
         {
             // check if the remote host closed the connection
-            AsyncUserToken token = e.UserToken as AsyncUserToken;
+            IAsyncUserToken token = e.UserToken as IAsyncUserToken;
             if (e.BytesTransferred > 0 && e.SocketError == SocketError.Success)
             {
                 //increment the count of the total bytes receive by the server
@@ -228,7 +226,7 @@ namespace Dragon.Server
             if (e.SocketError == SocketError.Success)
             {
                 // done echoing data back to the client
-                AsyncUserToken token = e.UserToken as AsyncUserToken;
+                QueuedMessageProcessor token = e.UserToken as QueuedMessageProcessor;
                 // read the next block of data send from the client 
 
                 //block until value return
@@ -237,7 +235,7 @@ namespace Dragon.Server
 
                 if (Logger.IsDebugEnabled)
                 {
-                    Logger.Debug(string.Format("send:", bytes));
+                    Logger.Debug(string.Format("send:{0} bytes", bytes.Length));
                 }
                 
                 
@@ -255,7 +253,7 @@ namespace Dragon.Server
 
         private void CloseClientSocket(SocketAsyncEventArgs e)
         {
-            AsyncUserToken token = e.UserToken as AsyncUserToken;
+            QueuedMessageProcessor token = e.UserToken as QueuedMessageProcessor;
 
             // close the socket associated with the client 
             try

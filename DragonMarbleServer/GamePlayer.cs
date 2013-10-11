@@ -2,13 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using Dragon.Interfaces;
-using Dragon.Server;
 using DragonMarble.Message;
 using log4net;
 
 namespace DragonMarble
 {
-    public class GamePlayer : AsyncUserToken, IObserver<GameObject>
+    public class GamePlayer : IObserver<GameObject>
     {
         private int _messageStartOffset;
         private int _bytesTransferred;

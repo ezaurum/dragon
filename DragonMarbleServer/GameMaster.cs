@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using Dragon.Server;
 
 namespace DragonMarble {
-    public class GameMaster : IActionRunner, IObservable<GameObject>
+    public class GameMaster
     {   
         private IList<StageTile> _tiles;
         private IList<GamePlayer> _players;        
@@ -19,15 +18,6 @@ namespace DragonMarble {
             set { _tiles = value; }
         }
 
-        public AsyncUserToken NewAsyncUserToken()
-        {
-            GamePlayer gamePlayer = new GamePlayer 
-            {GameMaster = this};
-
-            Subscribe(gamePlayer);
-
-            return gamePlayer;
-        }
 
         public IDisposable Subscribe(IObserver<GameObject> observer)
         {

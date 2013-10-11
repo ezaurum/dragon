@@ -3,7 +3,7 @@ using GameUtils;
 
 namespace DragonMarble.Message
 {
-    public class InitializeContentS2C : IGameMessageContent
+    public class InitializeContent : IGameMessageContent
     {
         private int[] _feeBoostedTiles =
         {
@@ -34,14 +34,14 @@ namespace DragonMarble.Message
         }
     }
 
-    public class RollMoveDiceContentS2C : IGameMessageContent
+    public class RollMoveDiceResultContent : IGameMessageContent
     {
         private bool _doublePip;
         public bool DoublePip {get { return _doublePip; } set { _doublePip = value; }}
         public char[] Dices { get; set; }
         private char[] _dices;
 
-        public RollMoveDiceContentS2C(byte[] bytes)
+        public RollMoveDiceResultContent(byte[] bytes)
         {
             FromByteArray(bytes);
         }
@@ -62,6 +62,18 @@ namespace DragonMarble.Message
             BitConvertUtils.ReadBytes(bytes, ref index, ref _dices[0]);
             BitConvertUtils.ReadBytes(bytes, ref index, ref _dices[1]);
             BitConvertUtils.ReadBytes(bytes, ref index, ref _doublePip);
+        }
+    }
+
+    public class InitUserContent : IGameMessageContent
+    {
+        public byte[] ToByteArray()
+        {
+            return new byte[0];
+        }
+
+        public void FromByteArray(byte[] bytes, int index = 38)
+        {
         }
     }
 }

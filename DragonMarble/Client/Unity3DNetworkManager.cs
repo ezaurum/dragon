@@ -72,7 +72,7 @@ namespace Dragon.Client
                 throw new InvalidOperationException("OnAfterMessageReceive is not setted.");
             }
             _readEventArgs = new SocketAsyncEventArgs();
-            _readEventArgs.Completed += OnAfterMessageReceive;
+            //_readEventArgs.Completed += OnAfterMessageReceive;
             _readEventArgs.Completed += Read_Completed;
             _readEventArgs.SetBuffer(new byte[1024], 0, 1024);
             
@@ -97,12 +97,32 @@ namespace Dragon.Client
 
         private void Read_Completed(object sender, SocketAsyncEventArgs e)
         {
+            Console.WriteLine("READ_COMPLETED");
+            if (e.SocketError == SocketError.Success && e.BytesTransferred > 0)
+            {
+                Console.WriteLine("Has Data");
+                OnAfterMessageReceive(sender, e);
+            }
+
+            Console.WriteLine("Recursive READ");
+            if (!_socket.ReceiveAsync(e))
+            {
+                Read_Completed(sender, e);
+            }
+        }
+        /*
+
+        private void Read_Completed(object sender, SocketAsyncEventArgs e)
+        {
+            
             while (true)
             {
                 if (e.SocketError == SocketError.Success && e.BytesTransferred > 0)
                 {
+                    Console.WriteLine("Has Data");
                     if (!_socket.ReceiveAsync(e))
                     {
+                        Console.WriteLine("Recursive READ");
                         OnAfterMessageReceive(this, e);
                         continue;
                     }
@@ -113,7 +133,7 @@ namespace Dragon.Client
                 }
                 break;
             }
-        }
+        }*/
 
         private void Connect_Completed(object sender, SocketAsyncEventArgs e)
         {
@@ -123,7 +143,8 @@ namespace Dragon.Client
             {
                 _readEventArgs.UserToken = new QueueAsyncClientUserToken() ;
                 _writeEventArgs.UserToken = new SimpleAsyncClientUserToken() ;
-
+                
+                Console.WriteLine("Start to read");
                 Read_Completed(this, _readEventArgs);
             }
         }

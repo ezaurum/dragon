@@ -7,14 +7,12 @@ using log4net;
 namespace Dragon.Server
 {
     // user token for async process.
-    public class AsyncUserToken
+    public class QueuedMessageProcessor : IAsyncUserToken
     {
-        private static readonly ILog Logger = LogManager.GetLogger(typeof(AsyncUserToken));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(QueuedMessageProcessor));
         public Socket Socket { get; set; }
         public SocketAsyncEventArgs ReadArg { get; set; }
         public SocketAsyncEventArgs WriteArg { get; set; }
-        public IMessageParser Parser { get; set; }
-        public IActionRunner Runner { get; set; }
 
         private readonly Queue<IGameMessage> _receivedMessages = new Queue<IGameMessage>();
         private readonly Queue<IGameMessage> _sendingMessages = new Queue<IGameMessage>();
@@ -70,8 +68,11 @@ namespace Dragon.Server
         }
     }
 
-    public interface IActionRunner
+    public class MessageProcessorProvier : ITokenProvider
     {
-        AsyncUserToken NewAsyncUserToken();
+        public IAsyncUserToken NewAsyncUserToken()
+        {
+            return new QueuedMessageProcessor();
+        }
     }
 }

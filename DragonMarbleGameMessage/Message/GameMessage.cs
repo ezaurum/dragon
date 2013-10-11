@@ -41,7 +41,7 @@ namespace DragonMarble.Message
             }
         }
 
-        public static GameMessage InitGameMessage(byte[] m, GameMessageFlowType flowType)
+        public static GameMessage FromByteArray(byte[] m, GameMessageFlowType flowType)
         {
             GameMessageType gameMessageType = (GameMessageType)BitConverter.ToInt32(m, GameMessageHeader.HeaderLength);
 
@@ -76,9 +76,9 @@ namespace DragonMarble.Message
             switch (gameMessageType)
             {
                 case GameMessageType.Roll:
-                    return new RollMoveDiceContentS2C(bytes);
+                    return new RollMoveDiceResultContent(bytes);
                 case GameMessageType.InitilizeBoard:
-                    return new InitializeContentS2C();
+                    return new InitializeContent();
                 default:
                     return null;
             }
@@ -89,9 +89,9 @@ namespace DragonMarble.Message
             switch (gameMessageType)
             {
                 case GameMessageType.Roll:
-                    return new RollMoveDiceContentC2S(m);
+                    return new RollMoveDiceContent(m);
                 case GameMessageType.InitilizeBoard:
-                    return new InitializeContentC2S();
+                    return new InitializeContent();
                 default:
                     return null;
             }

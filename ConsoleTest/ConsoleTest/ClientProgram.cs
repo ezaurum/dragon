@@ -21,7 +21,7 @@ namespace ConsoleTest
                 Body = new GameMessageBody()
                 {
                     MessageType = GameMessageType.Roll,
-                    Content = new RollMoveDiceContentC2S
+                    Content = new RollMoveDiceContent
                     {
                         Pressed = new Random().Next(0,int.MaxValue)
                     }
@@ -59,13 +59,18 @@ namespace ConsoleTest
         }
 
         private static void ProcessClientReceivedMessage(object o, SocketAsyncEventArgs eventArgs)
-        {
+        {   
             QueueAsyncClientUserToken token = eventArgs.UserToken as QueueAsyncClientUserToken;
-            
-            short messageLength = BitConverter.ToInt16(eventArgs.Buffer, eventArgs.Offset);
-            byte[] m = eventArgs.Buffer.Skip(eventArgs.Offset).Take(messageLength).ToArray();
 
-            GameMessage initGameMessage = GameMessage.InitGameMessage(m, GameMessageFlowType.S2C);
+            Console.WriteLine("Offeset , {0}", eventArgs.Offset);
+            Console.WriteLine("Buffer Length , {0}", eventArgs.Buffer.Length);
+
+            short messageLength = BitConverter.ToInt16(eventArgs.Buffer, eventArgs.Offset);
+            if (messageLength < 32) return;
+            
+                byte[] m = eventArgs.Buffer.Skip(eventArgs.Offset).Take(messageLength).ToArray();
+                Console.WriteLine("receive , {0}", m.Length);
+            GameMessage initGameMessage = GameMessage.FromByteArray(m, GameMessageFlowType.S2C);
 
             Console.WriteLine("receive , {0}", initGameMessage.MessageType);
 

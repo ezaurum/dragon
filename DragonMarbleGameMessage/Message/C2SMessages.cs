@@ -2,14 +2,14 @@
 
 namespace DragonMarble.Message
 {
-    public class RollMoveDiceContentC2S : IGameMessageContent
+    public class RollMoveDiceContent : IGameMessageContent
     {
-        public RollMoveDiceContentC2S(byte[] bytes)
+        public RollMoveDiceContent(byte[] bytes)
         {
             FromByteArray(bytes);
         }
 
-        public RollMoveDiceContentC2S()
+        public RollMoveDiceContent()
         {
             
         }
@@ -24,19 +24,6 @@ namespace DragonMarble.Message
         public void FromByteArray(byte[] bytes, int index = 38)
         {
             Pressed = BitConverter.ToInt32(bytes, index);
-        }
-    }
-
-    public class InitializeContentC2S : IGameMessageContent
-    {
-        public byte[] ToByteArray()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void FromByteArray(byte[] bytes, int index = 38)
-        {
-            throw new NotImplementedException();
         }
     }
 }

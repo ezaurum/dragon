@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using Dragon.Interfaces;
+using System.Runtime.Remoting.Contexts;
 using Dragon.Server;
 using DragonMarble.Message;
 using GameUtils;
@@ -35,7 +35,7 @@ namespace DragonMarble
 
             var server = new MultiClientServer(
                 MaxConnection, BufferSize, QueueNumber,
-                new IPEndPoint(IPAddress.Any, Port), gm);
+                new IPEndPoint(IPAddress.Any, Port), new MessageProcessorProvier());
             server.OnReceiveBytes += ConvertBytesToMessage;
             server.OnAcceptConnection += AddPlayer;
             server.Start();
@@ -46,19 +46,36 @@ namespace DragonMarble
         private static void AddPlayer(object sender, SocketAsyncEventArgs eventArgs)
         {   
             Logger.Debug("connectecd.");
-            AsyncUserToken token = eventArgs.UserToken as AsyncUserToken;
+            QueuedMessageProcessor token = (QueuedMessageProcessor)eventArgs.UserToken;
+
+            GameMessage idMessage = new GameMessage
+            {
+                Header = new GameMessageHeader
+                {
+                    From = Guid.NewGuid(),
+                    To = Guid.NewGuid()
+                },
+                Body = new GameMessageBody
+                {
+                    MessageType = GameMessageType.InitUser,
+                    Content = new InitUserContent()
+                }
+                
+            };
+
+            token.SendingMessage = idMessage;
+
         }
 
         private static void ConvertBytesToMessage(object sender, SocketAsyncEventArgs eventArgs)
         {
-            AsyncUserToken token = eventArgs.UserToken as AsyncUserToken;
+            QueuedMessageProcessor token = (QueuedMessageProcessor) eventArgs.UserToken;
             short messageLength = BitConverter.ToInt16(eventArgs.Buffer, eventArgs.Offset);
             byte[] m = eventArgs.Buffer.Skip(eventArgs.Offset).Take(messageLength).ToArray();
-            GameMessage gameMessage = GameMessage.InitGameMessage(m, GameMessageFlowType.C2S);
+            GameMessage gameMessage = GameMessage.FromByteArray(m, GameMessageFlowType.C2S);
             Logger.DebugFormat("receivec. {0}", gameMessage.MessageType);
             token.ReceivedMessage = gameMessage;
         }
     }
 
-    
 }

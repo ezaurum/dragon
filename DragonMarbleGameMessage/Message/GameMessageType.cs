@@ -2,6 +2,13 @@
 {
     public enum GameMessageType
     {
-        Roll = 0, InitilizeBoard = 1001
+        //system message
+        InitUser = 0,
+        
+        //game 
+        InitilizeBoard = 100,
+
+        //user action
+        Roll = 1000, 
     }
 }
