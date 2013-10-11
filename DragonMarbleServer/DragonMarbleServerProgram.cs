@@ -99,7 +99,6 @@ namespace DragonMarble
                     }
                 }
             };
-
             token.SendingMessage = boardMessage;
         }
 
