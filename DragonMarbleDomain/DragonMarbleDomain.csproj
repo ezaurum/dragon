@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{CF240925-F622-49AB-A322-E94C08BFE1B9}</ProjectGuid>
+    <ProjectGuid>{26208981-E513-4C57-B66E-560CBD88E28D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>DragonMarble</RootNamespace>
-    <AssemblyName>DragonMarbleGameMessage</AssemblyName>
+    <AssemblyName>DragonMarbleDomain</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -38,25 +38,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Message\GameMessage.cs" />
-    <Compile Include="Message\C2SMessages.cs" />
-    <Compile Include="Message\GameMessageType.cs" />
-    <Compile Include="Message\S2CMessages.cs" />
+    <Compile Include="Contents.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\DragonMarbleDomain\DragonMarbleDomain.csproj">
-      <Project>{26208981-e513-4c57-b66e-560cbd88e28d}</Project>
-      <Name>DragonMarbleDomain</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\GameUtils\GameUtils.csproj">
-      <Project>{cb0a9f6c-d5af-4d74-9a77-b491a17b964e}</Project>
-      <Name>GameUtils</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Interfaces\Interfaces.csproj">
-      <Project>{6a94673f-ae42-4a0d-badc-83933c0976c1}</Project>
-      <Name>Interfaces</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
