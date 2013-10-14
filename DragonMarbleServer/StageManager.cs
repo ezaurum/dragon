@@ -86,10 +86,14 @@ namespace DragonMarble
         
         public void InitGame()
         {
+            List<StageUnitInfo> units 
+                = _players.Select(stageUnit => stageUnit.Info).ToList();
+
             foreach (GamePlayer stageUnit in _players)
             {   
                 stageUnit.StageManager = this;
 
+                
                 stageUnit.SendingMessage = new GameMessage
                 {
                     Header = new GameMessageHeader
@@ -101,7 +105,9 @@ namespace DragonMarble
                         MessageType = GameMessageType.InitializeGame,
                         Content = new InitializeContent()
                         {
-                            
+                            NumberOfPlayers = units.Count,
+                            FeeBoostedTiles = new[]{3,31,29,4},
+                            Units = units
                         }
                     }
                 };

@@ -32,7 +32,7 @@ namespace DragonMarble.Message
         
         public byte[] ToByteArray()
         {
-            byte[] bytes = new byte[_feeBoostedTiles.Length * sizeof(int)];
+            byte[] bytes = new byte[(_feeBoostedTiles.Length + (NumberOfPlayers*4) +1) * sizeof(int) ];
             int index = 0;
             foreach (int feeBoostedTile in FeeBoostedTiles)
             {
