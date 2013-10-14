@@ -85,9 +85,9 @@ namespace DragonMarble
 
             gm.Join(player);
 
-            GamePlayer player0 = new AIGamePlayer();
+            /*GamePlayer player0 = new AIGamePlayer();
             player0.Token = new QueuedMessageProcessor();
-            gm.Join(player0);
+            gm.Join(player0);*/
         }
        
 
@@ -99,8 +99,10 @@ namespace DragonMarble
             GameMessage gameMessage = GameMessage.FromByteArray(m, GameMessageFlowType.C2S);
             Logger.DebugFormat("receivec. {0}", gameMessage.MessageType);
             token.ReceivedMessage = gameMessage;
+            
             if (gameMessage.MessageType == GameMessageType.RollMoveDice)
             {
+                RollMoveDiceResultContent rollMoveDiceResultContent = new RollMoveDiceResultContent(new[] {1, 1});
                 token.SendingMessage = new GameMessage()
                 {
                     Header = new GameMessageHeader()
@@ -111,9 +113,11 @@ namespace DragonMarble
                     Body = new GameMessageBody()
                     {
                         MessageType = GameMessageType.RollMoveDice,
-                        Content = new RollMoveDiceResultContent(new[] {1, 1})
+                        Content = rollMoveDiceResultContent
                     }
                 };
+
+                gm.Notify(Guid.NewGuid(), GameMessageType.RollMoveDice, rollMoveDiceResultContent);
             }
         }
     }
