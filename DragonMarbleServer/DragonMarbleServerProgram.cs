@@ -85,9 +85,9 @@ namespace DragonMarble
 
             gm.Join(player);
 
-            /*GamePlayer player0 = new AIGamePlayer();
+            GamePlayer player0 = new AIGamePlayer();
             player0.Token = new QueuedMessageProcessor();
-            gm.Join(player0);*/
+            gm.Join(player0);
         }
        
 
@@ -117,7 +117,25 @@ namespace DragonMarble
                     }
                 };
 
-                gm.Notify(Guid.NewGuid(), GameMessageType.RollMoveDice, rollMoveDiceResultContent);
+                gm.Notify(Guid.NewGuid(),
+                    GameMessageType.RollMoveDice, rollMoveDiceResultContent);
+            }
+
+            if (gameMessage.MessageType == GameMessageType.OrderCardSelect)
+            {
+                ((GameMessageHeader) gameMessage.Header).To = Guid.NewGuid();
+                ((GameMessageHeader)gameMessage.Header).From = Guid.NewGuid();
+                
+                SelectOrderCardContent content 
+                    = (SelectOrderCardContent) gameMessage.Content;
+
+                content.Result = true;
+
+                content.OrderSelectCards[content.SelectedCard] 
+                    = ((GamePlayer) token.Player).Order;
+
+                token.SendingMessage = gameMessage;
+
             }
         }
     }

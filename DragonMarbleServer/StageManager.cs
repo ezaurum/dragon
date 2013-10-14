@@ -111,10 +111,7 @@ namespace DragonMarble
                         }
                     }
                 };
-                //Subscribe(new GamePlayer(stageUnit));
             }
-
-            //_tiles.AsQueryable().Where(t=>t.).Where(t=>t.)
 
             _state = StageState.InitStage;
         }
@@ -129,11 +126,8 @@ namespace DragonMarble
             GameContinue = true;
 
             //order
-            OrderPlayers();
-            //play game
-            PlayGame();
-            //end game
-            EndGame();
+            //OrderPlayers();
+            
         }
 
         private void SendOrderMessageToPlayers()
@@ -177,6 +171,7 @@ namespace DragonMarble
         public void PlayGame()
         {
             ProcessAction();
+            EndGame();
         }
 
         private void ProcessAction()
@@ -195,11 +190,8 @@ namespace DragonMarble
                 {
                     Result.TargetTiles.ForEach(t => t.Result = Result);
                 }
-                
-                
 
                 //need check game end
-
             }
         }
 
