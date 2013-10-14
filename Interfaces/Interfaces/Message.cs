@@ -20,15 +20,4 @@ namespace Dragon.Interfaces
         byte[] ToByteArray();
         byte[] ToByteArray(byte[] bytes);
     }
-
-    public interface IMessageParser
-    {
-        IGameMessage MakeNewMessage<T, TD>(T messageType, TD messageData);
-        IGameMessage MakeNewMessage(byte[] buffer, int offset, int messageLength);
-    }
-
-    public interface IMessageProcessor
-    {
-        void ProcessMessage(IGameMessage gameMessage);
-    }
 }
