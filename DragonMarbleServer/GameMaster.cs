@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using DragonMarble.Message;
 using log4net;
 
-namespace DragonMarble {
+namespace DragonMarble
+{
     public class GameMaster
     {
-        private static readonly ILog Logger = LogManager.GetLogger(typeof(GameMaster));
-        private List<StageTile> _tiles;
-        private List<GamePlayer> _players;
+        private static readonly ILog Logger = LogManager.GetLogger(typeof (GameMaster));
+        private readonly List<GamePlayer> _players;
+        private readonly List<StageTile> _tiles;
         private StageManager _stageManager;
 
         public GameMaster(List<StageTile> tiles)
@@ -19,6 +21,11 @@ namespace DragonMarble {
         }
 
         public Guid Id { get; set; }
+
+        public bool IsGameStartable
+        {
+            get { return (_players.Count > 1); }
+        }
 
         public void Join(GamePlayer player)
         {
@@ -34,9 +41,9 @@ namespace DragonMarble {
 
             _stageManager.InitGame();
             _stageManager.StartGame();
-            
-              //init game
-            GameMessage boardMessage = new GameMessage
+
+            //init game
+            var boardMessage = new GameMessage
             {
                 Header = new GameMessageHeader
                 {
@@ -45,20 +52,32 @@ namespace DragonMarble {
                 },
                 Body = new GameMessageBody
                 {
-                    MessageType = GameMessageType.InitilizeBoard,
-                    Content = new InitializeContent()
+                    MessageType = GameMessageType.InitializeGame,
+                    Content = new InitializeContent
                     {
-                        FeeBoostedTiles = new[] { 2, 3, 4, 4 }
+                        FeeBoostedTiles = new[] {2, 3, 4, 4}
                     }
                 }
             };
 
-            _players.ForEach(p=>p.SendingMessage=boardMessage);
+            _players.ForEach(p => p.SendingMessage = boardMessage);
         }
 
-        public void Notify(Guid senderGuid, GameMessageType messageType, object messageContent)
+        public void Notify(Guid senderGuid,
+            GameMessageType messageType,
+            IGameMessageContent messageContent)
         {
-            
+            if (Logger.IsDebugEnabled)
+            {
+                Logger.DebugFormat("Notify from {0}, messageType:{1}"
+                    , senderGuid, messageType);
+            }
+
+            foreach (GamePlayer p in _players.Where(p => p.Id != senderGuid))
+            {
+                p.SendingMessage
+                    = new GameMessage(Id, p.Id, senderGuid, messageType, messageContent);
+            }
         }
     }
 }

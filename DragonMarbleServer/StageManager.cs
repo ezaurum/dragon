@@ -89,6 +89,22 @@ namespace DragonMarble
             foreach (GamePlayer stageUnit in _players)
             {   
                 stageUnit.StageManager = this;
+
+                stageUnit.SendingMessage = new GameMessage
+                {
+                    Header = new GameMessageHeader
+                    {
+                        From = Id,
+                        To = stageUnit.Id
+                    }, Body = new GameMessageBody
+                    {
+                        MessageType = GameMessageType.InitializeGame,
+                        Content = new InitializeContent()
+                        {
+                            
+                        }
+                    }
+                };
                 //Subscribe(new GamePlayer(stageUnit));
             }
 
@@ -128,25 +144,12 @@ namespace DragonMarble
         {
 
             //At first, select order
-           /* SendOrderMessageToPlayers();
-
-            int firstPlayerNumber = _first[new Random().Next(1, 5)];
-
-            Console.WriteLine("first player is {0}", firstPlayerNumber);
-
-            int order = 0;
-            while (order < _players.Count)
-            {
-                _players[firstPlayerNumber++].Order = order++;
-                if (firstPlayerNumber >= _players.Count)
-                {
-                    firstPlayerNumber = 0;
-                }
-            }*/
 
             //TODO dummy
-            _players[0].Order = 0;
             _players[1].Order = 1;
+
+            //init game
+
 
             OrderedByTurnPlayers = (from player in _players orderby player.Order select player).ToArray();
             int j = 0;

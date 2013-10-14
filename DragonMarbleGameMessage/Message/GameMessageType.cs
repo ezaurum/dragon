@@ -5,9 +5,10 @@
         //system message
         HeartBeat = 0,
         InitUser = 1,
+        Inform = 2,
         
         //game 
-        InitilizeBoard = 100,
+        InitializeGame = 100,
 
         //user action
         RollMoveDice = 1000,
@@ -20,5 +21,7 @@
         TakeOverLand,
         PayMethod,
         AskYesNo,
+
+        
     }
 }

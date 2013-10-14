@@ -50,7 +50,11 @@ namespace DragonMarble
             //initialize player
             InitializePlayer(token);
 
-            gm.StartGame();
+            if (gm.IsGameStartable)
+            {
+                gm.StartGame();
+                
+            }
         }
 
         private static void InitializePlayer(QueuedMessageProcessor token)
@@ -84,8 +88,6 @@ namespace DragonMarble
             GamePlayer player0 = new AIGamePlayer();
             player0.Token = new QueuedMessageProcessor();
             gm.Join(player0);
-
-
         }
        
 

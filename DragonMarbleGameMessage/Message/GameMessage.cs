@@ -11,6 +11,25 @@ namespace DragonMarble.Message
 
     public class GameMessage : IGameMessage
     {
+        public GameMessage(Guid from, Guid to, Guid messageSource, GameMessageType messageType, IGameMessageContent messageContent)
+        {
+            Header = new GameMessageHeader
+            {
+                From = from,
+                To = to
+            };
+            Body = new GameMessageBody
+            {
+                MessageType = GameMessageType.Inform,
+                Content = new InformContent(messageSource, messageType, messageContent)
+            };
+        }
+
+        public GameMessage()
+        {
+            
+        }
+
         public IGameMessageHeader Header { get; set; }
         public IGameMessageBody Body { get; set; }
 
@@ -76,7 +95,7 @@ namespace DragonMarble.Message
             {
                 case GameMessageType.RollMoveDice:
                     return new RollMoveDiceResultContent(bytes);
-                case GameMessageType.InitilizeBoard:
+                case GameMessageType.InitializeGame:
                     return new InitializeContent();
                 default:
                     return null;
@@ -89,11 +108,42 @@ namespace DragonMarble.Message
             {
                 case GameMessageType.RollMoveDice:
                     return new RollMoveDiceContent(m);
-                case GameMessageType.InitilizeBoard:
+                case GameMessageType.InitializeGame:
                     return new InitializeContent();
                 default:
                     return null;
             }
+        }
+    }
+
+    /**
+     * inform something action for everyone
+     */
+    public class InformContent : IGameMessageContent
+    {
+        public IGameMessageContent Content { get; set; }
+        public GameMessageType MessageType { get; set; }
+        public Guid MessageSource { get; set; }
+        public InformContent(Guid messageSource, GameMessageType messageType, IGameMessageContent messageContent)
+        {
+            MessageSource = messageSource;
+            MessageType = messageType;
+            Content = messageContent;
+        }
+
+        public byte[] ToByteArray()
+        {
+            byte[] byteArray = Content.ToByteArray();
+            byte[] bytes = new byte[20+byteArray.Length];
+            MessageSource.ToByteArray().CopyTo(bytes, 0);
+            BitConverter.GetBytes((int) MessageType).CopyTo(bytes, 16);
+            Buffer.BlockCopy(byteArray,0,bytes,20, byteArray.Length);
+            return bytes;
+        }
+
+        public void FromByteArray(byte[] bytes, int index = 38)
+        {
+            throw new NotImplementedException();
         }
     }
 
@@ -147,6 +197,4 @@ namespace DragonMarble.Message
         byte[] ToByteArray();
         void FromByteArray(byte[] bytes, int index =  GameMessageHeader.HeaderLength + 4);
     }
-
-    
 }
