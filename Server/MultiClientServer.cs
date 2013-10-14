@@ -234,7 +234,7 @@ namespace Dragon.Server
                 bytes.CopyTo(e.Buffer, e.Offset);
 
                 if (Logger.IsDebugEnabled)
-                {
+                { 
                     Logger.Debug(string.Format("send:{0} bytes", bytes.Length));
                 }
                 

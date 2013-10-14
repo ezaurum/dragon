@@ -72,7 +72,6 @@ namespace Dragon.Client
                 throw new InvalidOperationException("OnAfterMessageReceive is not setted.");
             }
             _readEventArgs = new SocketAsyncEventArgs();
-            //_readEventArgs.Completed += OnAfterMessageReceive;
             _readEventArgs.Completed += Read_Completed;
             _readEventArgs.SetBuffer(new byte[1024], 0, 1024);
             
@@ -110,30 +109,6 @@ namespace Dragon.Client
                 Read_Completed(sender, e);
             }
         }
-        /*
-
-        private void Read_Completed(object sender, SocketAsyncEventArgs e)
-        {
-            
-            while (true)
-            {
-                if (e.SocketError == SocketError.Success && e.BytesTransferred > 0)
-                {
-                    Console.WriteLine("Has Data");
-                    if (!_socket.ReceiveAsync(e))
-                    {
-                        Console.WriteLine("Recursive READ");
-                        OnAfterMessageReceive(this, e);
-                        continue;
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("read. socket error : {0}", e.SocketError);
-                }
-                break;
-            }
-        }*/
 
         private void Connect_Completed(object sender, SocketAsyncEventArgs e)
         {
