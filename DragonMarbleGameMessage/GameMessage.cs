@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using Dragon.Interfaces;
 
 namespace DragonMarble.Message
@@ -63,13 +62,19 @@ namespace DragonMarble.Message
         {
             GameMessageType gameMessageType = (GameMessageType)BitConverter.ToInt32(m, GameMessageHeader.HeaderLength);
 
+            byte[] fromBytes = new byte[16];
+            Buffer.BlockCopy(m, GameMessageHeader.FirstGuidIndex, fromBytes, 0,16);
+
+            byte[] toBytes = new byte[16];
+            Buffer.BlockCopy(m, GameMessageHeader.SecondGuidIndex, fromBytes, 0, 16);
+
             GameMessage initGameMessage = new GameMessage()
             {
                 Header = new GameMessageHeader()
                 {
                     MessageLength = (short) m.Length,
-                    From = new Guid(m.Skip(GameMessageHeader.FirstGuidIndex).Take(16).ToArray()),
-                    To = new Guid(m.Skip(GameMessageHeader.SecondGuidIndex).Take(16).ToArray())
+                    From = new Guid(fromBytes),
+                    To = new Guid(toBytes)
                 },
                 Body = new GameMessageBody()
                 {
@@ -196,5 +201,55 @@ namespace DragonMarble.Message
     {
         byte[] ToByteArray();
         void FromByteArray(byte[] bytes, int index =  GameMessageHeader.HeaderLength + 4);
+    }
+
+    public static class BitConvertUtils
+    {
+        public static void WriteBytes(Int16 valueObject, byte[] bytes, ref int index)
+        {
+            BitConverter.GetBytes(valueObject).CopyTo(bytes, index);
+            index += sizeof(Int16);
+        }
+
+        public static void WriteBytes(Int32 valueObject, byte[] bytes, ref int index)
+        {
+            BitConverter.GetBytes(valueObject).CopyTo(bytes, index);
+            index += sizeof(Int32);
+        }
+        public static void WriteBytes(bool valueObject, byte[] bytes, ref int index)
+        {
+            BitConverter.GetBytes(valueObject).CopyTo(bytes, index);
+            index += sizeof(bool);
+        }
+
+        public static void WriteBytes(char valueObject, byte[] bytes, ref int index)
+        {
+            BitConverter.GetBytes(valueObject).CopyTo(bytes, index);
+            index += sizeof(char);
+        }
+
+        public static void ReadBytes(byte[] bytes, ref int index, ref char value)
+        {
+            value = BitConverter.ToChar(bytes, index);
+            index += sizeof(char);
+        }
+
+        public static void ReadBytes(byte[] bytes, ref int index, ref bool value)
+        {
+            value = BitConverter.ToBoolean(bytes, index);
+            index += sizeof(bool);
+        }
+
+        public static void ReadBytes(byte[] bytes, ref int index, ref Int16 value)
+        {
+            value = BitConverter.ToInt16(bytes, index);
+            index += sizeof(Int16);
+        }
+
+        public static void ReadBytes(byte[] bytes, ref int index, ref Int32 value)
+        {
+            value = BitConverter.ToInt32(bytes, index);
+            index += sizeof(Int32);
+        }
     }
 }
