@@ -7,7 +7,7 @@
     <ProjectGuid>{CF240925-F622-49AB-A322-E94C08BFE1B9}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DragonMarble</RootNamespace>
+    <RootNamespace>DragonMarble.Message</RootNamespace>
     <AssemblyName>DragonMarbleGameMessage</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -32,26 +32,19 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Message\GameMessage.cs" />
-    <Compile Include="Message\C2SMessages.cs" />
-    <Compile Include="Message\GameMessageType.cs" />
-    <Compile Include="Message\S2CMessages.cs" />
+    <Compile Include="GameMessage.cs" />
+    <Compile Include="C2SMessages.cs" />
+    <Compile Include="GameMessageType.cs" />
+    <Compile Include="S2CMessages.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DragonMarbleDomain\DragonMarbleDomain.csproj">
-      <Project>{26208981-e513-4c57-b66e-560cbd88e28d}</Project>
+      <Project>{26208981-E513-4C57-B66E-560CBD88E28D}</Project>
       <Name>DragonMarbleDomain</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\GameUtils\GameUtils.csproj">
-      <Project>{cb0a9f6c-d5af-4d74-9a77-b491a17b964e}</Project>
-      <Name>GameUtils</Name>
     </ProjectReference>
     <ProjectReference Include="..\Interfaces\Interfaces.csproj">
       <Project>{6a94673f-ae42-4a0d-badc-83933c0976c1}</Project>

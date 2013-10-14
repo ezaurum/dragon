@@ -103,7 +103,7 @@ namespace DragonMarble
                     }, Body = new GameMessageBody
                     {
                         MessageType = GameMessageType.InitializeGame,
-                        Content = new InitializeContent()
+                        Content = new InitializeGameContent
                         {
                             NumberOfPlayers = units.Count,
                             FeeBoostedTiles = new[]{3,31,29,4},

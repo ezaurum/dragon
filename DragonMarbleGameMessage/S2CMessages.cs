@@ -15,22 +15,16 @@ namespace DragonMarble.Message
             throw new NotImplementedException();
         }
     }
-    public class InitializeContent : IGameMessageContent
+    public class InitializeGameContent : IGameMessageContent
     {
-        private int[] _feeBoostedTiles =
-        {
-            1, 9, 30, 28
-        };
 
         public int NumberOfPlayers { get; set; }
         public List<StageUnitInfo> Units { get; set; }
-
-
-        public int[] FeeBoostedTiles {get { return _feeBoostedTiles; }set { _feeBoostedTiles = value; }}
+        public int[] FeeBoostedTiles {get;set;}
         
         public byte[] ToByteArray()
         {
-            byte[] bytes = new byte[(_feeBoostedTiles.Length + (NumberOfPlayers*4) +1) * sizeof(int) ];
+            byte[] bytes = new byte[(FeeBoostedTiles.Length + (NumberOfPlayers * 4) + 1) * sizeof(int)];
             int index = 0;
             foreach (int feeBoostedTile in FeeBoostedTiles)
             {
@@ -57,11 +51,15 @@ namespace DragonMarble.Message
 
         public void FromByteArray(byte[] bytes, int index = 38)
         {
-            _feeBoostedTiles = new int[4];
-            BitConvertUtils.ReadBytes(bytes, ref index, ref _feeBoostedTiles[0]);
-            BitConvertUtils.ReadBytes(bytes, ref index, ref _feeBoostedTiles[1]);
-            BitConvertUtils.ReadBytes(bytes, ref index, ref _feeBoostedTiles[2]);
-            BitConvertUtils.ReadBytes(bytes, ref index, ref _feeBoostedTiles[3]);
+            FeeBoostedTiles = new int[4];
+            FeeBoostedTiles[0] = BitConverter.ToInt32(bytes, index);
+            index += sizeof(Int32);
+            FeeBoostedTiles[1] = BitConverter.ToInt32(bytes, index);
+            index += sizeof(Int32);
+            FeeBoostedTiles[2] = BitConverter.ToInt32(bytes, index);
+            index += sizeof(Int32);
+            FeeBoostedTiles[3] = BitConverter.ToInt32(bytes, index);
+            index += sizeof(Int32);
 
             NumberOfPlayers = BitConverter.ToInt32(bytes, index);
             index += sizeof (Int32);
@@ -122,9 +120,11 @@ namespace DragonMarble.Message
         public void FromByteArray(byte[] bytes, int index = 38)
         {
             _dices = new char[2];
-            BitConvertUtils.ReadBytes(bytes, ref index, ref _dices[0]);
-            BitConvertUtils.ReadBytes(bytes, ref index, ref _dices[1]);
-            BitConvertUtils.ReadBytes(bytes, ref index, ref _doublePip);
+            _dices[0] = BitConverter.ToChar(bytes, index);
+            index += sizeof(char);
+            _dices[1] = BitConverter.ToChar(bytes, index);
+            index += sizeof(char);
+            _doublePip = BitConverter.ToBoolean(bytes, index);
         }
     }
 

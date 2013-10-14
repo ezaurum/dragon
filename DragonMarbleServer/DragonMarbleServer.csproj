@@ -62,7 +62,6 @@
   <ItemGroup>
     <Content Include="data_chance.xml" />
     <Content Include="data_stage.xml" />
-    <Content Include="DragonMarble.DLL" />
     <Content Include="lib\log4net.dll" />
     <Content Include="lib\log4net.xml" />
   </ItemGroup>

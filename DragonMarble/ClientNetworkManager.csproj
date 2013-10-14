@@ -7,8 +7,8 @@
     <ProjectGuid>{E797A74B-09D9-4D8F-823B-42B532215BA0}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Dragon</RootNamespace>
-    <AssemblyName>Client</AssemblyName>
+    <RootNamespace>Dragon.Client</RootNamespace>
+    <AssemblyName>ClientNetworkManager</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile>
@@ -33,14 +33,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Client\NetworkEventArgs.cs" />
-    <Compile Include="Client\Unity3DNetworkManager.cs" />
+    <Compile Include="NetworkEventArgs.cs" />
+    <Compile Include="Unity3DNetworkManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />

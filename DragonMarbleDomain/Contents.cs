@@ -31,7 +31,7 @@ namespace DragonMarble
                 return false;
             }
         }
-
+    
         public StageBuffInfo(TYPE type, int power, int turn)
         {
             this.type = type;
@@ -73,7 +73,7 @@ namespace DragonMarble
         public StageDiceInfo()
         {
             rand = new Random();
-            result = new[] { 0, 0 };
+            result = new int[] { 0, 0 };
             rollCount = 0;
             isDouble = false;
             rollType = ROLL_TYPE.NORMAL;
@@ -102,6 +102,7 @@ namespace DragonMarble
                 }
             }
 
+
             if (result[0] == result[1])
             {
                 isDouble = true;
@@ -123,7 +124,6 @@ namespace DragonMarble
         }
 
     }
-
 
     public class StageUnitInfo
     {
@@ -283,7 +283,7 @@ namespace DragonMarble
         public StageTileInfo(int index, string name, TYPE tileType)
         {
             this.index = index;
-            type = tileType;
+            this.type = tileType;
             this.name = name;
 
             tileBuff = null;
@@ -295,7 +295,7 @@ namespace DragonMarble
         public StageTileInfo(Hashtable data)
         {
             index = (int)data["Index"];
-            type = (TYPE)Enum.Parse(typeof(TYPE), (string)data["Type"]);
+            type = (StageTileInfo.TYPE)Enum.Parse(typeof(StageTileInfo.TYPE), (string)data["Type"]);
             name = (string)data["Name"];
             typeValue = (int)data["TypeValue"];
             tileBuff = null;
