@@ -41,26 +41,6 @@ namespace DragonMarble
 
             _stageManager.InitGame();
             _stageManager.StartGame();
-
-            //init game
-            var boardMessage = new GameMessage
-            {
-                Header = new GameMessageHeader
-                {
-                    From = Guid.NewGuid(),
-                    To = Guid.NewGuid()
-                },
-                Body = new GameMessageBody
-                {
-                    MessageType = GameMessageType.InitializeGame,
-                    Content = new InitializeContent
-                    {
-                        FeeBoostedTiles = new[] {2, 3, 4, 4}
-                    }
-                }
-            };
-
-            _players.ForEach(p => p.SendingMessage = boardMessage);
         }
 
         public void Notify(Guid senderGuid,
