@@ -46,7 +46,6 @@ stream.close()
 f = codecs.open(output_file, 'w', encoding='utf-8')
 f.write('// Automatic generate by PacketGenerator.\n')
 f.write('using System;\n')
-f.write('using Dragon.Interfaces;\n')
 f.write('using System.Collections.Generic;\n')
 f.write('\nnamespace DragonMarble.Message')
 f.write('\n{')
@@ -61,12 +60,31 @@ for packet_name in packet_list:
 	f.write('\n\t%s,'%packet_name)
 f.write('\n}')
 
+#make message instance maker
+f.write('\npublic static class GameMessageFactory')
+f.write('\n{')
+f.write('\npublic static IDragonMarbleGameMessage GetGameMessage(byte[] bytes)')
+f.write('\n{')
+f.write('\nIDragonMarbleGameMessage message = null;')
+f.write('\nGameMessageType messageType = (GameMessageType) BitConverter.ToInt32(bytes, 2);')
+f.write('\n\tswitch (messageType)')
+f.write('\n\t{')
+for packet_name in packet_list:
+	f.write('\n\t\tcase GameMessageType.%s:'%packet_name)
+	f.write('\n\t\tmessage = new %sGameMessage();'%(packet_name))		
+	f.write('\n\t\tbreak;')
+f.write('\n\t}')
+f.write('\n\tmessage.FromByteArray(bytes);')
+f.write('\n\treturn message;')
+f.write('\n}')
+f.write('\n}')
+
 for packet_name in packet_list:
 	packet = packet_list[packet_name]
 	# Comment
 	f.write('\n// %s'%(packet['comment']))
 	# class declare
-	f.write('\t\npublic class %sGameMessage : IGameMessage'%(packet_name))
+	f.write('\t\npublic class %sGameMessage : IDragonMarbleGameMessage'%(packet_name))
 	f.write('\t\n{')
 	#header added
 	fields = common_header.get('fields',[])+packet.get('fields',[])
@@ -77,7 +95,8 @@ for packet_name in packet_list:
 		if 'collection' in field:
 			f.write('\n\tpublic %s<%s> %s;'%(field['collection'],field['type'], field['name']))
 		elif field['name'] == 'MessageType':
-			f.write('\n\tpublic readonly GameMessageType MessageType = GameMessageType.%s;'%(packet_name))
+			f.write('\n\tpublic readonly GameMessageType _messageType = GameMessageType.%s;'%(packet_name))
+			f.write('\n\tpublic GameMessageType MessageType {get{return _messageType;}}')
 		#in case of one object
 		else:
 			f.write('\n\tpublic %s %s;'%(field['type'], field['name']))
@@ -188,10 +207,13 @@ for packet_name in packet_list:
 		else:
 			length = '(%s)'%field.get('length',length)
 		f.write('+%s'%length)
-	f.write(');')
-
+	f.write(');')	
 	f.write('\n\t}\n}')
 
-f.write('\n}\n}')
+	#end of class
+	f.write('\n}\n')
+
+#end of namespace
+f.write('\n}')
 f.close()
 print ('Generate Success.')

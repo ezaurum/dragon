@@ -18,17 +18,17 @@ Header :
 InitializeGame :
     comment : 게임 초기화 정보
     fields :
-        - type : Int16
-          collection : List
-          name : FeeBoostedTiles
+        - name : FeeBoostedTiles
+          type : Int16
+          collection : List          
           size : 4
         - type : Int16
           name : NumberOfPlayers
-        - type : StageUnitInfo
+        - name : Units
+          type : StageUnitInfo
           constructor : blank
           collection : List          
           length : 4 * sizeof(Int32)
-          name : Units
           size : NumberOfPlayers
           target :
             - name : gold
@@ -40,3 +40,21 @@ InitializeGame :
             - name : teamColor
               cast : Int32 
               type : StageUnitInfo.TEAM_COLOR
+
+RollMoveDice :
+    comment : 클라이언트에서 이동 주사위 굴리기
+    fields :
+        - name : Pressed
+          type : Int32
+        - name : Odd
+          type : Boolean
+        - name : Even
+          type : Boolean
+
+RollMoveDiceResult :
+    comment : 서버에서 주사위 굴리기 결과
+    fields :
+        - name : Dices
+          type : Int32
+          collection : List
+          size : 2
