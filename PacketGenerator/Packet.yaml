@@ -1,0 +1,42 @@
+Header :
+    comment : 헤더
+    fields :        
+        - type : GameMessageType
+          name : MessageType    
+          cast : Int32
+        - type : Guid
+          name : From
+          length : 16
+          constructor : byte_param
+          has_to_byte_array : true
+        - type : Guid
+          name : To        
+          length : 16
+          constructor : byte_param
+          has_to_byte_array : true        
+
+InitializeGame :
+    comment : 게임 초기화 정보
+    fields :
+        - type : Int16
+          collection : List
+          name : FeeBoostedTiles
+          size : 4
+        - type : Int16
+          name : NumberOfPlayers
+        - type : StageUnitInfo
+          constructor : blank
+          collection : List          
+          length : 4 * sizeof(Int32)
+          name : Units
+          size : NumberOfPlayers
+          target :
+            - name : gold
+              type : Int32
+            - name : Order
+              type : Int32
+            - name : Capital
+              type : Int32
+            - name : teamColor
+              cast : Int32 
+              type : StageUnitInfo.TEAM_COLOR
