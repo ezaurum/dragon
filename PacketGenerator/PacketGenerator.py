@@ -230,11 +230,15 @@ for packet_name in packet_list:
 	f.write('\n\npublic Int16 Length\n{\n\tget\n\t{')
 	f.write('\n\treturn (Int16)(2')
 	for field in fields:
-		length = 'sizeof(%s)'%(field['type'])
-		if 'size' in field:
-			length = '(%s*(%s))'%(field['size'],field.get('length',length))
+		length = 'sizeof(%s)'%(field['type'])		
+		if 'size' in field:		
+			if 'target' in field:
+				l = len(field['target'])
+				length = '(%s*(%s*%s))'%(field['size'],field.get('length',length),l)
+			else:
+				length = '(%s*(%s))'%(field['size'],field.get('length',length))
 		else:
-			length = '(%s)'%field.get('length',length)
+			length = '(%s)'%field.get('length',length)		
 		f.write('+%s'%length)
 	f.write(');')	
 	f.write('\n\t}\n}')

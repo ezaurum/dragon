@@ -28,7 +28,7 @@ InitializeGame :
           type : StageUnitInfo
           constructor : blank
           collection : List          
-          length : 4 * sizeof(Int32)
+          length : sizeof(Int32)
           size : NumberOfPlayers
           target :
             - name : gold
