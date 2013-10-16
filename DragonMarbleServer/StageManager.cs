@@ -42,7 +42,7 @@ namespace DragonMarble
         private StageUnit[] _availablePlayers;
         private bool _gameContinue;
         private StageState _state;
-        private IDictionary<string, GameMessage> messages;
+        private IDictionary<string, IDragonMarbleGameMessage> messages;
         private bool _playerOreded;
 
         public int Turn { get; set; }
@@ -93,23 +93,11 @@ namespace DragonMarble
             {   
                 stageUnit.StageManager = this;
 
-                
-                stageUnit.SendingMessage = new GameMessage
+                var f = new InitializeGameGameMessage
                 {
-                    Header = new GameMessageHeader
-                    {
-                        From = Id,
-                        To = stageUnit.Id
-                    }, Body = new GameMessageBody
-                    {
-                        MessageType = GameMessageType.InitializeGame,
-                        Content = new InitializeGameContent
-                        {
-                            NumberOfPlayers = units.Count,
-                            FeeBoostedTiles = new[]{3,31,29,4},
-                            Units = units
-                        }
-                    }
+                    FeeBoostedTiles = new List<short>(new Int16[] {3, 31, 29, 4}),
+                    NumberOfPlayers = (short) units.Count,
+                    Units = units
                 };
             }
 
@@ -216,8 +204,7 @@ namespace DragonMarble
             {
                 case GameMessageType.OrderCardSelect:
                     return OrderPlayers(action);
-                case GameMessageType.RollDice:
-                    break;
+                
             }
             return DoGameAction(action);
         }

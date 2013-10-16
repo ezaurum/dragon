@@ -36,9 +36,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GameMessage.cs" />
-    <Compile Include="C2SMessages.cs" />
-    <Compile Include="GameMessageType.cs" />
-    <Compile Include="S2CMessages.cs" />
+    <Compile Include="IDragonMarbleGameMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
