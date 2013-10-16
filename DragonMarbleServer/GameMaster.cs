@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Dragon.Server;
 using DragonMarble.Message;
 using log4net;
 
@@ -12,7 +13,7 @@ namespace DragonMarble
         private readonly List<GamePlayer> _players;
         private readonly List<StageTile> _tiles;
         private StageManager _stageManager;
-
+        public List<GamePlayer> Players { get { return _players; } }
         public GameMaster(List<StageTile> tiles)
         {
             Id = Guid.NewGuid();
@@ -31,6 +32,15 @@ namespace DragonMarble
         {
             _players.Add(player);
             player.GameMaster = this;
+
+            //set initailize player message
+            InitailizePlayerGameMessage idMessage = new InitailizePlayerGameMessage
+            {
+                To = player.Id,
+                From = Guid.NewGuid()
+            };
+
+            player.SendingMessage = idMessage;
         }
 
         public void StartGame()
