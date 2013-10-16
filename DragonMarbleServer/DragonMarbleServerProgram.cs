@@ -122,6 +122,10 @@ namespace DragonMarble
 
     internal class AIGamePlayer : GamePlayer
     {
+        public AIGamePlayer()
+        {
+            Unit.ControlMode = StageUnitInfo.ControlModeType.AI_0;
+        }
 
     }
 }
