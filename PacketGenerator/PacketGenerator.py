@@ -55,12 +55,24 @@ def makeMessageInstanceMaker(packet_list):
 	f.write('\n\t{')
 	for packet_name in packet_list:
 		f.write('\n\t\tcase GameMessageType.%s:'%packet_name)
-	f.write('\n\t\tmessage = new %sGameMessage();'%packet_name)		
-	f.write('\n\t\tbreak;')
+		f.write('\n\t\tmessage = new %sGameMessage();'%packet_name)		
+		f.write('\n\t\tbreak;')
 	f.write('\n\t}')
 	f.write('\n\treturn message;')
 	f.write('\n}')
 	f.write('\n}')
+
+def makeTempByByteParamConstructor(name, targetType, length):
+	f.write('\n\tbyte[] temp%s = new byte[%s];'%(name,length))
+	f.write('Buffer.BlockCopy(bytes, index,temp%s,0,%s);'%(name,length))
+	f.write('\n\t\t%s target%s = new %s(temp%s);'%(targetType, name, targetType, name))
+	f.write('\n\t\tindex += %s;'%length)
+
+def makeFieldByByteParamConstructor(name, targetType, length):
+	f.write('\n\tbyte[] temp%s = new byte[%s];'%(name,length))
+	f.write('Buffer.BlockCopy(bytes, index,temp%s,0,%s);'%(name,length))
+	f.write('\n\t\t%s = new %s(temp%s);'%(name, targetType, name))
+	f.write('\n\t\tindex += %s;'%length)
 	
 input_file = sys.argv[1]
 output_file = sys.argv[2]
@@ -154,7 +166,7 @@ for packet_name in packet_list:
 	# FromByteArray method implementation
 	f.write('\n\npublic void FromByteArray(byte[] bytes)\n{')
 
-	f.write('\n\t\tint index = 10;')
+	f.write('\n\t\tint index = 6;')
 	for field in fields:
 		if field['name'] == 'MessageType':
 			continue
@@ -172,8 +184,7 @@ for packet_name in packet_list:
 				f.write('\n\tfor (int i = 0; i < %s ; i++ )\n\t{'%field['size'])
 				#for object type has constructor
 				if field.get('constructor') == 'byte_param':
-					f.write('\n\t\t%s target%s = new %s(new ArraySegment<Byte>(bytes, index,%s).Array);'%(field['type'], field['name'],field['type'],length))
-					f.write('\n\t\tindex += %s;'%length)
+					makeTempByByteParamConstructor(field['name'],field['type'],length)
 					f.write('\n\t\t%s.Add(target%s);'%(field['name'],field['name']))
 				#for object type don't has constructor
 				elif field.get('constructor') == 'blank':
@@ -206,8 +217,7 @@ for packet_name in packet_list:
 		#when not collection
 		else:
 			if field.get('constructor') == 'byte_param':
-				f.write('\n\t\t%s = new %s(new ArraySegment<Byte>(bytes, index,%s).Array);'%(field['name'],fieldType,length))
-				f.write('\n\t\tindex += %s;'%length)
+				makeFieldByByteParamConstructor(field['name'],field['type'],length)
 			elif field.get('constructor') == 'blank':
 				f.write('\n\t\t%s = new %s();'%(field['name'],fieldType))
 				f.write('\n\t\tindex += %s;'%length)
