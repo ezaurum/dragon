@@ -90,6 +90,16 @@ namespace ConsoleTest
 
             Console.WriteLine("receive , {0}", dragonMarbleGameMessage.MessageType);
 
+            switch (dragonMarbleGameMessage.MessageType)
+            { case GameMessageType.OrderCardSelect:
+                    Console.WriteLine("{0},{1}",
+                        ((OrderCardSelectGameMessage)dragonMarbleGameMessage).OrderCardSelectState[0],
+                    ((OrderCardSelectGameMessage)dragonMarbleGameMessage).OrderCardSelectState[1])
+                    ;
+                    break;
+            }
+            
+
             token.Message = dragonMarbleGameMessage;
         }
     }

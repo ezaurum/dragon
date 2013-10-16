@@ -355,6 +355,7 @@ public void FromByteArray(byte[] bytes)
 	for (int i = 0; i < NumberOfPlayers ; i++ )
 	{
 		Int16 targetOrderCardSelectState = BitConverter.ToInt16(bytes, index);
+	    index += sizeof (Int16);
 		OrderCardSelectState.Add(targetOrderCardSelectState);
 	}
 }
