@@ -127,6 +127,10 @@ namespace DragonMarble
 
     public class StageUnitInfo
     {
+        public enum ControlModeType
+        {
+            Player, AI_0, AI_1, AI_2, 
+        }
 
         public enum TEAM_COLOR
         {
@@ -149,6 +153,7 @@ namespace DragonMarble
         public int Capital { get; set; }
         public bool OwnTurn { get; set; }
         public int DiceId { get; set; }
+        public ControlModeType ControlMode { get; set; }
 
         public StageUnitInfo(TEAM_COLOR teamColor, int initialCapital = 2000000) : this()
         {

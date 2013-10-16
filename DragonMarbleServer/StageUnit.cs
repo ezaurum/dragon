@@ -12,6 +12,18 @@ namespace DragonMarble
         private int _position;
         public StageDiceInfo Dice { get; set; }
 
+        public StageUnitInfo.ControlModeType ControlMode
+        {
+            get
+            {
+                return Info.ControlMode;
+            }
+            set
+            {
+                Info.ControlMode = value;
+            }
+        }
+
         public int Position
         {
             get

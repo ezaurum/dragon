@@ -40,6 +40,10 @@ InitializeGame :
             - name : teamColor
               cast : Int32 
               type : StageUnitInfo.TEAM_COLOR
+            - name : ControlMode
+              type : StageUnitInfo.ControlModeType
+              cast : Int32 
+
 
 RollMoveDice :
     comment : 클라이언트에서 이동 주사위 굴리기
