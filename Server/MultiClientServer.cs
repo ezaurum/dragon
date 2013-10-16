@@ -258,27 +258,29 @@ namespace Dragon.Server
             // close the socket associated with the client 
             try
             {
-                token.Socket.Shutdown(SocketShutdown.Send);
-
-                // decrement the counter keeping track of the total number of clients connected to the server
-                Interlocked.Decrement(ref _numConnectedSockets);
-                _maxNumberAcceptedClients.Release();
+                token.Socket.Shutdown(SocketShutdown.Both);
+                token.Socket.Disconnect(true);
+                
                 Logger.Debug(
                     string.Format(
                         "A client has been disconnected from the server. There are {0} clients connected to the server",
                         _numConnectedSockets)
                     );
             }
-            // throws if client process has already closed 
+                // throws if client process has already closed 
             catch (Exception exception)
             {
                 Logger.Debug(exception);
                 Logger.Debug(_maxNumberAcceptedClients);
             }
-            token.Socket.Close();
-            
-            // Free the SocketAsyncEventArg so they can be reused by another client
-            _readWritePool.Push(e);
+            finally
+            {
+                // decrement the counter keeping track of the total number of clients connected to the server
+                Interlocked.Decrement(ref _numConnectedSockets);
+                _maxNumberAcceptedClients.Release();
+                // Free the SocketAsyncEventArg so they can be reused by another client
+                _readWritePool.Push(e);
+            }
         }
 
         public event EventHandler<SocketAsyncEventArgs> OnAcceptConnection;
