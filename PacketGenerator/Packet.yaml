@@ -58,3 +58,17 @@ RollMoveDiceResult :
           type : Int32
           collection : List
           size : 2
+
+OrderCardSelect :
+    comment : 선 뽑기
+    fields :
+      - name : SelectedCardNumber
+        type : Int16
+      - name : Result
+        type : Boolean
+      - name : NumberOfPlayers
+        type : Int32
+      - name : OrderCardSelectState
+        type : Int16
+        collection : List
+        size : NumberOfPlayers

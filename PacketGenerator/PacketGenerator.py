@@ -38,6 +38,30 @@ def convertToBitInnerTarget(field, target):
 	target_string='%s[i].%s'%(field['name'],target['name'])
 	convertToBit(target_string, length,cast)
 
+def makeMessageInstanceMaker(packet_list):
+	f.write('\npublic static class GameMessageFactory')
+	f.write('\n{')
+	f.write('\npublic static IDragonMarbleGameMessage GetGameMessage(byte[] bytes)')
+	f.write('\n{')
+	f.write('\nGameMessageType messageType = (GameMessageType) BitConverter.ToInt32(bytes, 2);')
+	f.write('\nIDragonMarbleGameMessage message = GetGameMessage(messageType);')
+	f.write('\n\tmessage.FromByteArray(bytes);')
+	f.write('\n\treturn message;')
+	f.write('\n}')
+	f.write('\npublic static IDragonMarbleGameMessage GetGameMessage(GameMessageType messageType)')
+	f.write('\n{')
+	f.write('\nIDragonMarbleGameMessage message = null;')
+	f.write('\n\tswitch (messageType)')
+	f.write('\n\t{')
+	for packet_name in packet_list:
+		f.write('\n\t\tcase GameMessageType.%s:'%packet_name)
+	f.write('\n\t\tmessage = new %sGameMessage();'%packet_name)		
+	f.write('\n\t\tbreak;')
+	f.write('\n\t}')
+	f.write('\n\treturn message;')
+	f.write('\n}')
+	f.write('\n}')
+	
 input_file = sys.argv[1]
 output_file = sys.argv[2]
 stream = open(input_file, 'r',encoding='utf-8')
@@ -61,28 +85,14 @@ for packet_name in packet_list:
 f.write('\n}')
 
 #make message instance maker
-f.write('\npublic static class GameMessageFactory')
-f.write('\n{')
-f.write('\npublic static IDragonMarbleGameMessage GetGameMessage(byte[] bytes)')
-f.write('\n{')
-f.write('\nIDragonMarbleGameMessage message = null;')
-f.write('\nGameMessageType messageType = (GameMessageType) BitConverter.ToInt32(bytes, 2);')
-f.write('\n\tswitch (messageType)')
-f.write('\n\t{')
-for packet_name in packet_list:
-	f.write('\n\t\tcase GameMessageType.%s:'%packet_name)
-	f.write('\n\t\tmessage = new %sGameMessage();'%(packet_name))		
-	f.write('\n\t\tbreak;')
-f.write('\n\t}')
-f.write('\n\tmessage.FromByteArray(bytes);')
-f.write('\n\treturn message;')
-f.write('\n}')
-f.write('\n}')
+makeMessageInstanceMaker(packet_list)
 
+#make each message class
 for packet_name in packet_list:
 	packet = packet_list[packet_name]
 	# Comment
-	f.write('\n// %s'%(packet['comment']))
+	if packet.get('comment') is not None:
+		f.write('\n// %s'%(packet['comment']))
 	# class declare
 	f.write('\t\npublic class %sGameMessage : IDragonMarbleGameMessage'%(packet_name))
 	f.write('\t\n{')
@@ -161,9 +171,12 @@ for packet_name in packet_list:
 			if type(field['size']) is not int:
 				f.write('\n\t%s = new %s<%s>();'%(field['name'],field['collection'],field['type']))
 				f.write('\n\tfor (int i = 0; i < %s ; i++ )\n\t{'%field['size'])
+				#for object type has constructor
 				if field.get('constructor') == 'byte_param':
 					f.write('\n\t\t%s target%s = new %s(new ArraySegment<Byte>(bytes, index,%s).Array);'%(field['type'], field['name'],field['type'],length))
 					f.write('\n\t\tindex += %s;'%length)
+					f.write('\n\t\t%s.Add(target%s);'%(field['name'],field['name']))
+				#for object type don't has constructor
 				elif field.get('constructor') == 'blank':
 					f.write('\n\t\t%s target%s = new %s();'%(field['type'],field['name'],field['type']))
 					if 'target' in field:
@@ -174,8 +187,15 @@ for packet_name in packet_list:
 							else:
 								f.write('\n\t\ttarget%s.%s = (%s)BitConverter.To%s(bytes, index);'%(field['name'],target['name'],target['type'],target['cast']))
 							f.write('\n\t\tindex += %s;'%length)
-
-				f.write('\n\t\t%s.Add(target%s);'%(field['name'],field['name']))
+					f.write('\n\t\t%s.Add(target%s);'%(field['name'],field['name']))
+				#for simple type
+				else:
+					cast = field.get('cast')
+					if cast is None :
+						f.write('\n\t\t%s target%s = BitConverter.To%s(bytes, index);'%(field['type'],field['name'],field['type']))
+					else:
+						f.write('\n\t\t%s target%s = (%s)BitConverter.To%s(bytes, index);'%(field['type'],field['name'],field['type'],cast))
+					f.write('\n\t\t%s.Add(target%s);'%(field['name'],field['name']))
 
 				f.write('\n\t}')
 
