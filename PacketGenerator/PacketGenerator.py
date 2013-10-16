@@ -205,6 +205,7 @@ for packet_name in packet_list:
 						f.write('\n\t\t%s target%s = BitConverter.To%s(bytes, index);'%(field['type'],field['name'],field['type']))
 					else:
 						f.write('\n\t\t%s target%s = (%s)BitConverter.To%s(bytes, index);'%(field['type'],field['name'],field['type'],cast))
+					f.write('\n\t\tindex += %s;'%length)
 					f.write('\n\t\t%s.Add(target%s);'%(field['name'],field['name']))
 
 				f.write('\n\t}')
