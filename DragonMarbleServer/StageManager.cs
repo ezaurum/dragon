@@ -115,7 +115,7 @@ namespace DragonMarble
             GameContinue = true;
 
             //order
-            //OrderPlayers();
+            OrderPlayers();
             
         }
 
@@ -133,14 +133,25 @@ namespace DragonMarble
         {
 
             //At first, select order
-
-            //TODO dummy
-            _players[1].Order = 1;
+            foreach (GamePlayer stageUnit in _players)
+            {
+                var f = new OrderCardSelectGameMessage()
+                {
+                    To = stageUnit.Id,
+                    From = Guid.NewGuid(),
+                    NumberOfPlayers = _players.Count,
+                    OrderCardSelectState = new List<Int16> {-1, -1},
+                    SelectedCardNumber = -1
+                };
+                stageUnit.SendingMessage = f;
+            }
 
             //init game
+        }
 
-
-            OrderedByTurnPlayers = (from player in _players orderby player.Order select player).ToArray();
+        public void OrderPlayers2()
+        {
+        OrderedByTurnPlayers = (from player in _players orderby player.Order select player).ToArray();
             int j = 0;
             foreach (StageUnit orderedByCapitalPlayer in OrderedByTurnPlayers)
             {

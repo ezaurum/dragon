@@ -124,7 +124,7 @@ namespace DragonMarble
     {
         public AIGamePlayer()
         {
-            Unit.ControlMode = StageUnitInfo.ControlModeType.AI_0;
+            Info.ControlMode = StageUnitInfo.ControlModeType.AI_0;
         }
 
     }
