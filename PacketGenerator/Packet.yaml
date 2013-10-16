@@ -72,3 +72,6 @@ OrderCardSelect :
         type : Int16
         collection : List
         size : NumberOfPlayers
+
+InitailizePlayer :
+  comment : 플레이어 초기화  
