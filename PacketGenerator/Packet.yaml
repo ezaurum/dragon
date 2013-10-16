@@ -77,5 +77,17 @@ OrderCardSelect :
         collection : List
         size : NumberOfPlayers
 
+OrderCardResult :
+    comment : 선 뽑기 결과
+    fields :
+      - name : FirstCardNumber
+        type : Int16      
+      - name : NumberOfPlayers
+        type : Int32
+      - name : OrderCardSelectState
+        type : Int16
+        collection : List
+        size : NumberOfPlayers
+
 InitailizePlayer :
   comment : 플레이어 초기화  

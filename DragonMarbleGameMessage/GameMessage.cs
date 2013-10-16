@@ -7,9 +7,10 @@ namespace DragonMarble.Message
 public enum GameMessageType
 {
 	InitializeGame,
-	InitailizePlayer,
+	OrderCardResult,
 	RollMoveDice,
 	RollMoveDiceResult,
+	InitailizePlayer,
 	OrderCardSelect,
 }
 public static class GameMessageFactory
@@ -29,14 +30,17 @@ IDragonMarbleGameMessage message = null;
 		case GameMessageType.InitializeGame:
 		message = new InitializeGameGameMessage();
 		break;
-		case GameMessageType.InitailizePlayer:
-		message = new InitailizePlayerGameMessage();
+		case GameMessageType.OrderCardResult:
+		message = new OrderCardResultGameMessage();
 		break;
 		case GameMessageType.RollMoveDice:
 		message = new RollMoveDiceGameMessage();
 		break;
 		case GameMessageType.RollMoveDiceResult:
 		message = new RollMoveDiceResultGameMessage();
+		break;
+		case GameMessageType.InitailizePlayer:
+		message = new InitailizePlayerGameMessage();
 		break;
 		case GameMessageType.OrderCardSelect:
 		message = new OrderCardSelectGameMessage();
@@ -155,12 +159,15 @@ public Int16 Length
 }
 }
 
-// 플레이어 초기화	
-public class InitailizePlayerGameMessage : IDragonMarbleGameMessage	
+// 선 뽑기 결과	
+public class OrderCardResultGameMessage : IDragonMarbleGameMessage	
 {
-	public GameMessageType MessageType {get{return GameMessageType.InitailizePlayer;}}
+	public GameMessageType MessageType {get{return GameMessageType.OrderCardResult;}}
 	public Guid From;
 	public Guid To;
+	public Int16 FirstCardNumber;
+	public Int32 NumberOfPlayers;
+	public List<Int16> OrderCardSelectState;
 
 	public byte[] ToByteArray()
 	{
@@ -178,6 +185,18 @@ public class InitailizePlayerGameMessage : IDragonMarbleGameMessage
 		To.ToByteArray()
 		.CopyTo(bytes,index);
 		index += 16;
+		BitConverter.GetBytes(FirstCardNumber)
+		.CopyTo(bytes,index);
+		index += sizeof(Int16);
+		BitConverter.GetBytes(NumberOfPlayers)
+		.CopyTo(bytes,index);
+		index += sizeof(Int32);
+	for (int i = 0; i < NumberOfPlayers ; i++ )
+	{
+		BitConverter.GetBytes(OrderCardSelectState[i])
+		.CopyTo(bytes,index);
+		index += sizeof(Int16);
+	}
 	return bytes;
 }
 
@@ -190,13 +209,24 @@ public void FromByteArray(byte[] bytes)
 	byte[] tempTo = new byte[16];Buffer.BlockCopy(bytes, index,tempTo,0,16);
 		To = new Guid(tempTo);
 		index += 16;
+		FirstCardNumber = BitConverter.ToInt16(bytes,index);
+		index += sizeof(Int16);
+		NumberOfPlayers = BitConverter.ToInt32(bytes,index);
+		index += sizeof(Int32);
+		OrderCardSelectState = new List<Int16>();
+	OrderCardSelectState = new List<Int16>();
+	for (int i = 0; i < NumberOfPlayers ; i++ )
+	{
+		Int16 targetOrderCardSelectState = BitConverter.ToInt16(bytes, index);
+		OrderCardSelectState.Add(targetOrderCardSelectState);
+	}
 }
 
 public Int16 Length
 {
 	get
 	{
-	return (Int16)(2+(sizeof(GameMessageType))+(16)+(16));
+	return (Int16)(2+(sizeof(GameMessageType))+(16)+(16)+(sizeof(Int16))+(sizeof(Int32))+(NumberOfPlayers*(sizeof(Int16))));
 	}
 }
 }
@@ -319,6 +349,52 @@ public Int16 Length
 	get
 	{
 	return (Int16)(2+(sizeof(GameMessageType))+(16)+(16)+(2*(sizeof(Int32))));
+	}
+}
+}
+
+// 플레이어 초기화	
+public class InitailizePlayerGameMessage : IDragonMarbleGameMessage	
+{
+	public GameMessageType MessageType {get{return GameMessageType.InitailizePlayer;}}
+	public Guid From;
+	public Guid To;
+
+	public byte[] ToByteArray()
+	{
+		byte[] bytes = new byte[Length];
+		int index = 0;
+		BitConverter.GetBytes(Length)
+		.CopyTo(bytes,index);
+		index += sizeof(Int16);
+		BitConverter.GetBytes((Int32)MessageType)
+		.CopyTo(bytes,index);
+		index += sizeof(GameMessageType);
+		From.ToByteArray()
+		.CopyTo(bytes,index);
+		index += 16;
+		To.ToByteArray()
+		.CopyTo(bytes,index);
+		index += 16;
+	return bytes;
+}
+
+public void FromByteArray(byte[] bytes)
+{
+		int index = 6;
+	byte[] tempFrom = new byte[16];Buffer.BlockCopy(bytes, index,tempFrom,0,16);
+		From = new Guid(tempFrom);
+		index += 16;
+	byte[] tempTo = new byte[16];Buffer.BlockCopy(bytes, index,tempTo,0,16);
+		To = new Guid(tempTo);
+		index += 16;
+}
+
+public Int16 Length
+{
+	get
+	{
+	return (Int16)(2+(sizeof(GameMessageType))+(16)+(16));
 	}
 }
 }
