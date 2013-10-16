@@ -42,7 +42,12 @@ InitializeGame :
               type : StageUnitInfo.TEAM_COLOR
             - name : ControlMode
               type : StageUnitInfo.ControlModeType
-              cast : Int32 
+              cast : Int32
+            - name : Id
+              type : Guid
+              length : 16
+              constructor : byte_param
+              has_to_byte_array : true
 
 
 RollMoveDice :
@@ -62,18 +67,18 @@ RollMoveDiceResult :
           type : Int32
           collection : List
           size : 2
+        - name : IsDouble
+          type : Boolean
 
 OrderCardSelect :
     comment : 선 뽑기
     fields :
       - name : SelectedCardNumber
-        type : Int16
-      - name : Result
-        type : Boolean
+        type : Int16      
       - name : NumberOfPlayers
         type : Int32
       - name : OrderCardSelectState
-        type : Int16
+        type : Boolean
         collection : List
         size : NumberOfPlayers
 
@@ -81,13 +86,21 @@ OrderCardResult :
     comment : 선 뽑기 결과
     fields :
       - name : FirstCardNumber
-        type : Int16      
-      - name : NumberOfPlayers
-        type : Int32
-      - name : OrderCardSelectState
         type : Int16
-        collection : List
-        size : NumberOfPlayers
+      - type : Guid
+        name : FirstPlayerId
+        length : 16
+        constructor : byte_param
+        has_to_byte_array : true
 
 InitailizePlayer :
   comment : 플레이어 초기화  
+
+InformOtherPlayerAction :
+  comment : 다른 플레이어의 행동 알림
+  fields :
+      - name : InformMessage
+        type : IDragonMarbleGameMessage
+        length : Length
+        has_from_byte_array : true        
+        has_to_byte_array : true

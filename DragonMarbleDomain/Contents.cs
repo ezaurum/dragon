@@ -154,6 +154,8 @@ namespace DragonMarble
         public bool OwnTurn { get; set; }
         public int DiceId { get; set; }
         public ControlModeType ControlMode { get; set; }
+        public int CharacterId { get; set; }
+        public Guid Id { get; set; }
 
         public StageUnitInfo(TEAM_COLOR teamColor, int initialCapital = 2000000) : this()
         {
@@ -164,6 +166,7 @@ namespace DragonMarble
 
         public StageUnitInfo()
         {
+            CharacterId = 1;
             round = 1;
             tileIndex = 0;
             lands = new Dictionary<int, StageTileInfo>();

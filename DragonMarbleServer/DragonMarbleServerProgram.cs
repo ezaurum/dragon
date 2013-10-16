@@ -47,41 +47,19 @@ namespace DragonMarble
             Logger.Debug("connectecd.");
             QueuedMessageProcessor token = (QueuedMessageProcessor)eventArgs.UserToken;
 
-            //initialize player
-            InitializePlayer(token);
+            GamePlayer player = new GamePlayer {Token = token, Order = 0};
+            token.Player = player;
+            gm.Join(player);
+
+            //TODO dummy ai player
+            GamePlayer player0 = new AIGamePlayer {Order = 1};
+            gm.Join(player0);
 
             if (gm.IsGameStartable)
             {
                 gm.StartGame();
-                
             }
         }
-
-        private static void InitializePlayer(QueuedMessageProcessor token)
-        {
-            GamePlayer player = new GamePlayer {Id = Guid.NewGuid()};
-            
-            //set initailize player message
-
-            InitailizePlayerGameMessage idMessage = new InitailizePlayerGameMessage
-            {
-                To = player.Id,
-                From = Guid.NewGuid()
-            };
-
-            token.SendingMessage = idMessage;
-            //player is just object
-            //TODO something should be done.
-            token.Player = player;
-            player.Token = token;
-            
-            gm.Join(player);
-
-            GamePlayer player0 = new AIGamePlayer();
-            player0.Token = new QueuedMessageProcessor();
-            gm.Join(player0);
-        }
-       
 
         private static void ConvertBytesToMessage(object sender, SocketAsyncEventArgs eventArgs)
         {
@@ -110,12 +88,25 @@ namespace DragonMarble
             if (gameMessage.MessageType == GameMessageType.OrderCardSelect)
             {
                 OrderCardSelectGameMessage gameMessage2 = (OrderCardSelectGameMessage) gameMessage;
+                gameMessage2.To = gameMessage2.From;
                 gameMessage2.From = Guid.NewGuid();
-                gameMessage2.To= Guid.NewGuid();
                 gameMessage2.Result = true;
                 Int16 foo = gameMessage2.SelectedCardNumber;
                 gameMessage2.OrderCardSelectState[foo] = (short) ((GamePlayer) token.Player).Order;
-                token.SendingMessage = gameMessage;
+                token.SendingMessage = gameMessage2;
+
+                Int16 f = (short) new Random().Next(0, gameMessage2.NumberOfPlayers);
+                //
+                OrderCardResultGameMessage m2 = new OrderCardResultGameMessage()
+                {
+                    FirstCardNumber = f,
+                    NumberOfPlayers = gameMessage2.NumberOfPlayers,
+                    OrderCardSelectState = gameMessage2.OrderCardSelectState,
+                    From = gameMessage2.From,
+                    To = gameMessage2.To,
+                    FirstPlayerId = gm.Players[f].Id
+                };
+                token.SendingMessage = m2;
             }
         }
     }
@@ -125,6 +116,7 @@ namespace DragonMarble
         public AIGamePlayer()
         {
             Info.ControlMode = StageUnitInfo.ControlModeType.AI_0;
+            Token = new QueuedMessageProcessor();
         }
 
     }

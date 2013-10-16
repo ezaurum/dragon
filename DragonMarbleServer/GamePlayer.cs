@@ -6,15 +6,24 @@ using log4net;
 namespace DragonMarble
 {
     public class GamePlayer :StageUnit
-    {
-        
-        
+    {   
         private static readonly ILog Logger = LogManager.GetLogger(typeof(GamePlayer));
         private QueuedMessageProcessor _token;
 
         public StageUnit Unit { get; set; }
         public GameMaster GameMaster { get; set; }
-        public Guid Id { get; set; }
+
+        public Guid Id
+        {
+            get
+            {
+                return Info.Id;
+            }
+            set
+            {
+                Info.Id = value;
+            }
+        }
 
         public QueuedMessageProcessor Token
         {

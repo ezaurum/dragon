@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using Dragon.Client;
@@ -42,6 +43,32 @@ namespace ConsoleTest
                 {
 
                     nm.SendMessage(rollMessage);
+                }
+
+                if (readLine.Contains("1"))
+                {
+                    OrderCardSelectGameMessage orderCardSelectGameMessage = new OrderCardSelectGameMessage
+                    {
+                        From = Guid.NewGuid(),
+                        To = Guid.NewGuid(),
+                        SelectedCardNumber = 1,
+                        OrderCardSelectState = new List<Int16> {-1,2},
+                        NumberOfPlayers = 2
+                    };
+                    nm.SendMessage(orderCardSelectGameMessage);
+                }
+
+                if (readLine.Contains("0"))
+                {
+                    OrderCardSelectGameMessage orderCardSelectGameMessage = new OrderCardSelectGameMessage
+                    {
+                        From = Guid.NewGuid(),
+                        To = Guid.NewGuid(),
+                        SelectedCardNumber = 0,
+                        OrderCardSelectState = new List<Int16> {2,-1},
+                        NumberOfPlayers = 2
+                    };
+                    nm.SendMessage(orderCardSelectGameMessage);
                 }
             }
         }
