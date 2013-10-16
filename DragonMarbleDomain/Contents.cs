@@ -150,7 +150,7 @@ namespace DragonMarble
         public bool OwnTurn { get; set; }
         public int DiceId { get; set; }
 
-        public StageUnitInfo(TEAM_COLOR teamColor, int initialCapital = 2000000)
+        public StageUnitInfo(TEAM_COLOR teamColor, int initialCapital = 2000000) : this()
         {
             this.teamColor = teamColor;
             Capital = initialCapital;
