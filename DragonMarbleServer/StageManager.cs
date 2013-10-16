@@ -99,6 +99,7 @@ namespace DragonMarble
                     NumberOfPlayers = (short) units.Count,
                     Units = units
                 };
+                stageUnit.SendingMessage = f;
             }
 
             _state = StageState.InitStage;
