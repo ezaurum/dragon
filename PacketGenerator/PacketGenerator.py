@@ -104,9 +104,8 @@ for packet_name in packet_list:
 		#in case of collections e.g. List
 		if 'collection' in field:
 			f.write('\n\tpublic %s<%s> %s;'%(field['collection'],field['type'], field['name']))
-		elif field['name'] == 'MessageType':
-			f.write('\n\tpublic readonly GameMessageType _messageType = GameMessageType.%s;'%(packet_name))
-			f.write('\n\tpublic GameMessageType MessageType {get{return _messageType;}}')
+		elif field['name'] == 'MessageType':			
+			f.write('\n\tpublic GameMessageType MessageType {get{return GameMessageType.%s;}}'%packet_name)
 		#in case of one object
 		else:
 			f.write('\n\tpublic %s %s;'%(field['type'], field['name']))
