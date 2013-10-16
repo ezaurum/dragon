@@ -110,14 +110,4 @@ namespace DragonMarble
             }
         }
     }
-
-    internal class AIGamePlayer : GamePlayer
-    {
-        public AIGamePlayer()
-        {
-            Info.ControlMode = StageUnitInfo.ControlModeType.AI_0;
-            Token = new QueuedMessageProcessor();
-        }
-
-    }
 }

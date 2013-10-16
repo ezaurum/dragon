@@ -151,6 +151,8 @@ namespace DragonMarble
         public int Order { get; set; }
         public int CapitalOrder { get; set; }
         public int Capital { get; set; }
+        
+
         public bool OwnTurn { get; set; }
         public int DiceId { get; set; }
         public ControlModeType ControlMode { get; set; }
@@ -159,6 +161,7 @@ namespace DragonMarble
 
         public StageUnitInfo(TEAM_COLOR teamColor, int initialCapital = 2000000) : this()
         {
+            Id = Guid.NewGuid();
             this.teamColor = teamColor;
             Capital = initialCapital;
             gold = initialCapital;
@@ -184,10 +187,10 @@ namespace DragonMarble
                 {
                     p += t.sellPrice;
                 }
+                Capital = p;
                 return p;
             }
         }
-
 
         public bool AddGold(int a)
         {

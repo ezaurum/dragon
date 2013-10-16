@@ -54,7 +54,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StageManager.cs" />
     <Compile Include="StageTile.cs" />
-    <Compile Include="StageUnit.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

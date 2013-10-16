@@ -1,57 +1,155 @@
 ﻿using System;
+using System.Collections.Generic;
 using Dragon.Interfaces;
 using Dragon.Server;
+using DragonMarble.Message;
 using log4net;
 
 namespace DragonMarble
 {
-    public class GamePlayer :StageUnit
-    {   
-        private static readonly ILog Logger = LogManager.GetLogger(typeof(GamePlayer));
-        private QueuedMessageProcessor _token;
+    internal class AIGamePlayer : GamePlayer
+    {
+        public AIGamePlayer() : this(TEAM_COLOR.BLUE, 2000000)
+        {
+            
+        }
 
-        public StageUnit Unit { get; set; }
+        public AIGamePlayer(TEAM_COLOR teamColor, int initCapital) : base(teamColor, initCapital)
+        {
+            ControlMode = ControlModeType.AI_0;
+            Token = new QueuedMessageProcessor();
+        }
+    }
+
+    public class GamePlayer : StageUnitInfo
+    {
+        private static readonly ILog Logger = LogManager.GetLogger(typeof (GamePlayer));
+        private GameActionResult _result;
+
+        public GamePlayer()
+        {
+            Dice = new StageDiceInfo();
+        }
+
+        public GamePlayer(TEAM_COLOR teamColor, int initialCapital) : base(teamColor, initialCapital)
+        {
+            Dice = new StageDiceInfo();
+        }
+        
+        public QueuedMessageProcessor Token { get; set; }
         public GameMaster GameMaster { get; set; }
+        public StageManager StageManager { get; set; }
+        public StageDiceInfo Dice { get; set; }
+        public int LastSelected { get; set; }
 
-        public Guid Id
+        public int Position
         {
-            get
-            {
-                return Info.Id;
-            }
-            set
-            {
-                Info.Id = value;
-            }
+            get { return tileIndex; }
+            set { tileIndex = value; }
         }
 
-        public QueuedMessageProcessor Token
+        public int Gold
         {
-            set
-            {
-                _token = value;
-            }
+            get { return gold; }
+            set { gold = value; }
         }
 
-        public GamePlayer() 
-            :base(StageUnitInfo.TEAM_COLOR.RED, 1000000)
+        public GameActionResult Result
         {
-            Id = Guid.NewGuid();
+            get { return _result; }
+            set { SetResult(value); }
         }
 
         public IGameMessage ReceivedMessage
         {
-            get
-            {
-                return _token.ReceivedMessage;
-            }
+            get { return Token.ReceivedMessage; }
         }
 
         public IGameMessage SendingMessage
         {
-            set 
+            set { Token.SendingMessage = value; }
+        }
+
+        public TEAM_COLOR TeamColor
+        {
+            get
             {
-                _token.SendingMessage = value;
+                return teamColor;
+            }
+            set
+            {
+                teamColor = value;
+            }
+        }
+
+        private int RollMoveDice(int press)
+        {
+            Dice.Roll();
+            Position += Dice.resultSum;
+            return Position;
+        }
+
+        public bool Earn(int a)
+        {
+            return AddGold(a);
+        }
+
+        public bool Pay(int money)
+        {
+            return AddGold(-money);
+        }
+
+        public void ActivateTurn()
+        {
+            Console.WriteLine("My turn!");
+            OwnTurn = true;
+        }
+
+        public IEnumerable<GameAction> GetAction()
+        {
+            Console.WriteLine("I Do something...");
+            yield return new GameAction();
+        }
+
+        public void SetResult(GameActionResult result)
+        {
+            Console.WriteLine("Set Action result.");
+        }
+
+        public void DeactivateTurn()
+        {
+            OwnTurn = false;
+        }
+
+        public void StartTurn(int turn, GameMessageType actionType,
+            bool active = true, GameActionResult result = null)
+        {
+            OwnTurn = active;
+
+            switch (actionType)
+            {
+                case GameMessageType.OrderCardSelect:
+
+                    break;
+                case GameMessageType.RollMoveDice:
+                    break;
+            }
+
+            if (!active && null != result)
+            {
+            }
+        }
+
+        public IEnumerable<GameAction> Actions()
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                Console.WriteLine("this is actions in player {1}. {0}", i, Order);
+                var action = new GameAction {PlayerNumber = Order};
+
+                //need something to stop running.
+
+                yield return action;
             }
         }
     }

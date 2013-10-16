@@ -39,7 +39,7 @@ namespace DragonMarble
         private readonly List<GamePlayer> _players;
         private readonly IList<StageTile> _tiles;
         
-        private StageUnit[] _availablePlayers;
+        private StageUnitInfo[] _availablePlayers;
         private bool _gameContinue;
         private StageState _state;
         private IDictionary<string, IDragonMarbleGameMessage> messages;
@@ -72,8 +72,8 @@ namespace DragonMarble
             set { _gameContinue = value; }
         }
 
-        public StageUnit[] OrderedByCapitalPlayers { get; set; }
-        public StageUnit[] OrderedByTurnPlayers { get; set; }
+        public GamePlayer[] OrderedByCapitalPlayers { get; set; }
+        public GamePlayer[] OrderedByTurnPlayers { get; set; }
 
         public StageManager(IList<StageTile> tiles, List<GamePlayer> players)
         {
@@ -86,19 +86,19 @@ namespace DragonMarble
         
         public void InitGame()
         {
-            List<StageUnitInfo> units 
-                = _players.Select(stageUnit => stageUnit.Info).ToList();
+            List<StageUnitInfo> units = _players.Cast<StageUnitInfo>().ToList();
+
+            var f = new InitializeGameGameMessage
+            {
+                FeeBoostedTiles = new List<short>(new Int16[] { 3, 31, 29, 4 }),
+                NumberOfPlayers = (short)_players.Count,
+                Units = units
+            };
 
             foreach (GamePlayer stageUnit in _players)
             {   
                 stageUnit.StageManager = this;
-
-                var f = new InitializeGameGameMessage
-                {
-                    FeeBoostedTiles = new List<short>(new Int16[] {3, 31, 29, 4}),
-                    NumberOfPlayers = (short) units.Count,
-                    Units = units
-                };
+                f.To = stageUnit.Id;
                 stageUnit.SendingMessage = f;
             }
 
@@ -153,7 +153,7 @@ namespace DragonMarble
         {
         OrderedByTurnPlayers = (from player in _players orderby player.Order select player).ToArray();
             int j = 0;
-            foreach (StageUnit orderedByCapitalPlayer in OrderedByTurnPlayers)
+            foreach (GamePlayer orderedByCapitalPlayer in OrderedByTurnPlayers)
             {
                 orderedByCapitalPlayer.Order = j++;
                 Console.WriteLine(orderedByCapitalPlayer.TeamColor + ", " + orderedByCapitalPlayer.Order);
@@ -161,7 +161,7 @@ namespace DragonMarble
 
             OrderedByCapitalPlayers = (from player in _players orderby player.Capital select player).ToArray();
             int i = 0;
-            foreach (StageUnit orderedByCapitalPlayer in OrderedByCapitalPlayers)
+            foreach (GamePlayer orderedByCapitalPlayer in OrderedByCapitalPlayers)
             {
                 orderedByCapitalPlayer.CapitalOrder = i++;
                 Console.WriteLine(orderedByCapitalPlayer.TeamColor + ", " + orderedByCapitalPlayer.Order);
@@ -281,7 +281,7 @@ namespace DragonMarble
             return gameActionResult;
         }
 
-        private IEnumerable<StageUnit> PlayersOrderByTurn()
+        private IEnumerable<GamePlayer> PlayersOrderByTurn()
         {
             for (Turn = 0; Turn < TurnLimit; Turn++)
             {
@@ -302,7 +302,7 @@ namespace DragonMarble
                 //if need, other's reactions
                 if (action.NeedOther)
                 {
-                    foreach (StageUnit targetUnit in action.TargetUnits)
+                    foreach (StageUnitInfo targetUnit in action.TargetUnits)
                     {
                         Console.WriteLine("This action need target units action.");
                         GameAction othersAction = new GameAction();
@@ -312,7 +312,7 @@ namespace DragonMarble
             }
         }
 
-        private StageUnit CurrentPlayer
+        private GamePlayer CurrentPlayer
         {
             get { return OrderedByTurnPlayers[Turn % _players.Count]; }
         }

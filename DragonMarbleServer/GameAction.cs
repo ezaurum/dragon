@@ -10,8 +10,8 @@ namespace DragonMarble
         public int PlayerNumber { get; set; }
         public bool NeedOther { get; set; }
         public int TargetPlayer { get; set; }
-        public StageUnit Actor { get; set; }
-        public ICollection<StageUnit> TargetUnits { get; set; }
+        public GamePlayer Actor { get; set; }
+        public ICollection<GamePlayer> TargetUnits { get; set; }
         public ICollection<StageTile> TargetTiles { get; set; }
     }
 }
