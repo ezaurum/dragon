@@ -148,17 +148,23 @@ namespace DragonMarble
         public int CapitalOrder { get; set; }
         public int Capital { get; set; }
         public bool OwnTurn { get; set; }
+        public int DiceId { get; set; }
 
-        public StageUnitInfo(TEAM_COLOR teamColor, int initialCapital = 2000000)
+        public StageUnitInfo(TEAM_COLOR teamColor, int initialCapital = 2000000) : this()
         {
             this.teamColor = teamColor;
+            Capital = initialCapital;
+            gold = initialCapital;
+        }
+
+        public StageUnitInfo()
+        {
             round = 1;
             tileIndex = 0;
             lands = new Dictionary<int, StageTileInfo>();
             unitBuff = null;
-            Capital = initialCapital;
-            gold = initialCapital;
             chanceCoupon = CHANCE_COUPON.NULL;
+            DiceId = 1;
         }
 
         public int property

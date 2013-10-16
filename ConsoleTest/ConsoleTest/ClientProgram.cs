@@ -10,23 +10,11 @@ namespace ConsoleTest
     {           
         static void Main(string[] args)
         {
-            GameMessage rollMessage = new GameMessage()
+            RollMoveDiceGameMessage rollMessage = new RollMoveDiceGameMessage()
             {
-                Header = new GameMessageHeader()
-                {
-                    From = Guid.NewGuid(),
-                    To = Guid.NewGuid()
-
-                },
-                Body = new GameMessageBody()
-                {
-                    MessageType = GameMessageType.RollMoveDice,
-                    Content = new RollMoveDiceContent
-                    {
-                        Pressed = new Random().Next(0,int.MaxValue)
-                    }
-                }
-
+                From = Guid.NewGuid(),
+                To = Guid.NewGuid(),
+                Pressed = new Random().Next(0,int.MaxValue)
             };    
 
             Unity3DNetworkManager nm = new Unity3DNetworkManager("127.0.0.1", 10008);
@@ -70,11 +58,12 @@ namespace ConsoleTest
             
                 byte[] m = eventArgs.Buffer.Skip(eventArgs.Offset).Take(messageLength).ToArray();
                 Console.WriteLine("receive , {0}", m.Length);
-            GameMessage initGameMessage = GameMessage.FromByteArray(m, GameMessageFlowType.S2C);
+            var dragonMarbleGameMessage = GameMessageFactory.GetGameMessage(m);
 
-            Console.WriteLine("receive , {0}", initGameMessage.MessageType);
 
-            token.Message = initGameMessage;
+            Console.WriteLine("receive , {0}", dragonMarbleGameMessage.MessageType);
+
+            token.Message = dragonMarbleGameMessage;
         }
     }
 }

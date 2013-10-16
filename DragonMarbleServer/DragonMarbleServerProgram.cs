@@ -62,18 +62,11 @@ namespace DragonMarble
             GamePlayer player = new GamePlayer {Id = Guid.NewGuid()};
             
             //set initailize player message
-            GameMessage idMessage = new GameMessage
+
+            InitailizePlayerGameMessage idMessage = new InitailizePlayerGameMessage
             {
-                Header = new GameMessageHeader
-                {
-                    From = Guid.NewGuid(),
-                    To = player.Id
-                },
-                Body = new GameMessageBody
-                {
-                    MessageType = GameMessageType.InitUser,
-                    Content = new InitUserContent()
-                }
+                To = player.Id,
+                From = Guid.NewGuid()
             };
 
             token.SendingMessage = idMessage;
@@ -81,8 +74,7 @@ namespace DragonMarble
             //TODO something should be done.
             token.Player = player;
             player.Token = token;
-
-
+            
             gm.Join(player);
 
             GamePlayer player0 = new AIGamePlayer();
@@ -96,26 +88,20 @@ namespace DragonMarble
             QueuedMessageProcessor token = (QueuedMessageProcessor) eventArgs.UserToken;
             short messageLength = BitConverter.ToInt16(eventArgs.Buffer, eventArgs.Offset);
             byte[] m = eventArgs.Buffer.Skip(eventArgs.Offset).Take(messageLength).ToArray();
-            GameMessage gameMessage = GameMessage.FromByteArray(m, GameMessageFlowType.C2S);
+            
+            IDragonMarbleGameMessage gameMessage = GameMessageFactory.GetGameMessage(m);
             Logger.DebugFormat("receivec. {0}", gameMessage.MessageType);
             token.ReceivedMessage = gameMessage;
             
             if (gameMessage.MessageType == GameMessageType.RollMoveDice)
-            {
-                RollMoveDiceResultContent rollMoveDiceResultContent = new RollMoveDiceResultContent(new[] {1, 1});
-                token.SendingMessage = new GameMessage()
+            {   
+                RollMoveDiceResultGameMessage rollMoveDiceResultContent  = new RollMoveDiceResultGameMessage()
                 {
-                    Header = new GameMessageHeader()
-                    {
-                        To = Guid.NewGuid(),
-                        From = Guid.NewGuid()
-                    },
-                    Body = new GameMessageBody()
-                    {
-                        MessageType = GameMessageType.RollMoveDice,
-                        Content = rollMoveDiceResultContent
-                    }
+                    To = Guid.NewGuid(),
+                    From = Guid.NewGuid(),
+                    Dices = new List<Int32>(new[] {2,3})
                 };
+                token.SendingMessage = rollMoveDiceResultContent;
 
                 gm.Notify(Guid.NewGuid(),
                     GameMessageType.RollMoveDice, rollMoveDiceResultContent);
@@ -123,19 +109,13 @@ namespace DragonMarble
 
             if (gameMessage.MessageType == GameMessageType.OrderCardSelect)
             {
-                ((GameMessageHeader) gameMessage.Header).To = Guid.NewGuid();
-                ((GameMessageHeader)gameMessage.Header).From = Guid.NewGuid();
-                
-                SelectOrderCardContent content 
-                    = (SelectOrderCardContent) gameMessage.Content;
-
-                content.Result = true;
-
-                content.OrderSelectCards[content.SelectedCard] 
-                    = ((GamePlayer) token.Player).Order;
-
+                OrderCardSelectGameMessage gameMessage2 = (OrderCardSelectGameMessage) gameMessage;
+                gameMessage2.From = Guid.NewGuid();
+                gameMessage2.To= Guid.NewGuid();
+                gameMessage2.Result = true;
+                Int16 foo = gameMessage2.SelectedCardNumber;
+                gameMessage2.OrderCardSelectState[foo] = (short) ((GamePlayer) token.Player).Order;
                 token.SendingMessage = gameMessage;
-
             }
         }
     }

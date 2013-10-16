@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Dragon.Interfaces;
 using DragonMarble.Message;
 using log4net;
 
@@ -45,7 +46,7 @@ namespace DragonMarble
 
         public void Notify(Guid senderGuid,
             GameMessageType messageType,
-            IGameMessageContent messageContent)
+            Object messageContent)
         {
             if (Logger.IsDebugEnabled)
             {
@@ -55,8 +56,10 @@ namespace DragonMarble
 
             foreach (GamePlayer p in _players.Where(p => p.Id != senderGuid))
             {
-                p.SendingMessage
-                    = new GameMessage(Id, p.Id, senderGuid, messageType, messageContent);
+                IDragonMarbleGameMessage message = GameMessageFactory.GetGameMessage(messageType);
+                //TODO message content setting neeed.
+                p.SendingMessage = message;
+                    //= new GameMessage(Id, p.Id, senderGuid, messageType, messageContent);
             }
         }
     }

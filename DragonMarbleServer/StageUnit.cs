@@ -146,9 +146,7 @@ namespace DragonMarble
                 case GameMessageType.OrderCardSelect:
 
                     break;
-                case GameMessageType.RollDice:
-                    break;
-                case GameMessageType.SelectDestination:
+                case GameMessageType.RollMoveDice:
                     break;
             }
 

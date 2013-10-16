@@ -1,0 +1,77 @@
+Header :
+    comment : 헤더
+    fields :        
+        - type : GameMessageType
+          name : MessageType    
+          cast : Int32
+        - type : Guid
+          name : From
+          length : 16
+          constructor : byte_param
+          has_to_byte_array : true
+        - type : Guid
+          name : To        
+          length : 16
+          constructor : byte_param
+          has_to_byte_array : true        
+
+InitializeGame :
+    comment : 게임 초기화 정보
+    fields :
+        - name : FeeBoostedTiles
+          type : Int16
+          collection : List          
+          size : 4
+        - type : Int16
+          name : NumberOfPlayers
+        - name : Units
+          type : StageUnitInfo
+          constructor : blank
+          collection : List          
+          length : sizeof(Int32)
+          size : NumberOfPlayers
+          target :
+            - name : gold
+              type : Int32
+            - name : Order
+              type : Int32
+            - name : Capital
+              type : Int32
+            - name : teamColor
+              cast : Int32 
+              type : StageUnitInfo.TEAM_COLOR
+
+RollMoveDice :
+    comment : 클라이언트에서 이동 주사위 굴리기
+    fields :
+        - name : Pressed
+          type : Int32
+        - name : Odd
+          type : Boolean
+        - name : Even
+          type : Boolean
+
+RollMoveDiceResult :
+    comment : 서버에서 주사위 굴리기 결과
+    fields :
+        - name : Dices
+          type : Int32
+          collection : List
+          size : 2
+
+OrderCardSelect :
+    comment : 선 뽑기
+    fields :
+      - name : SelectedCardNumber
+        type : Int16
+      - name : Result
+        type : Boolean
+      - name : NumberOfPlayers
+        type : Int32
+      - name : OrderCardSelectState
+        type : Int16
+        collection : List
+        size : NumberOfPlayers
+
+InitailizePlayer :
+  comment : 플레이어 초기화  
