@@ -1,3 +1,13 @@
+#byte_param_constructor : byte[] 를 받는 생성자가 있어서 그걸로 생성
+#from_byte_array FromByteArray : 메소드가 있어서 그걸로 변환, 빈 생성자가 있다고 가정
+#to_byte_array ToByteArray : 메소드가 있어서 그걸로 변환
+#property : 프로퍼티로 설정
+#has_instance_length : 인스턴스마다 Length가 설정되어 있음. \
+#                      length에 값이 있으면 그걸로 프로퍼티 이름을 삼음 기본값은 Length
+#has_type_length : 타입마다 Length가 설정되어 있음. \
+#                   length에 값이 있으면 그걸로 프로퍼티 이름을 삼음. 기본값은 Length
+#options 에 targets가 있으면 무조건 빈 프로퍼티 있다고 가정
+
 Header :
     comment : 헤더
     fields :        
@@ -58,7 +68,7 @@ RollMoveDiceResult :
     comment : 서버에서 주사위 굴리기 결과
     fields :
         - name : Dices
-          type : char
+          type : Char
           collection : List
           size : 2
         - name : IsDouble
@@ -86,7 +96,7 @@ OrderCardResult :
         length : 16
         options : [byte_param_constructor, to_byte_array]
 
-InitailizePlayer :
+InitializePlayer :
   comment : 플레이어 초기화  
 
 InformOtherPlayerAction :
@@ -94,4 +104,4 @@ InformOtherPlayerAction :
   fields :
       - name : InformMessage
         type : IDragonMarbleGameMessage        
-        options : [byte_param_constructor, to_byte_array, from_byte_array, has_instance_length]
+        options : [to_byte_array, from_byte_array, has_instance_length]

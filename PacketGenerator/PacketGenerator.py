@@ -2,6 +2,7 @@ import yaml
 import sys
 import codecs
 import message_instance
+import message_from_byte_array
 
 def convertToBit(target, length, cast):
 	if cast is not None:
@@ -16,13 +17,6 @@ def convertToBitBySelf(target, length):
 	f.write('\n\t\t.CopyTo(bytes,index);')
 	f.write('\n\t\tindex += %s;'%length)
 
-def convertFromBit(target, targetType, length, cast):
-	if cast is not None:
-		f.write('\n\t\t%s = (%s)BitConverter.To%s(bytes,index);'%(target, targetType,cast))
-	else:
-		f.write('\n\t\t%s = BitConverter.To%s(bytes,index);'%(target, targetType))
-	f.write('\n\t\tindex += %s;'%length)
-
 def BitConvertAddTo(target, targetType, length, cast):
 	if cast is not None:
 		f.write('\n\t\t%s.Add((%s)BitConverter.To%s(bytes,index));'%(target, targetType,cast))
@@ -30,8 +24,7 @@ def BitConvertAddTo(target, targetType, length, cast):
 		f.write('\n\t\t%s.Add(BitConverter.To%s(bytes,index));'%(target, targetType))
 	f.write('\n\t\tindex += %s;'%length)
 
-def MakeCollection(name, collection, targetType):
-	f.write('\n\t\t%s = new %s<%s>();'%(name,collection,targetType))
+
 
 def convertToBitInnerTarget(field, target):
 	cast = target.get('cast')
@@ -50,7 +43,6 @@ def makeFieldByByteParamConstructor(name, targetType, length):
 	f.write('Buffer.BlockCopy(bytes, index,temp%s,0,%s);'%(name,length))
 	f.write('\n\t\t%s = new %s(temp%s);'%(name, targetType, name))
 	f.write('\n\t\tindex += %s;'%length)
-
 	
 input_file = sys.argv[1]
 output_file = sys.argv[2]
@@ -142,68 +134,7 @@ for packet_name in packet_list:
 	f.write('\n\treturn bytes;\n}')
 
 	# FromByteArray method implementation
-	f.write('\n\npublic void FromByteArray(byte[] bytes)\n{')
-
-	f.write('\n\t\tint index = 6;')
-	for field in fields:
-		if field['name'] == 'MessageType':
-			continue
-		length = field.get('length','sizeof(%s)'%field['type'])
-		castType = field.get('cast')
-		fieldType = field['type']
-		if 'collection' in field:
-			MakeCollection(field['name'],field['collection'],field['type'])
-			if 'size' not in field:
-				print('Collection of %s, %s is not have size.'%(field['type'],field['name']))
-				break
-			#when collection size is not int
-			if type(field['size']) is not int:
-				f.write('\n\t%s = new %s<%s>();'%(field['name'],field['collection'],field['type']))
-				f.write('\n\tfor (int i = 0; i < %s ; i++ )\n\t{'%field['size'])
-				#for object type has constructor
-				if field.get('constructor') == 'byte_param':
-					makeTempByByteParamConstructor(field['name'],field['type'],length)
-					f.write('\n\t\t%s.Add(target%s);'%(field['name'],field['name']))
-				#for object type don't has constructor
-				elif field.get('constructor') == 'blank':
-					f.write('\n\t\t%s target%s = new %s();'%(field['type'],field['name'],field['type']))
-					if 'target' in field:
-						for target in field['target']:
-							cast = target.get('cast')
-							if cast is None:
-								f.write('\n\t\ttarget%s.%s = BitConverter.To%s(bytes, index);'%(field['name'],target['name'],target['type']))
-							else:
-								f.write('\n\t\ttarget%s.%s = (%s)BitConverter.To%s(bytes, index);'%(field['name'],target['name'],target['type'],target['cast']))
-							f.write('\n\t\tindex += %s;'%length)
-					f.write('\n\t\t%s.Add(target%s);'%(field['name'],field['name']))
-				#for simple type
-				else:
-					cast = field.get('cast')
-					if cast is None :
-						f.write('\n\t\t%s target%s = BitConverter.To%s(bytes, index);'%(field['type'],field['name'],field['type']))
-					else:
-						f.write('\n\t\t%s target%s = (%s)BitConverter.To%s(bytes, index);'%(field['type'],field['name'],field['type'],cast))
-					f.write('\n\t\tindex += %s;'%length)
-					f.write('\n\t\t%s.Add(target%s);'%(field['name'],field['name']))
-
-				f.write('\n\t}')
-
-			#when collection size is int
-			else:
-				for i in range(field['size']):
-					BitConvertAddTo(field['name'],fieldType,length, castType)
-
-		#when not collection
-		else:
-			if field.get('constructor') == 'byte_param':
-				makeFieldByByteParamConstructor(field['name'],field['type'],length)
-			elif field.get('constructor') == 'blank':
-				f.write('\n\t\t%s = new %s();'%(field['name'],fieldType))
-				f.write('\n\t\tindex += %s;'%length)
-			else:
-				convertFromBit(field['name'],fieldType,length, castType)
-
-	f.write('\n}')
+	message_from_byte_array.make_from_byte_array(f, fields)
 
 	# Length property getter implementation
 	message_instance.make_message_length(f, fields, length)
