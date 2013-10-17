@@ -26,7 +26,9 @@ def calculate_length(field):
 	if field.get('targets') is None:
 		options = field.get('options',[])
 		length = field.get('length','sizeof(%s)'%(field['type']))		
-		if 'has_length' in options:
+		if 'has_instance_length' in options:
+			length = '%s.Length'%field['name']
+		if 'has_type_length' in options:
 			length = '%s.Length'%field['type']						
 	else:
 		length = ''

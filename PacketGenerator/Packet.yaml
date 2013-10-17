@@ -94,4 +94,4 @@ InformOtherPlayerAction :
   fields :
       - name : InformMessage
         type : IDragonMarbleGameMessage        
-        options : [byte_param_constructor, to_byte_array, from_byte_array, has_length]
+        options : [byte_param_constructor, to_byte_array, from_byte_array, has_instance_length]
