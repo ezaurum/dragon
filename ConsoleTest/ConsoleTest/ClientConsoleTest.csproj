@@ -48,6 +48,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\DragonMarbleDomain\DragonMarbleDomain.csproj">
+      <Project>{26208981-e513-4c57-b66e-560cbd88e28d}</Project>
+      <Name>DragonMarbleDomain</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\DragonMarbleGameMessage\DragonMarbleGameMessage.csproj">
       <Project>{cf240925-f622-49ab-a322-e94c08bfe1b9}</Project>
       <Name>DragonMarbleGameMessage</Name>
