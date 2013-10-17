@@ -24,11 +24,11 @@ InitializeGame :
           name : NumberOfPlayers
         - name : Units
           type : StageUnitInfo
-          constructor : blank
+          options : [constructor]
           collection : List          
           length : sizeof(Int16)
           size : NumberOfPlayers
-          target :
+          targets :
             - name : gold
               type : Int32
             - name : Order
@@ -48,7 +48,7 @@ RollMoveDice :
     comment : 클라이언트에서 이동 주사위 굴리기
     fields :
         - name : Pressed
-          type : Float
+          type : Single
         - name : Odd
           type : Boolean
         - name : Even

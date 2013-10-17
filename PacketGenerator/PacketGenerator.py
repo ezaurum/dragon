@@ -1,6 +1,7 @@
 import yaml
 import sys
 import codecs
+import message_instance
 
 def convertToBit(target, length, cast):
 	if cast is not None:
@@ -38,30 +39,6 @@ def convertToBitInnerTarget(field, target):
 	target_string='%s[i].%s'%(field['name'],target['name'])
 	convertToBit(target_string, length,cast)
 
-def makeMessageInstanceMaker(packet_list):
-	f.write('\npublic static class GameMessageFactory')
-	f.write('\n{')
-	f.write('\npublic static IDragonMarbleGameMessage GetGameMessage(byte[] bytes)')
-	f.write('\n{')
-	f.write('\nGameMessageType messageType = (GameMessageType) BitConverter.ToInt32(bytes, 2);')
-	f.write('\nIDragonMarbleGameMessage message = GetGameMessage(messageType);')
-	f.write('\n\tmessage.FromByteArray(bytes);')
-	f.write('\n\treturn message;')
-	f.write('\n}')
-	f.write('\npublic static IDragonMarbleGameMessage GetGameMessage(GameMessageType messageType)')
-	f.write('\n{')
-	f.write('\nIDragonMarbleGameMessage message = null;')
-	f.write('\n\tswitch (messageType)')
-	f.write('\n\t{')
-	for packet_name in packet_list:
-		f.write('\n\t\tcase GameMessageType.%s:'%packet_name)
-		f.write('\n\t\tmessage = new %sGameMessage();'%packet_name)		
-		f.write('\n\t\tbreak;')
-	f.write('\n\t}')
-	f.write('\n\treturn message;')
-	f.write('\n}')
-	f.write('\n}')
-
 def makeTempByByteParamConstructor(name, targetType, length):
 	f.write('\n\tbyte[] temp%s = new byte[%s];'%(name,length))
 	f.write('Buffer.BlockCopy(bytes, index,temp%s,0,%s);'%(name,length))
@@ -73,6 +50,7 @@ def makeFieldByByteParamConstructor(name, targetType, length):
 	f.write('Buffer.BlockCopy(bytes, index,temp%s,0,%s);'%(name,length))
 	f.write('\n\t\t%s = new %s(temp%s);'%(name, targetType, name))
 	f.write('\n\t\tindex += %s;'%length)
+
 	
 input_file = sys.argv[1]
 output_file = sys.argv[2]
@@ -97,7 +75,7 @@ for packet_name in packet_list:
 f.write('\n}')
 
 #make message instance maker
-makeMessageInstanceMaker(packet_list)
+message_instance.make_message_instance_maker(f, packet_list)
 
 #make each message class
 for packet_name in packet_list:
@@ -228,22 +206,8 @@ for packet_name in packet_list:
 	f.write('\n}')
 
 	# Length property getter implementation
-	f.write('\n\npublic Int16 Length\n{\n\tget\n\t{')
-	f.write('\n\treturn (Int16)(2')
-	for field in fields:
-		length = 'sizeof(%s)'%(field['type'])		
-		if 'size' in field:		
-			if 'target' in field:
-				l = len(field['target'])
-				length = '(%s*(%s*%s))'%(field['size'],field.get('length',length),l)
-			else:
-				length = '(%s*(%s))'%(field['size'],field.get('length',length))
-		else:
-			length = '(%s)'%field.get('length',length)		
-		f.write('+%s'%length)
-	f.write(');')	
-	f.write('\n\t}\n}')
-
+	message_instance.make_message_length(f, fields, length)
+	
 	#end of class
 	f.write('\n}\n')
 
