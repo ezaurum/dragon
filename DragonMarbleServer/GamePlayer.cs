@@ -194,7 +194,7 @@ namespace DragonMarble
         {
             for (int i = 0; i < 3; i++)
             {
-                Console.WriteLine("this is actions in player {1}. {0} mode : {2}", i, Order, ControlMode);
+                Console.WriteLine("this is actions in id : {3}, player {1}. {0} mode : {2}", i, Order, ControlMode, Id);
                 var action = new GameAction {PlayerNumber = Order, Actor = this};
 
                 //need something to stop running.

@@ -13,6 +13,7 @@ public enum GameMessageType
 	InitializeGame,
 	RollMoveDice,
     InformOtherPlayerAction,
+    ActivateTurn
 }
 public static class GameMessageFactory
 {
@@ -48,13 +49,73 @@ IDragonMarbleGameMessage message = null;
 		break;
         case GameMessageType.InformOtherPlayerAction:
         message = new InformOtherPlayerActionGameMessage();
-	        break;
+	    break;
+        case GameMessageType.ActivateTurn:
+        message = new ActivateTurnGameMessage();
+        break;
 	}
 	return message;
 }
 }
 
-public class InformOtherPlayerActionGameMessage : IDragonMarbleGameMessage
+    public class ActivateTurnGameMessage : IDragonMarbleGameMessage
+    {
+        public Int16 Length
+        {
+            get
+            {
+                return (Int16)(2 + (sizeof(GameMessageType)) + (16) + (16) + 16 + 64);
+            }
+        }
+        public byte[] ToByteArray()
+        {
+            byte[] bytes = new byte[Length];
+            int index = 0;
+            BitConverter.GetBytes(Length)
+            .CopyTo(bytes, index);
+            index += sizeof(Int16);
+            BitConverter.GetBytes((Int32)MessageType)
+            .CopyTo(bytes, index);
+            index += sizeof(GameMessageType);
+            From.ToByteArray()
+            .CopyTo(bytes, index);
+            index += 16;
+            To.ToByteArray()
+            .CopyTo(bytes, index);
+            index += 16;
+            TurnOwner.ToByteArray()
+            .CopyTo(bytes, index);
+            index += 16;
+            BitConverter.GetBytes(ResponseLimit)
+            .CopyTo(bytes, index);
+            index += 64;
+            return bytes;
+        }
+
+        public void FromByteArray(byte[] bytes)
+        {
+            int index = 6;
+            byte[] tempFrom = new byte[16]; Buffer.BlockCopy(bytes, index, tempFrom, 0, 16);
+            From = new Guid(tempFrom);
+            index += 16;
+            byte[] tempTo = new byte[16]; Buffer.BlockCopy(bytes, index, tempTo, 0, 16);
+            To = new Guid(tempTo);
+            index += 16;
+            byte[] tempTurnOwner = new byte[16]; Buffer.BlockCopy(bytes, index, tempTurnOwner, 0, 16);
+            TurnOwner = new Guid(tempTurnOwner);
+            index += 16;
+            ResponseLimit = BitConverter.ToInt64(bytes, index);
+            index += 64;
+        }
+
+        public GameMessageType MessageType { get { return GameMessageType.ActivateTurn; } }
+        public Guid To { get; set; }
+        public Guid From { get; set; }
+        public Guid TurnOwner;
+        public Int64 ResponseLimit;
+    }
+
+    public class InformOtherPlayerActionGameMessage : IDragonMarbleGameMessage
     {
         public GameMessageType MessageType { get { return GameMessageType.InformOtherPlayerAction; } }
     public Guid To { get; set; }

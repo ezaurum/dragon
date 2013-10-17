@@ -41,16 +41,18 @@ namespace Dragon.Server
                 if (_receivedMessages.Count < 1)
                 {
                     _receiveMessageWaitHandler.Reset();
-                    Logger.Debug("Rest received message");
+                    Logger.Debug("Reset received message");
                     Logger.DebugFormat("{0}", Player.GetType());
                 }
+                Logger.DebugFormat("Start waiting. {0}",_receivedMessages.Count);
                 _receiveMessageWaitHandler.WaitOne();
+                Logger.Debug("Deque.");
                 return _receivedMessages.Dequeue();
             }
             set
             {
                 _receivedMessages.Enqueue(value);
-                Logger.Debug("received message. message set");
+                Logger.DebugFormat("received message. {0}", _receivedMessages.Count);
                 _receiveMessageWaitHandler.Set();
             }
         }

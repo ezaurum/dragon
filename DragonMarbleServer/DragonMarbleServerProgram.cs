@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 using Dragon.Server;
 using DragonMarble.Message;
 using GameUtils;
@@ -136,9 +137,9 @@ namespace DragonMarble
                     FirstPlayerId = gm.GetId(f)
                 };
                 token.SendingMessage = m2;
-
                 
-                gm.OrderEnd();
+                //TODO async call. event or something?
+                Task.Factory.StartNew(gm.OrderEnd);
             }
         }
     }
