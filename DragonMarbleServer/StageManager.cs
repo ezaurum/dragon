@@ -139,8 +139,8 @@ namespace DragonMarble
                 {
                     To = stageUnit.Id,
                     From = Guid.NewGuid(),
-                    NumberOfPlayers = _players.Count,
-                    OrderCardSelectState = new List<Int16> {-1, -1},
+                    NumberOfPlayers = (short) _players.Count,
+                    OrderCardSelectState = new List<Boolean>() {false, false},
                     SelectedCardNumber = -1
                 };
                 stageUnit.SendingMessage = f;

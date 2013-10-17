@@ -57,8 +57,9 @@ IDragonMarbleGameMessage message = null;
 public class InformOtherPlayerActionGameMessage : IDragonMarbleGameMessage
     {
         public GameMessageType MessageType { get { return GameMessageType.InformOtherPlayerAction; } }
-        public Guid From;
-        public Guid To;
+    public Guid To { get; set; }
+    public Guid From { get; set; }
+    
     public IDragonMarbleGameMessage InformMessage;    
     public byte[] ToByteArray()
         {
@@ -109,9 +110,10 @@ public class InformOtherPlayerActionGameMessage : IDragonMarbleGameMessage
 public class RollMoveDiceResultGameMessage : IDragonMarbleGameMessage	
 {
 	public GameMessageType MessageType {get{return GameMessageType.RollMoveDiceResult;}}
-	public Guid From;
-	public Guid To;
-	public List<Int32> Dices;
+    public Guid To { get; set; }
+    public Guid From { get; set; }
+
+    public List<Int32> Dices;
 
 	public byte[] ToByteArray()
 	{
@@ -167,10 +169,11 @@ public Int16 Length
 public class InitailizePlayerGameMessage : IDragonMarbleGameMessage	
 {
 	public GameMessageType MessageType {get{return GameMessageType.InitailizePlayer;}}
-	public Guid From;
-	public Guid To;
+    public Guid To { get; set; }
+    public Guid From { get; set; }
 
-	public byte[] ToByteArray()
+
+    public byte[] ToByteArray()
 	{
 		byte[] bytes = new byte[Length];
 		int index = 0;
@@ -213,11 +216,11 @@ public Int16 Length
 public class OrderCardResultGameMessage : IDragonMarbleGameMessage	
 {
 	public GameMessageType MessageType {get{return GameMessageType.OrderCardResult;}}
-	public Guid From;
-	public Guid To;
-	public Int16 FirstCardNumber;
-	public Int32 NumberOfPlayers;
-	public List<Int16> OrderCardSelectState;
+    public Guid To { get; set; }
+    public Guid From { get; set; }
+
+    public Int16 FirstCardNumber;
+	public Int16 NumberOfPlayers;
     public Guid FirstPlayerId;
 
 	public byte[] ToByteArray()
@@ -241,13 +244,7 @@ public class OrderCardResultGameMessage : IDragonMarbleGameMessage
 		index += sizeof(Int16);
 		BitConverter.GetBytes(NumberOfPlayers)
 		.CopyTo(bytes,index);
-		index += sizeof(Int32);
-	for (int i = 0; i < NumberOfPlayers ; i++ )
-	{
-		BitConverter.GetBytes(OrderCardSelectState[i])
-		.CopyTo(bytes,index);
-		index += sizeof(Int16);
-	}
+        index += sizeof(Int16);
     FirstPlayerId.ToByteArray()
     .CopyTo(bytes, index);
     index += 16;
@@ -265,16 +262,10 @@ public void FromByteArray(byte[] bytes)
 		index += 16;
 		FirstCardNumber = BitConverter.ToInt16(bytes,index);
 		index += sizeof(Int16);
-		NumberOfPlayers = BitConverter.ToInt32(bytes,index);
-		index += sizeof(Int32);
-		OrderCardSelectState = new List<Int16>();
-	OrderCardSelectState = new List<Int16>();
-	for (int i = 0; i < NumberOfPlayers ; i++ )
-	{
-		Int16 targetOrderCardSelectState = BitConverter.ToInt16(bytes, index);
-		OrderCardSelectState.Add(targetOrderCardSelectState);
-	}
-    byte[] tempFirstPlayerId = new byte[16]; Buffer.BlockCopy(bytes, index, tempFirstPlayerId, 0, 16);
+		NumberOfPlayers = BitConverter.ToInt16(bytes,index);
+		index += sizeof(Int16);
+    byte[] tempFirstPlayerId = new byte[16]; 
+    Buffer.BlockCopy(bytes, index, tempFirstPlayerId, 0, 16);
     FirstPlayerId = new Guid(tempFirstPlayerId);
     index += 16;
 }
@@ -283,7 +274,7 @@ public Int16 Length
 {
 	get
 	{
-	return (Int16)(16+2+(sizeof(GameMessageType))+(16)+(16)+(sizeof(Int16))+(sizeof(Int32))+(NumberOfPlayers*(sizeof(Int16))));
+	return (Int16)(16+2+(sizeof(GameMessageType))+(16)+(16)+(sizeof(Int16))+(sizeof(Int16)));
 	}
 }
 
@@ -294,12 +285,12 @@ public Int16 Length
 public class OrderCardSelectGameMessage : IDragonMarbleGameMessage	
 {
 	public GameMessageType MessageType {get{return GameMessageType.OrderCardSelect;}}
-	public Guid From;
-	public Guid To;
-	public Int16 SelectedCardNumber;
-	public Boolean Result;
-	public Int32 NumberOfPlayers;
-	public List<Int16> OrderCardSelectState;
+    public Guid To { get; set; }
+    public Guid From { get; set; }
+
+    public Int16 SelectedCardNumber;
+	public Int16 NumberOfPlayers;
+	public List<Boolean> OrderCardSelectState;
 
 	public byte[] ToByteArray()
 	{
@@ -320,17 +311,14 @@ public class OrderCardSelectGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes(SelectedCardNumber)
 		.CopyTo(bytes,index);
 		index += sizeof(Int16);
-		BitConverter.GetBytes(Result)
-		.CopyTo(bytes,index);
-		index += sizeof(Boolean);
 		BitConverter.GetBytes(NumberOfPlayers)
 		.CopyTo(bytes,index);
-		index += sizeof(Int32);
+		index += sizeof(Int16);
 	for (int i = 0; i < NumberOfPlayers ; i++ )
 	{
 		BitConverter.GetBytes(OrderCardSelectState[i])
 		.CopyTo(bytes,index);
-		index += sizeof(Int16);
+        index += sizeof(Boolean);
 	}
 	return bytes;
 }
@@ -346,16 +334,13 @@ public void FromByteArray(byte[] bytes)
 		index += 16;
 		SelectedCardNumber = BitConverter.ToInt16(bytes,index);
 		index += sizeof(Int16);
-		Result = BitConverter.ToBoolean(bytes,index);
-		index += sizeof(Boolean);
-		NumberOfPlayers = BitConverter.ToInt32(bytes,index);
-		index += sizeof(Int32);
-		OrderCardSelectState = new List<Int16>();
-	OrderCardSelectState = new List<Int16>();
+		NumberOfPlayers = BitConverter.ToInt16(bytes,index);
+		index += sizeof(Int16);
+        OrderCardSelectState = new List<Boolean>();
 	for (int i = 0; i < NumberOfPlayers ; i++ )
 	{
-		Int16 targetOrderCardSelectState = BitConverter.ToInt16(bytes, index);
-	    index += sizeof (Int16);
+        Boolean targetOrderCardSelectState = BitConverter.ToBoolean(bytes, index);
+	    index += sizeof (Boolean);
 		OrderCardSelectState.Add(targetOrderCardSelectState);
 	}
 }
@@ -364,7 +349,7 @@ public Int16 Length
 {
 	get
 	{
-	return (Int16)(2+(sizeof(GameMessageType))+(16)+(16)+(sizeof(Int16))+(sizeof(Boolean))+(sizeof(Int32))+(NumberOfPlayers*(sizeof(Int16))));
+	return (Int16)(2+(sizeof(GameMessageType))+(16)+(16)+(sizeof(Int16))+(sizeof(Int16))+(NumberOfPlayers*(sizeof(Boolean))));
 	}
 }
 }
@@ -373,9 +358,10 @@ public Int16 Length
 public class InitializeGameGameMessage : IDragonMarbleGameMessage	
 {
 	public GameMessageType MessageType {get{return GameMessageType.InitializeGame;}}
-	public Guid From;
-	public Guid To;
-	public List<Int16> FeeBoostedTiles;
+    public Guid To { get; set; }
+    public Guid From { get; set; }
+
+    public List<Int16> FeeBoostedTiles;
 	public Int16 NumberOfPlayers;
 	public List<StageUnitInfo> Units;
 
@@ -441,7 +427,7 @@ public void FromByteArray(byte[] bytes)
     Buffer.BlockCopy(bytes, index,tempFrom,0,16);
 		From = new Guid(tempFrom);
 		index += 16;
-	byte[] tempTo = new byte[16];Buffer.BlockCopy(bytes, index,tempTo,0,16);
+	    byte[] tempTo = new byte[16];Buffer.BlockCopy(bytes, index,tempTo,0,16);
 		To = new Guid(tempTo);
 		index += 16;
 		FeeBoostedTiles = new List<Int16>();
@@ -472,8 +458,11 @@ public void FromByteArray(byte[] bytes)
 		index += sizeof(Int32);
         byte[] tempId = new byte[16];
         Buffer.BlockCopy(bytes, index, tempId, 0, 16);
-        targetUnits.Id = new Guid(tempFrom);
-		index += sizeof(Int32);
+        targetUnits.Id = new Guid(tempId);
+        Console.WriteLine(targetUnits.Id);
+        Console.WriteLine(tempId);
+        Console.WriteLine(bytes);
+		index += 16;
 		Units.Add(targetUnits);
 	}
 }
@@ -491,9 +480,10 @@ public Int16 Length
 public class RollMoveDiceGameMessage : IDragonMarbleGameMessage	
 {
 	public GameMessageType MessageType {get{return GameMessageType.RollMoveDice;}}
-	public Guid From;
-	public Guid To;
-	public Int32 Pressed;
+    public Guid To { get; set; }
+    public Guid From { get; set; }
+
+    public Int32 Pressed;
 	public Boolean Odd;
 	public Boolean Even;
 

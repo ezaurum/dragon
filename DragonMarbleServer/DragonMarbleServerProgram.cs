@@ -47,12 +47,27 @@ namespace DragonMarble
             Logger.Debug("connectecd.");
             QueuedMessageProcessor token = (QueuedMessageProcessor)eventArgs.UserToken;
 
-            GamePlayer player = new GamePlayer {Token = token, Order = 0};
+            GamePlayer player = new GamePlayer {
+                Id = Guid.NewGuid(),
+                Token = token, 
+                Order = 0,
+                TeamColor = StageUnitInfo.TEAM_COLOR.BLUE,
+                CharacterId = 1,
+                Gold = 2000000
+            };
             token.Player = player;
+            
             gm.Join(player);
 
             //TODO dummy ai player
-            GamePlayer player0 = new AIGamePlayer {Order = 1};
+            GamePlayer player0 = new AIGamePlayer
+            {
+                Id = Guid.NewGuid(),
+                Order = 1,
+                TeamColor = StageUnitInfo.TEAM_COLOR.GREEN,
+                CharacterId = 2,
+                Gold = 2000000
+            };
             gm.Join(player0);
 
             if (gm.IsGameStartable)
@@ -88,12 +103,27 @@ namespace DragonMarble
             if (gameMessage.MessageType == GameMessageType.OrderCardSelect)
             {
                 OrderCardSelectGameMessage gameMessage2 = (OrderCardSelectGameMessage) gameMessage;
+                Int16 foo = gameMessage2.SelectedCardNumber;
+
                 gameMessage2.To = gameMessage2.From;
                 gameMessage2.From = Guid.NewGuid();
-                gameMessage2.Result = true;
-                Int16 foo = gameMessage2.SelectedCardNumber;
-                gameMessage2.OrderCardSelectState[foo] = (short) ((GamePlayer) token.Player).Order;
+                gameMessage2.OrderCardSelectState[foo] = true;
+                
                 token.SendingMessage = gameMessage2;
+
+                gm.SelectOrder(foo, ((GamePlayer)token.Player));
+
+                Int16 foo1 = (short) (foo == 0 ? 1 : 0);
+                OrderCardSelectGameMessage m3 = new OrderCardSelectGameMessage
+                {
+                    SelectedCardNumber = -1,
+                    From = gameMessage2.From,
+                    To = gameMessage2.To,
+                    OrderCardSelectState = new List<bool> {true, true},
+                    NumberOfPlayers = 2
+                };
+                gm.SelectOrder(foo1, gm.Players[1]);
+                token.SendingMessage = m3;
 
                 Int16 f = (short) new Random().Next(0, gameMessage2.NumberOfPlayers);
                 //
@@ -101,10 +131,9 @@ namespace DragonMarble
                 {
                     FirstCardNumber = f,
                     NumberOfPlayers = gameMessage2.NumberOfPlayers,
-                    OrderCardSelectState = gameMessage2.OrderCardSelectState,
                     From = gameMessage2.From,
                     To = gameMessage2.To,
-                    FirstPlayerId = gm.Players[f].Id
+                    FirstPlayerId = gm.GetId(f)
                 };
                 token.SendingMessage = m2;
             }

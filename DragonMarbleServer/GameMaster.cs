@@ -11,8 +11,10 @@ namespace DragonMarble
         private static readonly ILog Logger = LogManager.GetLogger(typeof (GameMaster));
         private readonly List<GamePlayer> _players;
         private readonly List<StageTile> _tiles;
+        private GameBoard Board { get; set; }
         private StageManager _stageManager;
         public List<GamePlayer> Players { get { return _players; } }
+        private Dictionary<Int16, Guid> _OrderCard = new Dictionary<short, Guid>();
         public GameMaster(List<StageTile> tiles)
         {
             Id = Guid.NewGuid();
@@ -36,7 +38,7 @@ namespace DragonMarble
             InitailizePlayerGameMessage idMessage = new InitailizePlayerGameMessage
             {
                 To = player.Id,
-                From = Guid.NewGuid()
+                From = Id
             };
 
             player.SendingMessage = idMessage;
@@ -70,5 +72,19 @@ namespace DragonMarble
                     //= new GameMessage(Id, p.Id, senderGuid, messageType, messageContent);
             }
         }
+
+        public void SelectOrder(short foo, GamePlayer gamePlayer)
+        {
+            _OrderCard.Add(foo, gamePlayer.Id);
+        }
+
+        public Guid GetId(short foo)
+        {
+            return _OrderCard[foo];
+        }
+    }
+
+    internal class GameBoard
+    {
     }
 }

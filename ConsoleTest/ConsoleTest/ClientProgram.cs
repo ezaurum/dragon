@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using Dragon.Client;
+using DragonMarble;
 using DragonMarble.Message;
 
 namespace ConsoleTest
@@ -52,7 +53,7 @@ namespace ConsoleTest
                         From = Guid.NewGuid(),
                         To = Guid.NewGuid(),
                         SelectedCardNumber = 1,
-                        OrderCardSelectState = new List<Int16> {-1,2},
+                        OrderCardSelectState = new List<Boolean> {false,true},
                         NumberOfPlayers = 2
                     };
                     nm.SendMessage(orderCardSelectGameMessage);
@@ -65,7 +66,7 @@ namespace ConsoleTest
                         From = Guid.NewGuid(),
                         To = Guid.NewGuid(),
                         SelectedCardNumber = 0,
-                        OrderCardSelectState = new List<Int16> {2,-1},
+                        OrderCardSelectState = new List<Boolean> { true, false },
                         NumberOfPlayers = 2
                     };
                     nm.SendMessage(orderCardSelectGameMessage);
@@ -81,7 +82,7 @@ namespace ConsoleTest
             Console.WriteLine("Buffer Length , {0}", eventArgs.Buffer.Length);
 
             short messageLength = BitConverter.ToInt16(eventArgs.Buffer, eventArgs.Offset);
-            if (messageLength < 32) return;
+            if (messageLength < 32) return;            
             
                 byte[] m = eventArgs.Buffer.Skip(eventArgs.Offset).Take(messageLength).ToArray();
                 Console.WriteLine("receive , {0}", m.Length);
@@ -97,6 +98,14 @@ namespace ConsoleTest
                     ((OrderCardSelectGameMessage)dragonMarbleGameMessage).OrderCardSelectState[1])
                     ;
                     break;
+                case GameMessageType.InitializeGame:
+                    Console.WriteLine("number of players : {0}", ((InitializeGameGameMessage) dragonMarbleGameMessage).NumberOfPlayers);
+                    Console.WriteLine("number of players : {0}", ((InitializeGameGameMessage)dragonMarbleGameMessage).Units[0].gold);
+                    Console.WriteLine("number of players : {0}", ((InitializeGameGameMessage)dragonMarbleGameMessage).Units[0].Id);
+                    Console.WriteLine("number of players : {0}", ((InitializeGameGameMessage)dragonMarbleGameMessage).Units[1].Id);
+                    Console.WriteLine("number of players : {0}", ((InitializeGameGameMessage)dragonMarbleGameMessage).Units[1].gold);
+                    break;
+
             }
             
 
