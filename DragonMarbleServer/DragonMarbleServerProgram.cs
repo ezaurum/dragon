@@ -46,7 +46,7 @@ namespace DragonMarble
         {   
             Logger.Debug("connectecd.");
             QueuedMessageProcessor token = (QueuedMessageProcessor)eventArgs.UserToken;
-
+            Logger.DebugFormat("token guid : {0}",token.Id);
             GamePlayer player = new GamePlayer {
                 Id = Guid.NewGuid(),
                 Token = token, 
@@ -136,6 +136,9 @@ namespace DragonMarble
                     FirstPlayerId = gm.GetId(f)
                 };
                 token.SendingMessage = m2;
+
+                
+                gm.OrderEnd();
             }
         }
     }

@@ -10,16 +10,66 @@ namespace DragonMarble
     internal class AIGamePlayer : GamePlayer
     {
         public AIGamePlayer() : this(TEAM_COLOR.BLUE, 2000000)
-        {
-            
+        {   
         }
 
         public AIGamePlayer(TEAM_COLOR teamColor, int initCapital) : base(teamColor, initCapital)
         {
             ControlMode = ControlModeType.AI_0;
-            Token = new QueuedMessageProcessor();
+            Token = new AIQueuedMessageProcessor();
+        }
+
+        public override GameMaster GameMaster
+        {
+            set
+            {
+                base.GameMaster = value;
+                ((AIQueuedMessageProcessor) Token).GameMasterId = value.Id;
+            }
         }
     }
+
+    internal class AIQueuedMessageProcessor : QueuedMessageProcessor
+    {
+        public Guid GameMasterId { get; set; }
+        public override IGameMessage SendingMessage
+        {
+            set
+            {
+                base.SendingMessage = value;
+                Console.WriteLine("AI received.");
+                ReceivedMessage = GetMessage(value);
+            }
+        }
+
+        public override IGameMessage ReceivedMessage
+        {   
+            set
+            {
+                if ( null != value )
+                    base.ReceivedMessage = value;
+            }
+        }
+
+        private IDragonMarbleGameMessage GetMessage(IGameMessage message)
+        {
+            GameMessageType messageType = ((IDragonMarbleGameMessage)message).MessageType;
+            IDragonMarbleGameMessage result = null;
+            switch (messageType)
+            {
+                case GameMessageType.ActivateTurn:
+                    result = new RollMoveDiceGameMessage()
+                    {
+                        Pressed = 10,
+                        To = Id,
+                        From = GameMasterId
+                    };
+                    break;
+            }
+            return result;
+        }
+    }
+
 
     public class GamePlayer : StageUnitInfo
     {
@@ -37,7 +87,7 @@ namespace DragonMarble
         }
         
         public QueuedMessageProcessor Token { get; set; }
-        public GameMaster GameMaster { get; set; }
+        public virtual GameMaster GameMaster { get; set; }
         public StageManager StageManager { get; set; }
         public StageDiceInfo Dice { get; set; }
         public int LastSelected { get; set; }
@@ -60,12 +110,12 @@ namespace DragonMarble
             set { SetResult(value); }
         }
 
-        public IGameMessage ReceivedMessage
+        public virtual IGameMessage ReceivedMessage
         {
             get { return Token.ReceivedMessage; }
         }
 
-        public IGameMessage SendingMessage
+        public virtual IGameMessage SendingMessage
         {
             set { Token.SendingMessage = value; }
         }
@@ -144,10 +194,21 @@ namespace DragonMarble
         {
             for (int i = 0; i < 3; i++)
             {
-                Console.WriteLine("this is actions in player {1}. {0}", i, Order);
-                var action = new GameAction {PlayerNumber = Order};
+                Console.WriteLine("this is actions in player {1}. {0} mode : {2}", i, Order, ControlMode);
+                var action = new GameAction {PlayerNumber = Order, Actor = this};
 
                 //need something to stop running.
+                SendingMessage = new ActivateTurnGameMessage
+                {
+                    To = Id,
+                    From = Id,
+                    TurnOwner = Id,
+                    ResponseLimit = 50000
+                };
+
+                var receivedMessage = ReceivedMessage;
+                
+                Console.WriteLine( ((IDragonMarbleGameMessage)receivedMessage).MessageType);
 
                 yield return action;
             }

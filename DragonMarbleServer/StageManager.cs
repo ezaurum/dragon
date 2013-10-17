@@ -179,6 +179,18 @@ namespace DragonMarble
             foreach (GameAction action in PlayerActions())
             {
                 Console.WriteLine("Here is ProcessAction");
+
+                foreach (GamePlayer gamePlayer in _players.Where( p=> !p.Id.Equals(action.Actor.Id )))
+                {
+                    gamePlayer.SendingMessage = new ActivateTurnGameMessage
+                    {
+                        To = gamePlayer.Id,
+                        From = Id,
+                        TurnOwner = action.Actor.Id,
+                        ResponseLimit = 50000
+                    };
+                }
+
                 CurrentAction = action;
 
                 if (Result.TargetUnits != null)

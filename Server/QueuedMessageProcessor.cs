@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Threading;
 using Dragon.Interfaces;
@@ -9,6 +10,8 @@ namespace Dragon.Server
     // user token for async process.
     public class QueuedMessageProcessor : IAsyncUserToken
     {
+        private Guid _id = Guid.NewGuid();
+        public Guid Id { get { return _id; } }
         private static readonly ILog Logger = LogManager.GetLogger(typeof(QueuedMessageProcessor));
         public Socket Socket { get; set; }
         public SocketAsyncEventArgs ReadArg { get; set; }
@@ -31,13 +34,15 @@ namespace Dragon.Server
             }
         }
 
-        public IGameMessage ReceivedMessage
+        public virtual  IGameMessage ReceivedMessage
         {
-            get
+            get 
             {   
                 if (_receivedMessages.Count < 1)
                 {
                     _receiveMessageWaitHandler.Reset();
+                    Logger.Debug("Rest received message");
+                    Logger.DebugFormat("{0}", Player.GetType());
                 }
                 _receiveMessageWaitHandler.WaitOne();
                 return _receivedMessages.Dequeue();
@@ -45,11 +50,12 @@ namespace Dragon.Server
             set
             {
                 _receivedMessages.Enqueue(value);
+                Logger.Debug("received message. message set");
                 _receiveMessageWaitHandler.Set();
             }
         }
 
-        public IGameMessage SendingMessage
+        public virtual IGameMessage SendingMessage
         {
             get
             {

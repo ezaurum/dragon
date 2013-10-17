@@ -69,6 +69,7 @@ namespace DragonMarble
                 IDragonMarbleGameMessage message = GameMessageFactory.GetGameMessage(messageType);
                 //TODO message content setting neeed.
                 p.SendingMessage = message;
+                
                     //= new GameMessage(Id, p.Id, senderGuid, messageType, messageContent);
             }
         }
@@ -81,6 +82,26 @@ namespace DragonMarble
         public Guid GetId(short foo)
         {
             return _OrderCard[foo];
+        }
+
+        public void OrderEnd()
+        {
+            var guid = _OrderCard[0];
+            _players.ForEach(p =>
+            {
+                if (p.Id.Equals(guid))
+                p.Order = 0;
+            });
+
+            var guid1 = _OrderCard[1];
+            _players.ForEach(p =>
+            {
+                if (p.Id.Equals(guid1))
+                    p.Order = 1;
+            });
+
+            _stageManager.OrderPlayers2();
+            _stageManager.PlayGame();
         }
     }
 
