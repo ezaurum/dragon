@@ -7,13 +7,11 @@ Header :
         - type : Guid
           name : From
           length : 16
-          constructor : byte_param
-          has_to_byte_array : true
+          options : [byte_param_constructor, to_byte_array, property]
         - type : Guid
           name : To        
           length : 16
-          constructor : byte_param
-          has_to_byte_array : true        
+          options : [byte_param_constructor, to_byte_array, property]
 
 InitializeGame :
     comment : 게임 초기화 정보
@@ -28,14 +26,12 @@ InitializeGame :
           type : StageUnitInfo
           constructor : blank
           collection : List          
-          length : sizeof(Int32)
+          length : sizeof(Int16)
           size : NumberOfPlayers
           target :
             - name : gold
               type : Int32
             - name : Order
-              type : Int32
-            - name : Capital
               type : Int32
             - name : teamColor
               cast : Int32 
@@ -46,15 +42,13 @@ InitializeGame :
             - name : Id
               type : Guid
               length : 16
-              constructor : byte_param
-              has_to_byte_array : true
-
+              options : [byte_param_constructor, to_byte_array]
 
 RollMoveDice :
     comment : 클라이언트에서 이동 주사위 굴리기
     fields :
         - name : Pressed
-          type : Int32
+          type : Float
         - name : Odd
           type : Boolean
         - name : Even
@@ -64,7 +58,7 @@ RollMoveDiceResult :
     comment : 서버에서 주사위 굴리기 결과
     fields :
         - name : Dices
-          type : Int32
+          type : char
           collection : List
           size : 2
         - name : IsDouble
@@ -76,7 +70,7 @@ OrderCardSelect :
       - name : SelectedCardNumber
         type : Int16      
       - name : NumberOfPlayers
-        type : Int32
+        type : Int16
       - name : OrderCardSelectState
         type : Boolean
         collection : List
@@ -90,8 +84,7 @@ OrderCardResult :
       - type : Guid
         name : FirstPlayerId
         length : 16
-        constructor : byte_param
-        has_to_byte_array : true
+        options : [byte_param_constructor, to_byte_array]
 
 InitailizePlayer :
   comment : 플레이어 초기화  
@@ -100,7 +93,5 @@ InformOtherPlayerAction :
   comment : 다른 플레이어의 행동 알림
   fields :
       - name : InformMessage
-        type : IDragonMarbleGameMessage
-        length : Length
-        has_from_byte_array : true        
-        has_to_byte_array : true
+        type : IDragonMarbleGameMessage        
+        options : [byte_param_constructor, to_byte_array, from_byte_array, has_length]
