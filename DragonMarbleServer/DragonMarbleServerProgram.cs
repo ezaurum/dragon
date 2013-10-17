@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
+using Dragon.Interfaces;
 using Dragon.Server;
 using DragonMarble.Message;
 using GameUtils;
@@ -84,7 +85,7 @@ namespace DragonMarble
             byte[] m = eventArgs.Buffer.Skip(eventArgs.Offset).Take(messageLength).ToArray();
             
             IDragonMarbleGameMessage gameMessage = GameMessageFactory.GetGameMessage(m);
-            Logger.DebugFormat("receivec. {0}", gameMessage.MessageType);
+            Console.WriteLine("received {0} message from {1}. ", gameMessage.MessageType, gameMessage.From);
             token.ReceivedMessage = gameMessage;
             
             if (gameMessage.MessageType == GameMessageType.RollMoveDice)
@@ -97,8 +98,8 @@ namespace DragonMarble
                 };
                 token.SendingMessage = rollMoveDiceResultContent;
 
-                gm.Notify(Guid.NewGuid(),
-                    GameMessageType.RollMoveDice, rollMoveDiceResultContent);
+                /*gm.Notify(Guid.NewGuid(),
+                    GameMessageType.RollMoveDice, rollMoveDiceResultContent);*/
             }
 
             if (gameMessage.MessageType == GameMessageType.OrderCardSelect)
@@ -109,8 +110,6 @@ namespace DragonMarble
                 gameMessage2.To = gameMessage2.From;
                 gameMessage2.From = Guid.NewGuid();
                 gameMessage2.OrderCardSelectState[foo] = true;
-                
-                token.SendingMessage = gameMessage2;
 
                 gm.SelectOrder(foo, ((GamePlayer)token.Player));
 
@@ -124,11 +123,11 @@ namespace DragonMarble
                     NumberOfPlayers = 2
                 };
                 gm.SelectOrder(foo1, gm.Players[1]);
-                token.SendingMessage = m3;
+                
 
                 Int16 f = (short) new Random().Next(0, gameMessage2.NumberOfPlayers);
                 //
-                OrderCardResultGameMessage m2 = new OrderCardResultGameMessage()
+                OrderCardResultGameMessage orderCardResultGameMessage = new OrderCardResultGameMessage()
                 {
                     FirstCardNumber = f,
                     NumberOfPlayers = gameMessage2.NumberOfPlayers,
@@ -136,8 +135,14 @@ namespace DragonMarble
                     To = gameMessage2.To,
                     FirstPlayerId = gm.GetId(f)
                 };
-                token.SendingMessage = m2;
-                
+
+                token.SendingMessage = gameMessage2;
+                token.SendingMessage = m3;
+                token.SendingMessage = orderCardResultGameMessage;
+
+                //TODO 처리가 필요
+                IGameMessage receivedMessage = token.ReceivedMessage;
+
                 //TODO async call. event or something?
                 Task.Factory.StartNew(gm.OrderEnd);
             }

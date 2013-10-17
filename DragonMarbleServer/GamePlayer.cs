@@ -155,12 +155,6 @@ namespace DragonMarble
             OwnTurn = true;
         }
 
-        public IEnumerable<GameAction> GetAction()
-        {
-            Console.WriteLine("I Do something...");
-            yield return new GameAction();
-        }
-
         public void SetResult(GameActionResult result)
         {
             Console.WriteLine("Set Action result.");
@@ -192,16 +186,16 @@ namespace DragonMarble
 
         public IEnumerable<GameAction> Actions()
         {
-            for (int i = 0; i < 3; i++)
+            //for (int i = 0; i < 3; i++)
             {
-                Console.WriteLine("this is actions in id : {3}, player {1}. {0} mode : {2}", i, Order, ControlMode, Id);
+                Console.WriteLine("this is actions in id : {2}, player order {0} mode : {1}",  Order, ControlMode, Id);
                 var action = new GameAction {PlayerNumber = Order, Actor = this};
 
                 //need something to stop running.
                 SendingMessage = new ActivateTurnGameMessage
                 {
                     To = Id,
-                    From = Id,
+                    From = GameMaster.Id,
                     TurnOwner = Id,
                     ResponseLimit = 50000
                 };

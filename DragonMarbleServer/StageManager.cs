@@ -119,16 +119,6 @@ namespace DragonMarble
             
         }
 
-        private void SendOrderMessageToPlayers()
-        {
-            Console.WriteLine("Ordering player");
-            _state = StageState.OrderPlayers;
-            foreach (GamePlayer stageUnit in _players)
-            {
-                stageUnit.StartTurn(Turn, GameMessageType.OrderCardSelect);
-            }
-        }
-
         public void OrderPlayers()
         {
 
@@ -180,7 +170,10 @@ namespace DragonMarble
             {
                 Console.WriteLine("Here is ProcessAction");
 
-                foreach (GamePlayer gamePlayer in _players.Where( p=> !p.Id.Equals(action.Actor.Id )))
+                /*
+                 * TODO activate notify 
+                 * GameAction action1 = action;
+                foreach (GamePlayer gamePlayer in _players.Where( p=> !p.Id.Equals(action1.Actor.Id )))
                 {
                     gamePlayer.SendingMessage = new ActivateTurnGameMessage
                     {
@@ -189,7 +182,7 @@ namespace DragonMarble
                         TurnOwner = action.Actor.Id,
                         ResponseLimit = 50000
                     };
-                }
+                } */
 
                 CurrentAction = action;
 

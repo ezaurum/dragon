@@ -45,6 +45,7 @@ namespace Dragon.Client
 
         private void Send_Completed(SocketAsyncEventArgs writeEventArgs)
         {
+            writeEventArgs.SetBuffer(new byte[1024], 0, 1024);
             OnAfterMessageSend(this, writeEventArgs);
         }
 
@@ -96,26 +97,24 @@ namespace Dragon.Client
 
         private void Read_Completed(object sender, SocketAsyncEventArgs e)
         {
-            while (OnLine)
+            Console.WriteLine("READ_COMPLETED");
+            if (e.SocketError == SocketError.Success && e.BytesTransferred > 0)
             {
-                Console.WriteLine("READ_COMPLETED");
-                if (e.SocketError == SocketError.Success && e.BytesTransferred > 0)
-                {
-                    Console.WriteLine("Has Data");
-                    OnAfterMessageReceive(sender, e);
-                } else if (e.SocketError != SocketError.Success)
-                {
-                    OnLine = false;
-                    continue;
-                }
-
+                Console.WriteLine("Has Data");
+                OnAfterMessageReceive(sender, e);
                 Console.WriteLine("Recursive READ");
-                if (!_socket.ReceiveAsync(e))
-                {
-                    continue;
-                }
-                break;
+                
+            } else if (e.SocketError != SocketError.Success)
+            {
+                OnLine = false;
+                return;
             }
+
+            if (!_socket.ReceiveAsync(e))
+            {
+                Read_Completed(sender, e);
+            }
+            
         }
 
         private void Connect_Completed(object sender, SocketAsyncEventArgs e)
