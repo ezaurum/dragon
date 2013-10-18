@@ -1,4 +1,4 @@
-import message_instance
+import _properties
 
 def convert_from_bit(target, targetType, length, cast):
 	result = ''
@@ -48,7 +48,7 @@ def convert_from_one(field_name, field):
 	else:
 		cast_type = field.get('cast')
 		#calculate_length has + in very front		
-		length = message_instance.calculate_length_one(field)
+		length = _properties.calculate_length_one(field)
 		result += bit_convert_to(field_name, field_type, cast_type, field.get('options',[]) , length)
 		result += add_index(length)
 	return result
@@ -67,7 +67,7 @@ def convert_from_one_for_collection(upper_field_name, field):
 	else:
 		cast_type = field.get('cast')
 		#calculate_length has + in very front		
-		length = message_instance.calculate_length_one(field)
+		length = _properties.calculate_length_one(field)
 		converted = bit_convert_to(field_name, field_type, cast_type, field.get('options',[]) , length)
 		converted = converted.replace(' = ','.Add(')
 		converted = converted.replace(';',');')		
@@ -85,7 +85,7 @@ def convert(field):
 	#make collection			
 	if 'collection' in field:
 		result += initialize_collection(field_name,field['collection'],field_type)		
-		length = message_instance.calculate_length_one(field)
+		length = _properties.calculate_length_one(field)
 		#target_object = 
 		field_name = field['name']
 		if type(field['size']) is int:

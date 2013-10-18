@@ -1,8 +1,9 @@
 import yaml
 import sys
 import codecs
-import message_instance
-import message_from_byte_array
+import _properties
+import _util
+import _from
 
 def convertToBit(target, length, cast):
 	if cast is not None:
@@ -59,13 +60,10 @@ if common_header is not None:
 	del packet_list['Header']
 
 #make messageType enum
-f.write('\npublic enum GameMessageType\n{')
-for packet_name in packet_list:
-	f.write('\n\t%s,'%packet_name)
-f.write('\n}')
+f.write ( _util.make_message_types(packet_list) )
 
 #make message instance maker
-message_instance.make_message_instance_maker(f, packet_list)
+_util.make_message_instance_maker(f, packet_list)
 
 #make each message class
 for packet_name in packet_list:
@@ -80,9 +78,9 @@ for packet_name in packet_list:
 	fields = common_header.get('fields',[])+packet.get('fields',[])
 
 	# class member
-	f.write( message_instance.make_fields(packet_name, fields) )
+	f.write( _properties.make_fields(packet_name, fields) )
 
-	# ToByteArray method implementation
+	# ToByteArray method implementation	
 	f.write('\n\n\tpublic byte[] ToByteArray()\n\t{')
 	f.write('\n\t\tbyte[] bytes = new byte[Length];\n\t\tint index = 0;')
 	convertToBit('Length','sizeof(Int16)', None)
@@ -124,10 +122,10 @@ for packet_name in packet_list:
 	f.write('\n\treturn bytes;\n}')
 
 	# FromByteArray method implementation
-	message_from_byte_array.make_from_byte_array(f, fields)
+	_from.make_from_byte_array(f, fields)
 
 	# Length property getter implementation
-	message_instance.make_message_length(f, fields, length)
+	_properties.make_message_length(f, fields, length)
 	
 	#end of class
 	f.write('\n}\n')
