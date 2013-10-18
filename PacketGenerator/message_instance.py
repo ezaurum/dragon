@@ -22,7 +22,8 @@ def make_message_instance_maker(f, packet_list):
 	f.write('\n\t}')
 	f.write('\n}')
 
-def calculate_length(field):
+def calculate_length_one(field):
+	length = ''
 	if field.get('targets') is None:
 		options = field.get('options',[])
 		length = field.get('length','sizeof(%s)'%(field['type']))		
@@ -33,7 +34,11 @@ def calculate_length(field):
 	else:
 		length = ''
 		for target in field.get('targets'):
-			length += calculate_length(target)		
+			length += calculate_length(target)
+	return length
+
+def calculate_length(field):
+	length = calculate_length_one(field)
 	
 	if 'size' in field and 'collection' in field:
 		if length[0] == '+' :
