@@ -25,7 +25,7 @@ def calculate_length(field):
 	return length
 
 #make length of message property
-def make_message_length(f, fields, length):
+def make_message_length(f, fields):
 	f.write('\n\n\tpublic Int16 Length')
 	f.write('\n\t{')	
 	f.write('\n\t\tget')
@@ -44,12 +44,15 @@ def make_message_length(f, fields, length):
 def make_fields(packet_name, fields):
 	result =''
 	for field in fields:
+		options = field.get('options',[])
 		#in case of collections e.g. List
 		if 'collection' in field:
 			result += '\n\tpublic %s<%s> %s;'%(field['collection'],field['type'], field['name'])
 		elif field['name'] == 'MessageType':			
 			result += '\n\tpublic GameMessageType MessageType {get{return GameMessageType.%s;}}'%packet_name
 		#in case of one object
+		elif 'property' in options:
+			result += '\n\tpublic %s %s { get; set;}'%(field['type'], field['name'])	
 		else:
 			result += '\n\tpublic %s %s;'%(field['type'], field['name'])	
 	return result

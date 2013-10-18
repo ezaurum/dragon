@@ -43,13 +43,15 @@ for packet_name in packet_list:
 	f.write( _properties.make_fields(packet_name, fields) )
 
 	#make each message class
-	f.write( _to.make_to_byte_array(fields) )
+	to_byte_array = _to.make_to_byte_array(fields)
+	if to_byte_array is not None :
+		f.write( to_byte_array )
 	
 	# FromByteArray method implementation
 	_from.make_from_byte_array(f, fields)
 
 	# Length property getter implementation
-	_properties.make_message_length(f, fields, length)
+	_properties.make_message_length(f, fields)
 	
 	#end of class
 	f.write('\n}\n')

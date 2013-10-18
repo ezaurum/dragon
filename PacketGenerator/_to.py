@@ -21,11 +21,12 @@ def convert_to_bit_inner_target(field, target):
 	target_string='%s[i].%s'%(field['name'],target['name'])
 	return convert_to_bit(target_string, length,cast)
 
-def make_to_byte_array(fields):
+def make_to_byte_array(fields):	
 	result = '\n\n\tpublic byte[] ToByteArray()\n\t{'
 	result += '\n\t\tbyte[] bytes = new byte[Length];\n\t\tint index = 0;'
-	convert_to_bit('Length','sizeof(Int16)', None)
+	result += convert_to_bit('Length','sizeof(Int16)', None)
 	for field in fields:
+		options = field.get('options',[])
 		length = field.get('length','sizeof(%s)'%field['type'])
 		cast = field.get('cast')
 		if 'collection' in field:
@@ -37,10 +38,10 @@ def make_to_byte_array(fields):
 				result += '\n\tfor (int i = 0; i < %s ; i++ )\n\t{'%field['size']
 				if 'target' in field:
 					for target in field['target']:
-						convert_to_bit_inner_target(field, target)
+						result += convert_to_bit_inner_target(field, target)
 				else:
 					target_string = '%s[i]'%field['name']
-					convert_to_bit(target_string, length,cast)
+					result += convert_to_bit(target_string, length,cast)
 
 				result += '\n\t}'
 			#when collection size is int
@@ -48,16 +49,19 @@ def make_to_byte_array(fields):
 				for i in range(field['size']):
 					if 'target' in field:
 						for target in field['target']:
-							convert_to_bit_inner_target(field, target)
+							result += convert_to_bit_inner_target(field, target)
 					else:
 						target_string = '%s[%i]'%(field['name'],i)
-						convert_to_bit(target_string, length, cast)
+						result += convert_to_bit(target_string, length, cast)
 		#when not collection
 		else:
-			target_string = field['name']
-			if field.get('has_to_byte_array',False) is True:
-				convert_to_bit_by_self(target_string, length)
+			target_string = field['name']			
+			if 'to_byte_array' in options:
+				result += convert_to_bit_by_self(target_string, length)
 			else:
-				convert_to_bit(target_string, length, cast)
+				result += convert_to_bit(target_string, length, cast)
+
+	print (result)
 
 	result += '\n\treturn bytes;\n}'
+	return result
