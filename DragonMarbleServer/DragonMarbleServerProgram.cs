@@ -36,7 +36,7 @@ namespace DragonMarble
 
             var server = new MultiClientServer(
                 MaxConnection, BufferSize, QueueNumber,
-                new IPEndPoint(IPAddress.Any, Port), new MessageProcessorProvier());
+                new IPEndPoint(IPAddress.Any, Port), new MessageProcessorProvier<IDragonMarbleGameMessage>());
             server.OnReceiveBytes += ConvertBytesToMessage;
             server.OnAcceptConnection += AddPlayer;
             server.Start();
@@ -47,13 +47,13 @@ namespace DragonMarble
         private static void AddPlayer(object sender, SocketAsyncEventArgs eventArgs)
         {   
             Logger.Debug("connectecd.");
-            QueuedMessageProcessor token = (QueuedMessageProcessor)eventArgs.UserToken;
-            Logger.DebugFormat("token guid : {0}",token.Id);
+            QueuedMessageProcessor<IDragonMarbleGameMessage> token = (QueuedMessageProcessor<IDragonMarbleGameMessage>)eventArgs.UserToken;
+            //Logger.DebugFormat("token guid : {0}",token.Id);
             GamePlayer player = new GamePlayer {
                 Id = Guid.NewGuid(),
-                Token = token, 
+                MessageProcessor = token, 
                 Order = 0,
-                TeamColor = StageUnitInfo.TEAM_COLOR.BLUE,
+                TeamColor = StageUnitInfo.UNIT_COLOR.BLUE,
                 CharacterId = 1,
                 Gold = 2000000
             };
@@ -66,7 +66,7 @@ namespace DragonMarble
             {
                 Id = Guid.NewGuid(),
                 Order = 1,
-                TeamColor = StageUnitInfo.TEAM_COLOR.GREEN,
+                TeamColor = StageUnitInfo.UNIT_COLOR.GREEN,
                 CharacterId = 2,
                 Gold = 2000000
             };
@@ -80,7 +80,7 @@ namespace DragonMarble
 
         private static void ConvertBytesToMessage(object sender, SocketAsyncEventArgs eventArgs)
         {
-            QueuedMessageProcessor token = (QueuedMessageProcessor) eventArgs.UserToken;
+            QueuedMessageProcessor<IDragonMarbleGameMessage> token = (QueuedMessageProcessor<IDragonMarbleGameMessage>)eventArgs.UserToken;
             short messageLength = BitConverter.ToInt16(eventArgs.Buffer, eventArgs.Offset);
             byte[] m = eventArgs.Buffer.Skip(eventArgs.Offset).Take(messageLength).ToArray();
             
@@ -94,7 +94,7 @@ namespace DragonMarble
                 {
                     To = Guid.NewGuid(),
                     From = Guid.NewGuid(),
-                    Dices = new List<Int32>(new[] {2,3})
+                    Dices = new List<char>(new[] {(char)2,(char)3})
                 };
                 token.SendingMessage = rollMoveDiceResultContent;
 

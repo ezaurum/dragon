@@ -9,28 +9,30 @@ namespace DragonMarble
 {
     internal class AIGamePlayer : GamePlayer
     {
-        public AIGamePlayer() : this(TEAM_COLOR.BLUE, 2000000)
+        public AIGamePlayer()
+            : this(UNIT_COLOR.BLUE, 2000000)
         {   
         }
 
-        public AIGamePlayer(TEAM_COLOR teamColor, int initCapital) : base(teamColor, initCapital)
+        public AIGamePlayer(UNIT_COLOR teamColor, int initCapital) : base(teamColor, initCapital)
         {
             ControlMode = ControlModeType.AI_0;
-            Token = new AIQueuedMessageProcessor();
+            MessageProcessor = new AIQueuedMessageProcessor();
             Dice = new StageDiceInfo();
         }
 
-        public override GameMaster GameMaster
+        public override IStageManager StageManager
         {
             set
             {
-                base.GameMaster = value;
-                ((AIQueuedMessageProcessor) Token).GameMasterId = value.Id;
+                base.StageManager = value;
+                ((AIQueuedMessageProcessor) MessageProcessor).GameMasterId = value.Id;
             }
+            get { throw new NotImplementedException(); }
         }
     }
 
-    internal class AIQueuedMessageProcessor : QueuedMessageProcessor
+    internal class AIQueuedMessageProcessor : QueuedMessageProcessor<IDragonMarbleGameMessage>, IDragonMarbleMessageProcessor
     {
         public Guid GameMasterId { get; set; }
         public override IGameMessage SendingMessage
@@ -43,12 +45,12 @@ namespace DragonMarble
             }
         }
 
-        public override IGameMessage ReceivedMessage
+        public override IDragonMarbleGameMessage ReceivedMessage
         {   
             set
             {
                 if ( null != value )
-                    base.ReceivedMessage = value;
+                    ReceivedMessage = value;
             }
         }
 
@@ -82,15 +84,12 @@ namespace DragonMarble
             Dice = new StageDiceInfo();
         }
 
-        public GamePlayer(TEAM_COLOR teamColor, int initialCapital) : base(teamColor, initialCapital)
+        public GamePlayer(UNIT_COLOR teamColor, int initialCapital)
+            : base(teamColor, initialCapital)
         {
             Dice = new StageDiceInfo();
         }
         
-        public QueuedMessageProcessor Token { get; set; }
-        public virtual GameMaster GameMaster { get; set; }
-        public StageManager StageManager { get; set; }
-        public StageDiceInfo Dice { get; set; }
         public int LastSelected { get; set; }
 
         public int Position
@@ -111,25 +110,17 @@ namespace DragonMarble
             set { SetResult(value); }
         }
 
-        public virtual IGameMessage ReceivedMessage
-        {
-            get { return Token.ReceivedMessage; }
-        }
 
-        public virtual IGameMessage SendingMessage
-        {
-            set { Token.SendingMessage = value; }
-        }
 
-        public TEAM_COLOR TeamColor
+        public UNIT_COLOR TeamColor
         {
             get
             {
-                return teamColor;
+                return unitColor;
             }
             set
             {
-                teamColor = value;
+                unitColor = value;
             }
         }
 
@@ -197,7 +188,7 @@ namespace DragonMarble
                 SendingMessage = new ActivateTurnGameMessage
                 {
                     To = Id,
-                    From = GameMaster.Id,
+                    From = StageManager.Id,
                     TurnOwner = Id,
                     ResponseLimit = 50000
                 };
@@ -213,9 +204,9 @@ namespace DragonMarble
                         RollMoveDiceResultGameMessage
                         rmdrgm = new RollMoveDiceResultGameMessage()
                         {
-                            From = GameMaster.Id,
+                            From = StageManager.Id,
                             To = Id,
-                            Dices = new List<Int32> { Dice.result[0], Dice.result[1] }
+                            Dices = new List<Char> { (char) Dice.result[0], (char) Dice.result[1] }
                         };
                         if (Dice.isDouble && Dice.rollCount < 3) ActionRemined += 1;
                         SendingMessage = rmdrgm;

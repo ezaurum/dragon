@@ -18,18 +18,11 @@ namespace DragonMarble
         EndGame
     }
     
-    public class StageManager
+    public class StageManager : IStageManager
     {
-        private readonly Guid _id;
         public const int TurnLimit = 30;
 
-        public Guid Id
-        {
-            get
-            {
-                return _id;
-            }
-        }
+        public Guid Id { get; set; }
 
         private static readonly ILog Logger = LogManager.GetLogger(typeof(StageManager));
         
@@ -81,7 +74,7 @@ namespace DragonMarble
             _state = StageState.BeforeInit;
             _tiles = tiles;
             _players = players;
-            _id = Guid.NewGuid();
+            Id = Guid.NewGuid();
         }
         
         public void InitGame()

@@ -37,7 +37,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Contents.cs" />
+    <Compile Include="Message\GameMessage.cs" />
+    <Compile Include="Message\IDragonMarbleGameMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Interfaces\Interfaces.csproj">
+      <Project>{6A94673F-AE42-4A0D-BADC-83933C0976C1}</Project>
+      <Name>Interfaces</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Security.Policy;
 using System.Threading;
+using Dragon.Interfaces;
 using log4net;
 
 namespace Dragon.Server
@@ -227,7 +228,7 @@ namespace Dragon.Server
             if (e.SocketError == SocketError.Success)
             {
                 // done echoing data back to the client
-                QueuedMessageProcessor token = e.UserToken as QueuedMessageProcessor;
+                QueuedMessageProcessor<IGameMessage> token = e.UserToken as QueuedMessageProcessor<IGameMessage>;
                 // read the next block of data send from the client 
 
                 //block until value return
@@ -254,7 +255,7 @@ namespace Dragon.Server
 
         private void CloseClientSocket(SocketAsyncEventArgs e)
         {
-            QueuedMessageProcessor token = e.UserToken as QueuedMessageProcessor;
+            QueuedMessageProcessor<IGameMessage> token = e.UserToken as QueuedMessageProcessor<IGameMessage>;
 
             // close the socket associated with the client 
             try

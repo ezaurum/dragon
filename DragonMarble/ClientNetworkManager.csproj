@@ -44,10 +44,6 @@
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DragonMarbleGameMessage\DragonMarbleGameMessage.csproj">
-      <Project>{CF240925-F622-49AB-A322-E94C08BFE1B9}</Project>
-      <Name>DragonMarbleGameMessage</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Interfaces\Interfaces.csproj">
       <Project>{6a94673f-ae42-4a0d-badc-83933c0976c1}</Project>
       <Name>Interfaces</Name>

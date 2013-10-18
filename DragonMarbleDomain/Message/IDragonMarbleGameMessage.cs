@@ -9,4 +9,9 @@ namespace DragonMarble.Message
         Guid To { get; set; }
         Guid From { get; set; }
     }
+
+
+    public interface IDragonMarbleMessageProcessor : IMessageProcessor<IDragonMarbleGameMessage>
+    {
+    }
 }

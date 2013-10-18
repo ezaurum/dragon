@@ -69,10 +69,6 @@
       <Project>{26208981-E513-4C57-B66E-560CBD88E28D}</Project>
       <Name>DragonMarbleDomain</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DragonMarbleGameMessage\DragonMarbleGameMessage.csproj">
-      <Project>{cf240925-f622-49ab-a322-e94c08bfe1b9}</Project>
-      <Name>DragonMarbleGameMessage</Name>
-    </ProjectReference>
     <ProjectReference Include="..\GameUtils\GameUtils.csproj">
       <Project>{cb0a9f6c-d5af-4d74-9a77-b491a17b964e}</Project>
       <Name>GameUtils</Name>
