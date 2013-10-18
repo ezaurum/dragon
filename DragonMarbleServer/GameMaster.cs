@@ -35,7 +35,7 @@ namespace DragonMarble
             player.StageManager = this;
 
             //set initailize player message
-            InitailizePlayerGameMessage idMessage = new InitailizePlayerGameMessage
+            InitializePlayerGameMessage idMessage = new InitializePlayerGameMessage
             {
                 To = player.Id,
                 From = Id

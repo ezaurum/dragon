@@ -130,7 +130,6 @@ namespace DragonMarble
                 OrderCardResultGameMessage orderCardResultGameMessage = new OrderCardResultGameMessage()
                 {
                     FirstCardNumber = f,
-                    NumberOfPlayers = gameMessage2.NumberOfPlayers,
                     From = gameMessage2.From,
                     To = gameMessage2.To,
                     FirstPlayerId = gm.GetId(f)

@@ -199,7 +199,7 @@ namespace DragonMarble
                 {
                     case GameMessageType.RollMoveDice:
                         RollMoveDiceGameMessage rollMoveDiceGameMessage = (RollMoveDiceGameMessage)receivedMessage;
-                        RollMoveDice(rollMoveDiceGameMessage.Pressed);
+                        RollMoveDice((int) rollMoveDiceGameMessage.Pressed);
                         Console.WriteLine("{0}", Dice);
                         RollMoveDiceResultGameMessage
                         rmdrgm = new RollMoveDiceResultGameMessage()
