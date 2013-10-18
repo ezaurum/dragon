@@ -22,6 +22,10 @@ Header :
           name : To        
           length : 16
           options : [byte_param_constructor, to_byte_array, property]
+        - name : Actor        
+          type : Guid
+          length : 16
+          options : [byte_param_constructor, to_byte_array, property]
 
 InitializeGame :
     comment : 게임 초기화 정보
@@ -43,9 +47,12 @@ InitializeGame :
               type : Int32
             - name : Order
               type : Int32
-            - name : teamColor
+            - name : unitColor
               cast : Int32 
-              type : StageUnitInfo.TEAM_COLOR
+              type : StageUnitInfo.UNIT_COLOR
+            - name : teamGroup
+              cast : Int32 
+              type : StageUnitInfo.TEAM_GROUP
             - name : ControlMode
               type : StageUnitInfo.ControlModeType
               cast : Int32
@@ -71,8 +78,8 @@ RollMoveDiceResult :
           type : Char
           collection : List
           size : 2
-        - name : IsDouble
-          type : Boolean
+        - name : DoubleCount
+          type : Char
 
 OrderCardSelect :
     comment : 선 뽑기
@@ -99,9 +106,12 @@ OrderCardResult :
 InitializePlayer :
   comment : 플레이어 초기화  
 
-InformOtherPlayerAction :
-  comment : 다른 플레이어의 행동 알림
+ActivateTurn :
+  comment : Activate player's turn
   fields :
-      - name : InformMessage
-        type : IDragonMarbleGameMessage        
-        options : [to_byte_array, from_byte_array, has_instance_length]
+    - name : TurnOwner
+      type : Guid
+      length : 16
+      options : [byte_param_constructor, to_byte_array, property]
+    - name : ResponseLimit
+      type : Int64

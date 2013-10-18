@@ -8,33 +8,33 @@ using log4net;
 namespace Dragon.Server
 {
     // user token for async process.
-    public class QueuedMessageProcessor : IAsyncUserToken
+    public class QueuedMessageProcessor<T> : IAsyncUserToken, IMessageProcessor<T> where T : IGameMessage
     {
-        private Guid _id = Guid.NewGuid();
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(QueuedMessageProcessor<>));
+        private readonly Guid _id = Guid.NewGuid();
         public Guid Id { get { return _id; } }
-        private static readonly ILog Logger = LogManager.GetLogger(typeof(QueuedMessageProcessor));
         public Socket Socket { get; set; }
         public SocketAsyncEventArgs ReadArg { get; set; }
         public SocketAsyncEventArgs WriteArg { get; set; }
 
-        private readonly Queue<IGameMessage> _receivedMessages = new Queue<IGameMessage>();
-        private readonly Queue<IGameMessage> _sendingMessages = new Queue<IGameMessage>();
+        private readonly Queue<T> _receivedMessages = new Queue<T>();
+        private readonly Queue<T> _sendingMessages = new Queue<T>();
 
         private readonly EventWaitHandle _receiveMessageWaitHandler = new ManualResetEvent(false);
         private readonly EventWaitHandle _sendMessageWaitHandler = new ManualResetEvent(false);
 
-        public IEnumerable<IGameMessage> ReceivedMessages
+        public IEnumerable<T> ReceivedMessages
         {
             set
             {
-                foreach (IGameMessage gameMessage in value)
+                foreach (T gameMessage in value)
                 {
                     ReceivedMessage = gameMessage;
                 }
             }
         }
 
-        public virtual  IGameMessage ReceivedMessage
+        public virtual  T ReceivedMessage
         {
             get 
             {   
@@ -70,7 +70,7 @@ namespace Dragon.Server
             }
             set
             {
-                _sendingMessages.Enqueue(value);
+                _sendingMessages.Enqueue((T) value);
                 _sendMessageWaitHandler.Set();
             }
         }
@@ -78,11 +78,11 @@ namespace Dragon.Server
         public object Player { get; set; }
     }
 
-    public class MessageProcessorProvier : ITokenProvider
+    public class MessageProcessorProvier<T> : ITokenProvider where T : IGameMessage
     {
         public IAsyncUserToken NewAsyncUserToken()
         {
-            return new QueuedMessageProcessor();
+            return new QueuedMessageProcessor<T>();
         }
     }
 }

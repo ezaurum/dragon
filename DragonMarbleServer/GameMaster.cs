@@ -6,7 +6,7 @@ using log4net;
 
 namespace DragonMarble
 {
-    public class GameMaster
+    public class GameMaster : IStageManager
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof (GameMaster));
         private readonly List<GamePlayer> _players;
@@ -32,10 +32,10 @@ namespace DragonMarble
         public void Join(GamePlayer player)
         {
             _players.Add(player);
-            player.GameMaster = this;
+            player.StageManager = this;
 
             //set initailize player message
-            InitailizePlayerGameMessage idMessage = new InitailizePlayerGameMessage
+            InitializePlayerGameMessage idMessage = new InitializePlayerGameMessage
             {
                 To = player.Id,
                 From = Id

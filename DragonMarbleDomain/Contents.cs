@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Dragon.Interfaces;
+using DragonMarble.Message;
 
 namespace DragonMarble
 {
@@ -14,19 +16,32 @@ namespace DragonMarble
 
     public class StageBuffInfo
     {
+        public enum TARGET
+        {
+            OWNER,
+            CITY_ENEMY,
+            CITYGROUP_ENEMY,
+            BUILDING_ENEMY,
+            BUILDINGGROUP_ENEMY
+        }
 
         public enum TYPE
         {
-            OVERCHARGE, DISCOUNT, DESTROY
-        }
-        public enum TARGET
-        {
-            OWNER, CITY_ENEMY, CITYGROUP_ENEMY, BUILDING_ENEMY, BUILDINGGROUP_ENEMY
+            OVERCHARGE,
+            DISCOUNT,
+            DESTROY
         }
 
-        public int turn;
         public int power;
+        public int turn;
         public TYPE type;
+
+        public StageBuffInfo(TYPE type, int power, int turn)
+        {
+            this.type = type;
+            this.turn = turn;
+            this.power = power;
+        }
 
         public bool isAlive
         {
@@ -39,13 +54,7 @@ namespace DragonMarble
                 return false;
             }
         }
-    
-        public StageBuffInfo(TYPE type, int power, int turn)
-        {
-            this.type = type;
-            this.turn = turn;
-            this.power = power;
-        }
+
         public void UpdateTurn()
         {
             turn--;
@@ -54,17 +63,29 @@ namespace DragonMarble
 
     public class StageDiceInfo
     {
-        Random rand;
-
         public enum ROLL_TYPE
         {
-            NORMAL, ODD, EVEN
+            NORMAL,
+            ODD,
+            EVEN
         }
-        public ROLL_TYPE rollType;
+
+        private readonly Random rand;
+        public bool isDouble;
 
         public int[] result;
         public int rollCount;
-        public bool isDouble;
+        public ROLL_TYPE rollType;
+
+        public StageDiceInfo()
+        {
+            rand = RandomFactory.NewRandom();
+            result = new[] {0, 0};
+            rollCount = 0;
+            isDouble = false;
+            rollType = ROLL_TYPE.NORMAL;
+        }
+
         public int resultSum
         {
             get
@@ -78,22 +99,13 @@ namespace DragonMarble
             }
         }
 
-        public StageDiceInfo()
-        {
-            rand = RandomFactory.NewRandom();
-            result = new int[] { 0, 0 };
-            rollCount = 0;
-            isDouble = false;
-            rollType = ROLL_TYPE.NORMAL;
-        }
-
         public void Roll()
         {
             result[0] = rand.Next(1, 7);
             result[1] = rand.Next(1, 7);
 
             int sum = result[0] + result[1];
-            if ((rollType == ROLL_TYPE.ODD && sum % 2 == 0) || (rollType == ROLL_TYPE.EVEN && sum % 2 == 1))
+            if ((rollType == ROLL_TYPE.ODD && sum%2 == 0) || (rollType == ROLL_TYPE.EVEN && sum%2 == 1))
             {
                 if (result[0] == 1)
                 {
@@ -105,7 +117,7 @@ namespace DragonMarble
                 }
                 else
                 {
-                    int[] r = { 1, -1 };
+                    int[] r = {1, -1};
                     result[0] += r[rand.Next(2)];
                 }
             }
@@ -130,25 +142,44 @@ namespace DragonMarble
             result[0] = 0;
             result[1] = 0;
         }
-
     }
-
+    
     public class StageUnitInfo
     {
-        public enum ControlModeType
+        public virtual IMessageProcessor<IDragonMarbleGameMessage> MessageProcessor { get; set; }
+        public virtual IStageManager StageManager { get; set; }
+        public StageDiceInfo Dice { get; set; }
+
+        public virtual IDragonMarbleGameMessage ReceivedMessage
         {
-            Player, AI_0, AI_1, AI_2, 
+            get { return MessageProcessor.ReceivedMessage; }
         }
 
-        public enum TEAM_COLOR
+        public virtual IDragonMarbleGameMessage SendingMessage
+        {
+            set { MessageProcessor.SendingMessage = value; }
+        }
+
+        public enum ControlModeType
+        {
+            Player, AI_0, AI_1, AI_2,
+        }
+
+        public enum UNIT_COLOR
         {
             RED = 0, BLUE, YELLOW, GREEN, PINK, SKY
+        }
+        public enum TEAM_GROUP
+        {
+            A = 0, B, C, D
         }
         public enum CHANCE_COUPON
         {
             NULL, DISCOUNT_50, ESCAPE_ISLAND, SHIELD, ANGEL
         }
-        public TEAM_COLOR teamColor;
+        public UNIT_COLOR unitColor;
+        public TEAM_GROUP teamGroup;
+
         public int gold;
         public Dictionary<int, StageTileInfo> lands;
         public int tileIndex;
@@ -159,7 +190,8 @@ namespace DragonMarble
         public int Order { get; set; }
         public int CapitalOrder { get; set; }
         public int Capital { get; set; }
-        
+        public int ActionRemined { get; set; }
+
 
         public bool OwnTurn { get; set; }
         public int DiceId { get; set; }
@@ -167,10 +199,11 @@ namespace DragonMarble
         public int CharacterId { get; set; }
         public Guid Id { get; set; }
 
-        public StageUnitInfo(TEAM_COLOR teamColor, int initialCapital = 2000000) : this()
+        public StageUnitInfo(UNIT_COLOR unitColor, int initialCapital = 2000000)
+            : this()
         {
             Id = Guid.NewGuid();
-            this.teamColor = teamColor;
+            this.unitColor = unitColor;
             Capital = initialCapital;
             gold = initialCapital;
         }
@@ -277,38 +310,80 @@ namespace DragonMarble
             }
         }
 
+        public void DoAction(IDragonMarbleGameMessage message)
+        {
+            switch (message.MessageType)
+            {
+                case GameMessageType.RollMoveDice:
+                    RollMoveDiceGameMessage rollMoveDiceGameMessage = (RollMoveDiceGameMessage)message;
+                    //RollMoveDice(rollMoveDiceGameMessage.Pressed);
+                    Console.WriteLine("{0}", Dice);
+                    RollMoveDiceResultGameMessage
+                    rmdrgm = new RollMoveDiceResultGameMessage()
+                    {
+                        From = StageManager.Id,
+                        To = Id,
+                        Dices = new List<char> { (char)Dice.result[0], (char)Dice.result[1] }
+                    };
+                    if (Dice.isDouble && Dice.rollCount < 3) ActionRemined += 1;
+                    //SendingMessage = rmdrgm;
+                    break;
+
+                case GameMessageType.RollMoveDiceResult:
+                    {
+                        RollMoveDiceResultGameMessage rollMoveDiceResultGameMessage = (RollMoveDiceResultGameMessage)message;
+                        int diceSum = 0;
+                        foreach (char i in rollMoveDiceResultGameMessage.Dices) diceSum += i;
+                        Go(diceSum);
+
+
+                        break;
+                    }
+
+
+            }
+
+        }
+    }
+
+
+    public interface IStageManager
+    {
+        Guid Id { get; set; }
     }
 
     public class StageTileInfo
     {
-
         public enum TYPE
         {
-            START, CITY, GAMBLE, CHANCE, PRISON, SIGHT, OLYMPIC, TRAVEL, TAX
+            START,
+            CITY,
+            GAMBLE,
+            CHANCE,
+            PRISON,
+            SIGHT,
+            OLYMPIC,
+            TRAVEL,
+            TAX
         }
+
+        public List<Building> buildings;
+
         public int index;
-        public TYPE type;
-        public string name;
-        public int typeValue;
 
         public bool isFestival;
         public bool isOlympicCity;
+        public string name;
 
-        public class Building
-        {
-            public int buyPrice;
-            public int sellPrice;
-            public int fee;
-            public bool isBuilt;
-        }
-        public List<Building> buildings;
-        public StageBuffInfo tileBuff;
         public StageUnitInfo owner;
+        public StageBuffInfo tileBuff;
+        public TYPE type;
+        public int typeValue;
 
         public StageTileInfo(int index, string name, TYPE tileType)
         {
             this.index = index;
-            this.type = tileType;
+            type = tileType;
             this.name = name;
 
             tileBuff = null;
@@ -319,30 +394,28 @@ namespace DragonMarble
 
         public StageTileInfo(Hashtable data)
         {
-            index = (int)data["Index"];
-            type = (StageTileInfo.TYPE)Enum.Parse(typeof(StageTileInfo.TYPE), (string)data["Type"]);
-            name = (string)data["Name"];
-            typeValue = (int)data["TypeValue"];
+            index = (int) data["Index"];
+            type = (TYPE) Enum.Parse(typeof (TYPE), (string) data["Type"]);
+            name = (string) data["Name"];
+            typeValue = (int) data["TypeValue"];
             tileBuff = null;
 
 
             buildings = new List<Building>();
             if (type == TYPE.CITY || type == TYPE.SIGHT)
             {
-                List<Hashtable> priceData = (List<Hashtable>)data["Price"];
+                var priceData = (List<Hashtable>) data["Price"];
                 foreach (Hashtable d in priceData)
                 {
-                    Building building = new Building();
-                    building.buyPrice = (int)d["BuyPrice"];
-                    building.sellPrice = (int)d["SellPrice"];
-                    building.fee = (int)d["Fee"];
+                    var building = new Building();
+                    building.buyPrice = (int) d["BuyPrice"];
+                    building.sellPrice = (int) d["SellPrice"];
+                    building.fee = (int) d["Fee"];
                     building.isBuilt = false;
 
                     buildings.Add(building);
                 }
             }
-
-
         }
 
         public int fee
@@ -361,12 +434,13 @@ namespace DragonMarble
                 {
                     if (tileBuff.type == StageBuffInfo.TYPE.DISCOUNT)
                     {
-                        p += (p * tileBuff.power / 100);
+                        p += (p*tileBuff.power/100);
                     }
                 }
                 return p;
             }
         }
+
         public int builtPrice
         {
             get
@@ -382,6 +456,7 @@ namespace DragonMarble
                 return p;
             }
         }
+
         public int sellPrice
         {
             get
@@ -401,10 +476,7 @@ namespace DragonMarble
 
         public int takeOverPrice
         {
-            get
-            {
-                return builtPrice * 2;
-            }
+            get { return builtPrice*2; }
         }
 
         public void AddBuff(StageBuffInfo.TYPE buffType, int power, int buffTurn)
@@ -425,7 +497,6 @@ namespace DragonMarble
             {
                 tileBuff = new StageBuffInfo(buffType, power, buffTurn);
             }
-
         }
 
         public bool IsSameOwner(StageUnitInfo unit)
@@ -461,6 +532,7 @@ namespace DragonMarble
             }
             return false;
         }
+
         public bool BuyLandmark(StageUnitInfo unit)
         {
             if (!buildings[4].isBuilt)
@@ -485,17 +557,14 @@ namespace DragonMarble
                 owner = unit;
                 return true;
             }
-            else
-            {
-                return false;
-            }
-
+            return false;
         }
 
         public void SetOwner(StageUnitInfo unit)
         {
             owner = unit;
         }
+
         public void ChangeOwner(StageTileInfo tile)
         {
             StageUnitInfo exOwner = owner;
@@ -530,13 +599,128 @@ namespace DragonMarble
                 if (!tileBuff.isAlive)
                 {
                     tileBuff = null;
-
                 }
             }
         }
 
-
+        public class Building
+        {
+            public int buyPrice;
+            public int fee;
+            public bool isBuilt;
+            public int sellPrice;
+        }
     }
 
+    public class StageGambleInfo
+    {
+        public const int MAX_WIN_COUNT = 3;
+        public const int BASIC_SHOW_COUNT = 4;
+        public const int COMPARER_NUMBER = 7;
+        public enum TYPE
+        {
+            spade, dia, heart, clover
+        }
+        public enum CHOICE
+        {
+            NULL, HIGH, LOW
+        }
+        public enum RESULT
+        {
+            NULL, WIN, LOSE
+        }
 
+        public class CardData
+        {
+            public TYPE type;
+            public int num;
+            public CardData(TYPE type, int num)
+            {
+                this.type = type;
+                this.num = num;
+            }
+        }
+        Random rand;
+        public int winCount;
+        public int rewardScale;
+        public int battingPrice;
+        public int rewardPrice;
+        public RESULT result;
+        public CHOICE selectChoice;
+        public List<CardData> cards;
+        public List<CardData> useCards;
+
+        public StageGambleInfo()
+        {
+            rand = RandomFactory.NewRandom();
+            winCount = 0;
+            battingPrice = 0;
+            rewardPrice = 0;
+            result = RESULT.NULL;
+            selectChoice = CHOICE.NULL;
+        }
+
+        public void SetBattingPrice(int price)
+        {
+            if (winCount == 0)
+            {
+                battingPrice = price;
+                rewardScale = 2;
+            }
+        }
+
+
+        public void InitCards()
+        {
+            cards = new List<CardData>();
+            foreach (TYPE t in Enum.GetValues(typeof(TYPE)))
+            {
+                for (int i = 1; i <= 13; i++)
+                {
+                    cards.Add(new CardData(t, i));
+                }
+            }
+            useCards = new List<CardData>();
+        }
+
+        public void UseBasicCards()
+        {
+            for (int i = 0; i < BASIC_SHOW_COUNT; i++)
+            {
+                PickOneCard();
+            }
+        }
+
+        CardData PickOneCard()
+        {
+            int r = rand.Next(0, cards.Count);
+            useCards.Add(cards[r]);
+            cards.RemoveAt(r);
+            return useCards[useCards.Count - 1];
+        }
+
+        public CardData SelectChoice(CHOICE c)
+        {
+            selectChoice = c;
+            CardData card = PickOneCard();
+            if ((c == CHOICE.HIGH && card.num >= COMPARER_NUMBER) || (c == CHOICE.LOW && card.num <= COMPARER_NUMBER))
+            {
+                result = RESULT.WIN;
+                rewardPrice = battingPrice * rewardScale;
+                winCount++;
+                if (winCount < MAX_WIN_COUNT)
+                {
+                    rewardScale = rewardScale * 2;
+                }
+
+            }
+            else
+            {
+                result = RESULT.LOSE;
+                rewardPrice = 0;
+            }
+            return card;
+        }
+
+    }
 }

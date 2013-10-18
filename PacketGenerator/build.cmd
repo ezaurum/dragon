@@ -1,2 +1,2 @@
-python PacketGenerator.py Packet.yaml ..\DragonMarbleGameMessage\GameMessage.cs
+python PacketGenerator.py Packet.yaml ..\DragonMarbleDomain\Message\GameMessage.cs
 @timeout 4

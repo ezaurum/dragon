@@ -52,10 +52,6 @@
       <Project>{26208981-e513-4c57-b66e-560cbd88e28d}</Project>
       <Name>DragonMarbleDomain</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\DragonMarbleGameMessage\DragonMarbleGameMessage.csproj">
-      <Project>{cf240925-f622-49ab-a322-e94c08bfe1b9}</Project>
-      <Name>DragonMarbleGameMessage</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\DragonMarble\ClientNetworkManager.csproj">
       <Project>{e797a74b-09d9-4d8f-823b-42b532215ba0}</Project>
       <Name>ClientNetworkManager</Name>

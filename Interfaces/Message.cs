@@ -8,4 +8,10 @@ namespace Dragon.Interfaces
         byte[] ToByteArray();
         void FromByteArray(byte[] bytes);
     }
+
+    public interface IMessageProcessor<T> where T : IGameMessage
+    {
+        T ReceivedMessage { get; set; }
+        IGameMessage SendingMessage { get; set; }
+    }
 }
