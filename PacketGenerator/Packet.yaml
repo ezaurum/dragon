@@ -10,19 +10,19 @@
 
 Header :
     comment : 헤더
-    fields :        
+    fields :
         - type : GameMessageType
-          name : MessageType    
+          name : MessageType
           cast : Int32
         - type : Guid
           name : From
           length : 16
           options : [byte_param_constructor, to_byte_array, property]
         - type : Guid
-          name : To        
+          name : To
           length : 16
           options : [byte_param_constructor, to_byte_array, property]
-        - name : Actor        
+        - name : Actor
           type : Guid
           length : 16
           options : [byte_param_constructor, to_byte_array, property]
@@ -32,14 +32,14 @@ InitializeGame :
     fields :
         - name : FeeBoostedTiles
           type : Int16
-          collection : List          
+          collection : List
           size : 4
         - type : Int16
           name : NumberOfPlayers
         - name : Units
           type : StageUnitInfo
           options : [constructor]
-          collection : List          
+          collection : List
           length : sizeof(Int16)
           size : NumberOfPlayers
           targets :
@@ -48,10 +48,10 @@ InitializeGame :
             - name : Order
               type : Int32
             - name : unitColor
-              cast : Int32 
+              cast : Int32
               type : StageUnitInfo.UNIT_COLOR
             - name : teamGroup
-              cast : Int32 
+              cast : Int32
               type : StageUnitInfo.TEAM_GROUP
             - name : ControlMode
               type : StageUnitInfo.ControlModeType
@@ -85,7 +85,7 @@ OrderCardSelect :
     comment : 선 뽑기
     fields :
       - name : SelectedCardNumber
-        type : Int16      
+        type : Int16
       - name : NumberOfPlayers
         type : Int16
       - name : OrderCardSelectState
@@ -104,7 +104,7 @@ OrderCardResult :
         options : [byte_param_constructor, to_byte_array]
 
 InitializePlayer :
-  comment : 플레이어 초기화  
+  comment : 플레이어 초기화
 
 ActivateTurn :
   comment : Activate player's turn
