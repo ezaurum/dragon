@@ -17,6 +17,7 @@ namespace DragonMarble
         {
             ControlMode = ControlModeType.AI_0;
             Token = new AIQueuedMessageProcessor();
+            Dice = new StageDiceInfo();
         }
 
         public override GameMaster GameMaster
@@ -135,7 +136,7 @@ namespace DragonMarble
         private int RollMoveDice(int press)
         {
             Dice.Roll();
-            Position += Dice.resultSum;
+            Go(Dice.resultSum);
             return Position;
         }
 
@@ -163,6 +164,7 @@ namespace DragonMarble
         public void DeactivateTurn()
         {
             OwnTurn = false;
+            Dice.Clear();
         }
 
         public void StartTurn(int turn, GameMessageType actionType,
@@ -186,7 +188,7 @@ namespace DragonMarble
 
         public IEnumerable<GameAction> Actions()
         {
-            //for (int i = 0; i < 3; i++)
+            for ( ActionRemined = 1; ActionRemined > 0; ActionRemined--)
             {
                 Console.WriteLine("this is actions in id : {2}, player order {0} mode : {1}",  Order, ControlMode, Id);
                 var action = new GameAction {PlayerNumber = Order, Actor = this};
@@ -200,12 +202,32 @@ namespace DragonMarble
                     ResponseLimit = 50000
                 };
 
-                var receivedMessage = ReceivedMessage;
+                IDragonMarbleGameMessage receivedMessage = (IDragonMarbleGameMessage) ReceivedMessage;
+
+                switch (receivedMessage.MessageType)
+                {
+                    case GameMessageType.RollMoveDice:
+                        RollMoveDiceGameMessage rollMoveDiceGameMessage = (RollMoveDiceGameMessage)receivedMessage;
+                        RollMoveDice(rollMoveDiceGameMessage.Pressed);
+                        Console.WriteLine("{0}", Dice);
+                        RollMoveDiceResultGameMessage
+                        rmdrgm = new RollMoveDiceResultGameMessage()
+                        {
+                            From = GameMaster.Id,
+                            To = Id,
+                            Dices = new List<Int32> { Dice.result[0], Dice.result[1] }
+                        };
+                        if (Dice.isDouble && Dice.rollCount < 3) ActionRemined += 1;
+                        SendingMessage = rmdrgm;
+                        break;
+                }
                 
-                Console.WriteLine( ((IDragonMarbleGameMessage)receivedMessage).MessageType);
+                Console.WriteLine( receivedMessage.MessageType);
 
                 yield return action;
             }
         }
+
+        public int ActionRemined { get; set; }
     }
 }
