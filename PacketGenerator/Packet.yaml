@@ -114,4 +114,4 @@ ActivateTurn :
       length : 16
       options : [byte_param_constructor, to_byte_array, property]
     - name : ResponseLimit
-      type : Int64     
+      type : Int64

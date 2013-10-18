@@ -158,7 +158,7 @@ namespace DragonMarble
         }
 
         private void ProcessAction()
-        {   
+        {    
             foreach (GameAction action in PlayerActions())
             {
                 Console.WriteLine("Here is ProcessAction");
