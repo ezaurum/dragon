@@ -4,6 +4,14 @@ using System.Collections.Generic;
 
 namespace DragonMarble
 {
+    public static class RandomFactory
+    {
+        public static Random NewRandom()
+        {
+            return new Random();
+        }
+    }
+
     public class StageBuffInfo
     {
 
@@ -72,7 +80,7 @@ namespace DragonMarble
 
         public StageDiceInfo()
         {
-            rand = new Random();
+            rand = RandomFactory.NewRandom();
             result = new int[] { 0, 0 };
             rollCount = 0;
             isDouble = false;
