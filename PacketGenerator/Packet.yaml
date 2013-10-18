@@ -71,8 +71,8 @@ RollMoveDiceResult :
           type : Char
           collection : List
           size : 2
-        - name : IsDouble
-          type : Boolean
+        - name : DoubleCount
+          type : Char
 
 OrderCardSelect :
     comment : 선 뽑기
