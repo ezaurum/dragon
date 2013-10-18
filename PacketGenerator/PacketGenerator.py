@@ -24,8 +24,6 @@ def BitConvertAddTo(target, targetType, length, cast):
 		f.write('\n\t\t%s.Add(BitConverter.To%s(bytes,index));'%(target, targetType))
 	f.write('\n\t\tindex += %s;'%length)
 
-
-
 def convertToBitInnerTarget(field, target):
 	cast = target.get('cast')
 	length = target.get('length','sizeof(%s)'%target['type'])
@@ -82,15 +80,7 @@ for packet_name in packet_list:
 	fields = common_header.get('fields',[])+packet.get('fields',[])
 
 	# class member
-	for field in fields:
-		#in case of collections e.g. List
-		if 'collection' in field:
-			f.write('\n\tpublic %s<%s> %s;'%(field['collection'],field['type'], field['name']))
-		elif field['name'] == 'MessageType':			
-			f.write('\n\tpublic GameMessageType MessageType {get{return GameMessageType.%s;}}'%packet_name)
-		#in case of one object
-		else:
-			f.write('\n\tpublic %s %s;'%(field['type'], field['name']))
+	f.write( message_instance.make_fields(packet_name, fields) )
 
 	# ToByteArray method implementation
 	f.write('\n\n\tpublic byte[] ToByteArray()\n\t{')

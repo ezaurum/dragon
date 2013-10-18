@@ -63,3 +63,17 @@ def make_message_length(f, fields, length):
 	f.write('%s);'%length)
 	f.write('\n\t\t}')
 	f.write('\n\t}')
+
+#make fields
+def make_fields(packet_name, fields):
+	result =''
+	for field in fields:
+		#in case of collections e.g. List
+		if 'collection' in field:
+			result += '\n\tpublic %s<%s> %s;'%(field['collection'],field['type'], field['name'])
+		elif field['name'] == 'MessageType':			
+			result += '\n\tpublic GameMessageType MessageType {get{return GameMessageType.%s;}}'%packet_name
+		#in case of one object
+		else:
+			result += '\n\tpublic %s %s;'%(field['type'], field['name'])	
+	return result
