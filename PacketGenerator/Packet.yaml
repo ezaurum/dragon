@@ -6,7 +6,7 @@
 #                      length에 값이 있으면 그걸로 프로퍼티 이름을 삼음 기본값은 Length
 #has_type_length : 타입마다 Length가 설정되어 있음. \
 #                   length에 값이 있으면 그걸로 프로퍼티 이름을 삼음. 기본값은 Length
-#options 에 targets가 있으면 무조건 빈 프로퍼티 있다고 가정
+#options 에 targets가 있으면 무조건 빈 생성자 있다고 가정
 
 Header :
     comment : 헤더
