@@ -123,3 +123,33 @@ ActivateTurn :
       options : [byte_param_constructor, to_byte_array, property]
     - name : ResponseLimit
       type : Int64
+
+NothingToDo :
+  comment : 할 수 있는게 없을 때
+  fields :
+    - name : Actor
+      type : Guid
+      length : 16
+      options : [byte_param_constructor, to_byte_array, property]
+
+BuyLandRequest :
+  comment : buy lands available
+  fields :
+    - name : ResponseLimit
+      type : Int64
+    - name : Actor
+      type : Guid
+      length : 16
+      options : [byte_param_constructor, to_byte_array, property]
+
+BuyLand :
+  comment : buy lands
+  fields :
+    - name : TileIndex
+      type : Char
+    - name : Buildings
+      type : Char
+    - name : Actor
+      type : Guid
+      length : 16
+      options : [byte_param_constructor, to_byte_array, property]
