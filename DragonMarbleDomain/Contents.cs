@@ -140,6 +140,11 @@ namespace DragonMarble
             result[0] = 0;
             result[1] = 0;
         }
+
+        public void Roll(float pressed, bool odd, bool even)
+        {
+            Roll();
+        }
     }
 
 

@@ -52,6 +52,26 @@ namespace DragonMarble
             };
         }
 
-        
+
+        public static IDragonMarbleGameMessage BuyLandRequest(StageUnitInfo arg1, object[] arg2)
+        {
+            return new BuyLandRequestGameMessage() 
+            {
+                To=arg1.Id,
+                Actor = ((StageUnitInfo)arg2[0]).Id,
+                ResponseLimit = 50000
+            };
+        }
+
+        public static IDragonMarbleGameMessage RollMoveDiceResult(StageUnitInfo arg1, object[] arg2)
+        {
+            return new RollMoveDiceResultGameMessage
+            {
+                To=arg1.Id,
+                Actor = ((StageUnitInfo) arg2[0]).Id,
+                Dices = new List<char> {(char) arg2[1],(char) arg2[2]},
+                RollCount = (char)arg2[3],
+            };
+        }
     }
 }

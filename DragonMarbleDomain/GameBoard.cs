@@ -5,13 +5,13 @@ using System.Linq;
 namespace DragonMarble
 {
     public class GameBoard
-    {
-        private readonly List<StageTile> _tiles;
+    {   
         public int GrossAssets { get; set; }
+        public List<StageTile> Tiles { get; set; }
 
         public GameBoard(List<StageTile> tiles)
         {
-            _tiles = tiles;
+            Tiles = tiles;
             FeeBoostedTiles = new List<short>();
         }
 
@@ -19,7 +19,7 @@ namespace DragonMarble
         {
             //StageTile from _tiles
             IEnumerable<StageTile> citiesAndSights 
-                = _tiles.Where(t => StageTileInfo.TYPE.CITY == t.Type 
+                = Tiles.Where(t => StageTileInfo.TYPE.CITY == t.Type 
                     || StageTileInfo.TYPE.SIGHT == t.Type);
             
             Random r = new Random();

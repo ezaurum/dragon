@@ -29,12 +29,9 @@ namespace DragonMarble
                     case GameMessageType.RollMoveDice:
                         var rollMoveDiceGameMessage = (RollMoveDiceGameMessage) receivedMessage;
 
-                        var rmdrgm = new RollMoveDiceResultGameMessage
-                        {
-                            From = StageManager.Id,
-                            To = Id,
-                            Dices = new List<Char> {(char) Dice.result[0], (char) Dice.result[1]}
-                        };
+                        Dice.Roll(rollMoveDiceGameMessage.Pressed
+                            , rollMoveDiceGameMessage.Odd
+                            , rollMoveDiceGameMessage.Even);
 
                         if (Dice.isDouble)
                         {
@@ -59,13 +56,25 @@ namespace DragonMarble
                             Actor = this,
                             NeedOther = false,
                             Type = GameMessageType.RollMoveDiceResult,
+                            ArgObjects = new object[] { (char)Dice.result[0], (char)Dice.result[1], (char)Dice.rollCount }
                         };
 
                         yield return action;
-
-                        //
+                        
+                        StageTile stageTile = Stage.Tiles[tileIndex];
+                        switch (stageTile.Type)
+                        {
+                            case StageTileInfo.TYPE.CITY:
+                            case StageTileInfo.TYPE.SIGHT:
+                                yield return new GameAction()
+                                {
+                                    Actor = this,
+                                    Type = GameMessageType.BuyLandRequest
+                                };
+                                break;
+                        }
+                        
                         IDragonMarbleGameMessage afterMovedMessage = ReceivedMessage;
-
 
                         break;
                 }
