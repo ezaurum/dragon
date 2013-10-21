@@ -31,9 +31,14 @@ namespace DragonMarble
         }
 
         /**
-         *  NumberOfPlayers = (short)arg2[0],
-                OrderCardSelectState = (List<bool>) arg2[1],
-                SelectedCardNumber = (short)arg2[2]
+         * <summary>
+         * order card selected by client
+         * (Int16 NumberOfPlayers, List&gt;bool&lt; OrderCardSelectState, Int16 SelectedCardNumber)
+         * </summary>
+         * <param name="p">stage unit info</param>
+         * <param name="args2[0]">short, NumberOfPlayers</param>
+         * <param name="args2[1]">list of short, OrderCardSelectState</param>
+         * <param name="args2[2]">short, SelectedCardNumber</param>
          */
         public static OrderCardSelectGameMessage OrderCardSelect(StageUnitInfo p, object[] arg2)
         {

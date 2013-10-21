@@ -110,6 +110,8 @@ namespace DragonMarble
             }
         }
 
+        public GameBoard Stage { get; set; }
+
         public void ResetMessages()
         {
             MessageProcessor.ResetMessages();

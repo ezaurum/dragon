@@ -26,7 +26,7 @@ namespace DragonMarble
         {
             XmlConfigurator.Configure(new FileInfo("log4net.xml"));
 
-            List<StageTile> tiles = XmlUtils.LoadXml(@"data_stage.xml", GameBoard.ParseTiles);
+            List<StageTile> tiles = XmlUtils.LoadXml(@"data_stage.xml", GameMaster.ParseTiles);
 
             Logger.Debug("Start app.");
 
@@ -83,19 +83,7 @@ namespace DragonMarble
             byte[] m = eventArgs.Buffer.Skip(eventArgs.Offset).Take(messageLength).ToArray();
             
             IDragonMarbleGameMessage gameMessage = GameMessageFactory.GetGameMessage(m);
-            Console.WriteLine("received {0} message from {1}. ", gameMessage.MessageType, gameMessage.From);
-            token.ReceivedMessage = gameMessage;
-            
-            if (gameMessage.MessageType == GameMessageType.RollMoveDice)
-            {   
-                RollMoveDiceResultGameMessage rollMoveDiceResultContent  = new RollMoveDiceResultGameMessage()
-                {
-                    To = Guid.NewGuid(),
-                    From = Guid.NewGuid(),
-                    Dices = new List<char>(new[] {(char)2,(char)3})
-                };
-                token.SendingMessage = rollMoveDiceResultContent;
-            }
+            Logger.DebugFormat("received {0} message from {1}. ", gameMessage.MessageType, gameMessage.From);
         }
     }
 }
