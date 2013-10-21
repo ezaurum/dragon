@@ -21,11 +21,7 @@ Header :
         - type : Guid
           name : To
           length : 16
-          options : [byte_param_constructor, to_byte_array, property]
-        - name : Actor
-          type : Guid
-          length : 16
-          options : [byte_param_constructor, to_byte_array, property]
+          options : [byte_param_constructor, to_byte_array, property]        
 
 InitializeGame :
     comment : 게임 초기화 정보
@@ -70,6 +66,10 @@ RollMoveDice :
           type : Boolean
         - name : Even
           type : Boolean
+        - name : Actor
+          type : Guid
+          length : 16
+          options : [byte_param_constructor, to_byte_array, property]
 
 RollMoveDiceResult :
     comment : 서버에서 주사위 굴리기 결과
@@ -80,6 +80,10 @@ RollMoveDiceResult :
           size : 2
         - name : DoubleCount
           type : Char
+        - name : Actor
+          type : Guid
+          length : 16
+          options : [byte_param_constructor, to_byte_array, property]
 
 OrderCardSelect :
     comment : 선 뽑기
@@ -92,6 +96,10 @@ OrderCardSelect :
         type : Boolean
         collection : List
         size : NumberOfPlayers
+      - name : Actor
+        type : Guid
+        length : 16
+        options : [byte_param_constructor, to_byte_array, property]
 
 OrderCardResult :
     comment : 선 뽑기 결과
