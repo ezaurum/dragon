@@ -1,92 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
-using Dragon.Interfaces;
-using Dragon.Server;
 using DragonMarble.Message;
 using log4net;
 
 namespace DragonMarble
 {
-    internal class AIGamePlayer : GamePlayer
-    {
-        public AIGamePlayer()
-            : this(UNIT_COLOR.BLUE, 2000000)
-        {   
-        }
-
-        public AIGamePlayer(UNIT_COLOR teamColor, int initCapital) : base(teamColor, initCapital)
-        {
-            ControlMode = ControlModeType.AI_0;
-            MessageProcessor = new AIQueuedMessageProcessor();
-            Dice = new StageDiceInfo();
-        }
-
-        public override IStageManager StageManager
-        {
-            set
-            {
-                base.StageManager = value;
-                ((AIQueuedMessageProcessor) MessageProcessor).GameMasterId = value.Id;
-            }
-        }
-    }
-
-    internal class AIQueuedMessageProcessor : QueuedMessageProcessor<IDragonMarbleGameMessage>, IDragonMarbleMessageProcessor
-    {
-        public Guid GameMasterId { get; set; }
-        public override IGameMessage SendingMessage
-        {
-            set
-            {
-                base.SendingMessage = value;
-                Console.WriteLine("AI received.");
-                ReceivedMessage = GetMessage(value);
-            }
-        }
-
-        public override IDragonMarbleGameMessage ReceivedMessage
-        {   
-            set
-            {
-                if ( null != value )
-                    base.ReceivedMessage = value;
-            }
-        }
-
-        private IDragonMarbleGameMessage GetMessage(IGameMessage message)
-        {
-            GameMessageType messageType = ((IDragonMarbleGameMessage)message).MessageType;
-            IDragonMarbleGameMessage result = null;
-            switch (messageType)
-            {
-                case GameMessageType.ActivateTurn:
-                    result = new RollMoveDiceGameMessage()
-                    {
-                        Pressed = 10,
-                        To = Id,
-                        From = GameMasterId
-                    };
-                    break;
-            }
-            return result;
-        }
-    }
-
-
     public class GamePlayer : StageUnitInfo
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof (GamePlayer));
-        private GameActionResult _result;
-
-        public GamePlayer()
-        {
-            Dice = new StageDiceInfo();
-        }
 
         public GamePlayer(UNIT_COLOR teamColor, int initialCapital)
             : base(teamColor, initialCapital)
         {
-            Dice = new StageDiceInfo();
+
+        }
+
+        public GamePlayer()
+        {
+            
         }
         
         public int LastSelected { get; set; }
@@ -103,15 +34,7 @@ namespace DragonMarble
             set { gold = value; }
         }
 
-        public GameActionResult Result
-        {
-            get { return _result; }
-            set { SetResult(value); }
-        }
-
-
-
-        public UNIT_COLOR TeamColor
+        public UNIT_COLOR UnitColor
         {
             get
             {
@@ -123,32 +46,10 @@ namespace DragonMarble
             }
         }
 
-        private int RollMoveDice(int press)
-        {
-            Dice.Roll();
-            Go(Dice.resultSum);
-            return Position;
-        }
-
-        public bool Earn(int a)
-        {
-            return AddGold(a);
-        }
-
-        public bool Pay(int money)
-        {
-            return AddGold(-money);
-        }
-
         public void ActivateTurn()
         {
-            Console.WriteLine("My turn!");
+            Logger.Debug("Activated Turn");
             OwnTurn = true;
-        }
-
-        public void SetResult(GameActionResult result)
-        {
-            Console.WriteLine("Set Action result.");
         }
 
         public void DeactivateTurn()
@@ -192,13 +93,15 @@ namespace DragonMarble
                     ResponseLimit = 50000
                 };
 
-                IDragonMarbleGameMessage receivedMessage = (IDragonMarbleGameMessage) ReceivedMessage;
+                IDragonMarbleGameMessage receivedMessage = ReceivedMessage;
+
+                DoAction(receivedMessage);
 
                 switch (receivedMessage.MessageType)
                 {
                     case GameMessageType.RollMoveDice:
                         RollMoveDiceGameMessage rollMoveDiceGameMessage = (RollMoveDiceGameMessage)receivedMessage;
-                        RollMoveDice((int) rollMoveDiceGameMessage.Pressed);
+                        Go((int)rollMoveDiceGameMessage.Pressed);
                         Console.WriteLine("{0}", Dice);
                         RollMoveDiceResultGameMessage
                         rmdrgm = new RollMoveDiceResultGameMessage()
@@ -212,7 +115,7 @@ namespace DragonMarble
                         break;
                 }
                 
-                Console.WriteLine( receivedMessage.MessageType);
+                Logger.Debug( receivedMessage.MessageType);
 
                 yield return action;
             }

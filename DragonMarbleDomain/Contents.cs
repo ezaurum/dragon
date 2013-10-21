@@ -217,6 +217,7 @@ namespace DragonMarble
             unitBuff = null;
             chanceCoupon = CHANCE_COUPON.NULL;
             DiceId = 1;
+            Dice = new StageDiceInfo();
         }
 
         public int property
@@ -316,8 +317,6 @@ namespace DragonMarble
             {
                 case GameMessageType.RollMoveDice:
                     RollMoveDiceGameMessage rollMoveDiceGameMessage = (RollMoveDiceGameMessage)message;
-                    //RollMoveDice(rollMoveDiceGameMessage.Pressed);
-                    Console.WriteLine("{0}", Dice);
                     RollMoveDiceResultGameMessage
                     rmdrgm = new RollMoveDiceResultGameMessage()
                     {

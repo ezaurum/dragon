@@ -53,7 +53,7 @@ namespace DragonMarble
                 Id = Guid.NewGuid(),
                 MessageProcessor = token, 
                 Order = 0,
-                TeamColor = StageUnitInfo.UNIT_COLOR.BLUE,
+                UnitColor = StageUnitInfo.UNIT_COLOR.BLUE,
                 CharacterId = 1,
                 Gold = 2000000
             };
@@ -66,7 +66,7 @@ namespace DragonMarble
             {
                 Id = Guid.NewGuid(),
                 Order = 1,
-                TeamColor = StageUnitInfo.UNIT_COLOR.GREEN,
+                UnitColor = StageUnitInfo.UNIT_COLOR.GREEN,
                 CharacterId = 2,
                 Gold = 2000000
             };
