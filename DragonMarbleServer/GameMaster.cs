@@ -24,10 +24,10 @@ namespace DragonMarble
 
         private static readonly ILog Logger = LogManager.GetLogger(typeof (GameMaster));
         private GameBoard Board { get; set; }
-        public List<GamePlayer> Players { get;set;}
+        public List<StageUnitInfo> Players { get;set;}
         private readonly Dictionary<Int16, Guid> _orderCard = new Dictionary<short, Guid>();
         private GameState _state;
-        private List<GamePlayer> _availablePlayers;
+        private List<StageUnitInfo> _availablePlayers;
         private bool _gameContinue;
 
         public GameMaster(List<StageTile> tiles) : this()
@@ -39,7 +39,7 @@ namespace DragonMarble
         {
             _state = GameState.BeforeInit;
             Id = Guid.NewGuid();
-            Players = new List<GamePlayer>();
+            Players = new List<StageUnitInfo>();
         }
 
         public Guid Id { get; set; }
@@ -49,7 +49,7 @@ namespace DragonMarble
             get { return (Players.Count > 1); }
         }
 
-        public void Join(GamePlayer player)
+        public void Join(StageUnitInfo player)
         {
             Players.Add(player);
             player.StageManager = this;
@@ -67,7 +67,6 @@ namespace DragonMarble
         public void StartGame()
         {
             Logger.Debug("Start game");
-
             InitGame();
             SendOrderCardSelectMessage();
         }
@@ -82,53 +81,34 @@ namespace DragonMarble
 
             //order
             //At first, select order
-            foreach (GamePlayer stageUnit in Players)
-            {
-                stageUnit.SendingMessage = new OrderCardSelectGameMessage
-                {
-                    To = stageUnit.Id,
-                    From = Id,
-                    Actor = Id,
-                    NumberOfPlayers = (short)Players.Count,
-                    OrderCardSelectState = new List<Boolean> { false, false },
-                    SelectedCardNumber = -1
-                };
-            }
-
+            Notify(GameMessageInstanceFactory.OrderCardSelect
+                , (short)Players.Count
+                , new List<bool> { false, false }
+                , (short)-1);
         }
 
         private void InitGame()
-        {
-            List<StageUnitInfo> units = Players.Cast<StageUnitInfo>().ToList();
-            
+        {   
             _availablePlayers = Players;
 
             Board.Init();
             
             //send initialize message
-            Notify(GameMessageInstanceFactory.MakeInitializePlayerMessage, units, Board.FeeBoostedTiles);
+            Notify(GameMessageInstanceFactory.MakeInitializePlayerMessage, _availablePlayers, Board.FeeBoostedTiles);
             
             _state = GameState.Init;
         }
 
-        
-
-        public void Notify(Func<GamePlayer, object[], IDragonMarbleGameMessage> makeInitializePlayerMessage, params object[] parameterObjects)
+        public void Notify(Func<StageUnitInfo, object[], IDragonMarbleGameMessage> instanceMessage, params object[] parameterObjects)
         {
-            Players.ForEach(p => { p.SendingMessage = makeInitializePlayerMessage(p, parameterObjects); });
+            Players.ForEach(p =>
+            {
+                IDragonMarbleGameMessage message = instanceMessage(p, parameterObjects);
+                message.From = Id;
+                p.SendingMessage = message;
+            });
         }
        
-
-        public void SelectOrder(short foo, GamePlayer gamePlayer)
-        {
-            _orderCard.Add(foo, gamePlayer.Id);
-        }
-
-        public Guid GetId(short foo)
-        {
-            return _orderCard[foo];
-        }
-
         public void OrderEnd()
         {
             //TODO
@@ -136,7 +116,16 @@ namespace DragonMarble
             Players.ForEach(p =>
             {
                 if (p.Id.Equals(guid))
-                p.Order = 0;
+                    p.Order = 0;
+
+                if (p.ControlMode == StageUnitInfo.ControlModeType.Player)
+                {
+                    
+                    var dragonMarbleGameMessage = p.ReceivedMessage;
+                    p.ResetMessages();
+                    
+                }
+                
             });
 
             var guid1 = _orderCard[1];
@@ -144,6 +133,14 @@ namespace DragonMarble
             {
                 if (p.Id.Equals(guid1))
                     p.Order = 1;
+                //TODO 처리가 필요
+                if (p.ControlMode == StageUnitInfo.ControlModeType.Player)
+                {
+                    var dragonMarbleGameMessage = p.ReceivedMessage;
+                    p.ResetMessages();
+                
+                }
+                
             });
 
             OrderedByTurnPlayers = Players.OrderBy(player => player.Order).ToList();
@@ -169,7 +166,7 @@ namespace DragonMarble
                 //if need, other's reactions
                 if (action.NeedOther)
                 {
-                    foreach (GamePlayer targetUnit in action.TargetUnits)
+                    foreach (StageUnitInfo targetUnit in action.TargetUnits)
                     {
                         Logger.Debug("This action need target units action.");
                         
@@ -180,7 +177,7 @@ namespace DragonMarble
             }
         }
 
-        private IEnumerable<GamePlayer> PlayersOrderByTurn()
+        private IEnumerable<StageUnitInfo> PlayersOrderByTurn()
         {
             for (Turn = 0; Turn < TurnLimit; Turn++)
             {
@@ -196,12 +193,12 @@ namespace DragonMarble
 
         public int Turn { get; set; }
 
-        private GamePlayer CurrentPlayer
+        private StageUnitInfo CurrentPlayer
         {
             get { return OrderedByTurnPlayers[Turn % Players.Count]; }
         }
 
-        public List<GamePlayer> OrderedByTurnPlayers{ get; set; }
+        public List<StageUnitInfo> OrderedByTurnPlayers{ get; set; }
 
         public void EndGame()
         {

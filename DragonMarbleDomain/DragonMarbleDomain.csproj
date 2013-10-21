@@ -39,7 +39,6 @@
     <Compile Include="Contents.cs" />
     <Compile Include="GameAction.cs" />
     <Compile Include="GameActionResult.cs" />
-    <Compile Include="GamePlayer.cs" />
     <Compile Include="Message\GameMessage.cs" />
     <Compile Include="Message\IDragonMarbleGameMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

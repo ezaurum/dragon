@@ -14,7 +14,7 @@ namespace DragonMarble
         public bool Success { get; set; }
         public ICollection<int> EffectedPlayers { get; set; }
 
-        public List<GamePlayer> TargetUnits { get; set; }
+        public List<StageUnitInfo> TargetUnits { get; set; }
         public List<StageTile> TargetTiles { get; set; }
     }
 }

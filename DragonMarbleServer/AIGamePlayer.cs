@@ -6,7 +6,7 @@ using log4net;
 
 namespace DragonMarble
 {
-    public sealed class AIGamePlayer : GamePlayer
+    public sealed class AIGamePlayer : StageUnitInfo
     {
         public AIGamePlayer()
             : this(UNIT_COLOR.BLUE, 2000000)
