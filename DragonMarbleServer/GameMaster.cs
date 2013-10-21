@@ -6,32 +6,52 @@ using log4net;
 
 namespace DragonMarble
 {
+    public enum GameState
+    {
+        BeforeInit = 0,
+        Init,
+        StartGame,
+        OrderPlayers,
+        WaitPlayerAction,
+        ProcessPlayerAction,
+        EndGame
+    }
+
     public class GameMaster : IStageManager
     {
+
+        public const int TurnLimit = 30;
+
         private static readonly ILog Logger = LogManager.GetLogger(typeof (GameMaster));
-        private readonly List<GamePlayer> _players;
-        private readonly List<StageTile> _tiles;
         private GameBoard Board { get; set; }
-        private StageManager _stageManager;
-        public List<GamePlayer> Players { get { return _players; } }
-        private Dictionary<Int16, Guid> _OrderCard = new Dictionary<short, Guid>();
-        public GameMaster(List<StageTile> tiles)
+        public List<GamePlayer> Players { get;set;}
+        private readonly Dictionary<Int16, Guid> _orderCard = new Dictionary<short, Guid>();
+        private GameState _state;
+        private List<GamePlayer> _availablePlayers;
+        private bool _gameContinue;
+
+        public GameMaster(List<StageTile> tiles) : this()
         {
+            Board = new GameBoard(tiles);
+        }
+
+        public GameMaster()
+        {
+            _state = GameState.BeforeInit;
             Id = Guid.NewGuid();
-            _tiles = tiles;
-            _players = new List<GamePlayer>();
+            Players = new List<GamePlayer>();
         }
 
         public Guid Id { get; set; }
 
         public bool IsGameStartable
         {
-            get { return (_players.Count > 1); }
+            get { return (Players.Count > 1); }
         }
 
         public void Join(GamePlayer player)
         {
-            _players.Add(player);
+            Players.Add(player);
             player.StageManager = this;
 
             //set initailize player message
@@ -48,10 +68,57 @@ namespace DragonMarble
         {
             Logger.Debug("Start game");
 
-            _stageManager = new StageManager(_tiles, _players);
+            InitGame();
+            SendOrderCardSelectMessage();
+        }
 
-            _stageManager.InitGame();
-            _stageManager.StartGame();
+        private void SendOrderCardSelectMessage()
+        {
+            if (GameState.Init != _state)
+                throw new InvalidOperationException("State is not initialized.");
+
+            _state = GameState.OrderPlayers;
+            GameContinue = true;
+
+            //order
+            //At first, select order
+            foreach (GamePlayer stageUnit in Players)
+            {
+                stageUnit.SendingMessage = new OrderCardSelectGameMessage
+                {
+                    To = stageUnit.Id,
+                    From = Id,
+                    Actor = Id,
+                    NumberOfPlayers = (short)Players.Count,
+                    OrderCardSelectState = new List<Boolean> { false, false },
+                    SelectedCardNumber = -1
+                };
+            }
+
+        }
+
+        private void InitGame()
+        {
+            List<StageUnitInfo> units = Players.Cast<StageUnitInfo>().ToList();
+
+            //send initialize message
+            Players.ForEach(p =>
+            {
+                p.StageManager = this;
+                p.SendingMessage = new InitializeGameGameMessage
+                {
+                    From = Id,
+                    To = p.Id,
+                    Actor = p.Id,
+                    FeeBoostedTiles = Board.FeeBoostedTiles,
+                    NumberOfPlayers = (short)units.Count,
+                    Units = units
+                };
+            });
+
+            _availablePlayers = Players;
+            
+            _state = GameState.Init;
         }
 
         public void Notify(Guid senderGuid,
@@ -64,7 +131,7 @@ namespace DragonMarble
                     , senderGuid, messageType);
             }
 
-            foreach (GamePlayer p in _players.Where(p => p.Id != senderGuid))
+            foreach (GamePlayer p in Players.Where(p => p.Id != senderGuid))
             {
                 IDragonMarbleGameMessage message = GameMessageFactory.GetGameMessage(messageType);
                 //TODO message content setting neeed.
@@ -76,36 +143,135 @@ namespace DragonMarble
 
         public void SelectOrder(short foo, GamePlayer gamePlayer)
         {
-            _OrderCard.Add(foo, gamePlayer.Id);
+            _orderCard.Add(foo, gamePlayer.Id);
         }
 
         public Guid GetId(short foo)
         {
-            return _OrderCard[foo];
+            return _orderCard[foo];
         }
 
         public void OrderEnd()
         {
-            var guid = _OrderCard[0];
-            _players.ForEach(p =>
+            //TODO
+            var guid = _orderCard[0];
+            Players.ForEach(p =>
             {
                 if (p.Id.Equals(guid))
                 p.Order = 0;
             });
 
-            var guid1 = _OrderCard[1];
-            _players.ForEach(p =>
+            var guid1 = _orderCard[1];
+            Players.ForEach(p =>
             {
                 if (p.Id.Equals(guid1))
                     p.Order = 1;
             });
 
-            _stageManager.OrderPlayers2();
-            _stageManager.PlayGame();
+            OrderedByTurnPlayers = Players.OrderBy(player => player.Order).ToList();
+            
+            PlayGame();
         }
-    }
 
-    internal class GameBoard
-    {
+        private void PlayGame()
+        {
+            ProcessAction();
+            EndGame();
+        }
+
+        private IEnumerable<GameAction> PlayerActions()
+        {
+            foreach (GameAction action
+                in PlayersOrderByTurn().SelectMany(player => player.Actions()))
+            {
+                //turn owner's action
+                Console.WriteLine("Here is playerAcitions");
+                yield return action;
+
+                //if need, other's reactions
+                if (action.NeedOther)
+                {
+                    foreach (StageUnitInfo targetUnit in action.TargetUnits)
+                    {
+                        Console.WriteLine("This action need target units action.");
+                        GameAction othersAction = new GameAction();
+                        yield return othersAction;
+                    }
+                }
+            }
+        }
+
+        private IEnumerable<GamePlayer> PlayersOrderByTurn()
+        {
+            for (Turn = 0; Turn < TurnLimit; Turn++)
+            {
+                Console.WriteLine("Turn:{0}", Turn + 1);
+                yield return CurrentPlayer;
+            }
+        }
+
+        public int Turn { get; set; }
+
+
+        private GamePlayer CurrentPlayer
+        {
+            get { return OrderedByTurnPlayers[Turn % Players.Count]; }
+        }
+
+        public List<GamePlayer> OrderedByTurnPlayers{ get; set; }
+
+        public void EndGame()
+        {
+            Logger.Debug("end game.");
+        }
+
+
+
+        private void ProcessAction()
+        {
+            foreach (GameAction action in PlayerActions())
+            {
+                Logger.Debug("Here is ProcessAction");
+
+
+                GameAction action1 = action;
+                foreach (GamePlayer gamePlayer in Players.Where(p => !p.Id.Equals(action1.Actor.Id)))
+                {
+                    gamePlayer.SendingMessage = new ActivateTurnGameMessage
+                    {
+                        To = gamePlayer.Id,
+                        From = Id,
+                        TurnOwner = action.Actor.Id,
+                        ResponseLimit = 50000
+                    };
+                }
+
+                CurrentAction = action;
+
+                //need check game end
+            }
+        }
+
+        public GameAction CurrentAction { get; set; }
+
+        public bool GameContinue
+        {
+            get
+            {
+                if (_availablePlayers.Count < 2)
+                {
+                    Logger.Debug("Everyone else is out.");
+                    _gameContinue = false;
+                    return _gameContinue;
+                }
+                if (Turn > 29)
+                {
+                    Logger.Debug("Turn over.");
+                    _gameContinue = false;
+                }
+                return _gameContinue;
+            }
+            set { _gameContinue = value; }
+        }
     }
 }
