@@ -5,54 +5,8 @@ using DragonMarble.Message;
 
 namespace DragonMarble
 {
-    public class StageUnitInfo
+    public partial class StageUnitInfo
     {
-        public enum CHANCE_COUPON
-        {
-            NULL,
-            DISCOUNT_50,
-            ESCAPE_ISLAND,
-            SHIELD,
-            ANGEL
-        }
-
-        public enum ControlModeType
-        {
-            Player,
-            AI_0,
-            AI_1,
-            AI_2,
-        }
-
-        public enum TEAM_GROUP
-        {
-            A = 0,
-            B,
-            C,
-            D
-        }
-
-        public enum UNIT_COLOR
-        {
-            RED = 0,
-            BLUE,
-            YELLOW,
-            GREEN,
-            PINK,
-            SKY
-        }
-
-        public CHANCE_COUPON chanceCoupon;
-
-        public int gold;
-        public Dictionary<int, StageTileInfo> lands;
-        public int ranking;
-        public int round;
-        public TEAM_GROUP teamGroup;
-        public int tileIndex;
-        public StageBuffInfo unitBuff;
-        public UNIT_COLOR unitColor;
-        public int usableLoanCount;
 
         public StageUnitInfo(UNIT_COLOR unitColor, int initialCapital = 2000000)
             : this()
@@ -75,9 +29,26 @@ namespace DragonMarble
             Dice = new StageDiceInfo();
         }
 
+        public Guid Id { get; set; }
+        public CHANCE_COUPON chanceCoupon;
+        public int gold;
+        public Dictionary<int, StageTileInfo> lands;
+        public int ranking;
+        public int round;
+        public TEAM_GROUP teamGroup;
+        public int tileIndex;
+        public StageBuffInfo unitBuff;
+        public UNIT_COLOR unitColor;
+        public int usableLoanCount;
         public virtual IMessageProcessor<IDragonMarbleGameMessage> MessageProcessor { get; set; }
         public virtual IStageManager StageManager { get; set; }
         public StageDiceInfo Dice { get; set; }
+        public int Order { get; set; }
+        public int ActionRemined { get; set; }
+        public bool OwnTurn { get; set; }
+        public ControlModeType ControlMode { get; set; }
+        public int CharacterId { get; set; }
+        public int DiceId { get; set; }
 
         public virtual IDragonMarbleGameMessage ReceivedMessage
         {
@@ -87,41 +58,6 @@ namespace DragonMarble
         public virtual IDragonMarbleGameMessage SendingMessage
         {
             set { MessageProcessor.SendingMessage = value; }
-        }
-
-        public int Order { get; set; }
-        public int ActionRemined { get; set; }
-
-
-        public bool OwnTurn { get; set; }
-        public int DiceId { get; set; }
-        public ControlModeType ControlMode { get; set; }
-        public int CharacterId { get; set; }
-        public Guid Id { get; set; }
-
-        public int property
-        {
-            get
-            {
-                int p = gold;
-                foreach (StageTileInfo t in lands.Values)
-                {
-                    p += t.sellPrice;
-                }
-                return p;
-            }
-        }
-
-        public bool isAbleToLoan
-        {
-            get
-            {
-                if (usableLoanCount > 0)
-                {
-                    return true;
-                }
-                return false;
-            }
         }
 
         public int Assets
@@ -147,6 +83,31 @@ namespace DragonMarble
         {
             get { return unitColor; }
             set { unitColor = value; }
+        }
+
+        public int property
+        {
+            get
+            {
+                int p = gold;
+                foreach (StageTileInfo t in lands.Values)
+                {
+                    p += t.sellPrice;
+                }
+                return p;
+            }
+        }
+
+        public bool isAbleToLoan
+        {
+            get
+            {
+                if (usableLoanCount > 0)
+                {
+                    return true;
+                }
+                return false;
+            }
         }
 
         public void ResetMessages()
@@ -235,93 +196,6 @@ namespace DragonMarble
             if (buffTurn > 0)
             {
                 unitBuff = new StageBuffInfo(buffType, buffTurn, power);
-            }
-        }
-
-
-        public void ActivateTurn()
-        {
-            OwnTurn = true;
-        }
-
-        public void DeactivateTurn()
-        {
-            OwnTurn = false;
-            Dice.Clear();
-        }
-
-
-        public IEnumerable<GameAction> Actions()
-        {
-            for (ActionRemined = 1; ActionRemined > 0; ActionRemined--)
-            {
-                var action = new GameAction {PlayerNumber = Order, Actor = this};
-
-                IDragonMarbleGameMessage receivedMessage = ReceivedMessage;
-
-                DoAction(receivedMessage);
-
-                switch (receivedMessage.MessageType)
-                {
-                    case GameMessageType.RollMoveDice:
-                        var rollMoveDiceGameMessage = (RollMoveDiceGameMessage) receivedMessage;
-                        Go((int) rollMoveDiceGameMessage.Pressed);
-                        Console.WriteLine("{0}", Dice);
-                        var
-                            rmdrgm = new RollMoveDiceResultGameMessage
-                            {
-                                From = StageManager.Id,
-                                To = Id,
-                                Dices = new List<Char> {(char) Dice.result[0], (char) Dice.result[1]}
-                            };
-                        if (Dice.isDouble && Dice.rollCount < 3) ActionRemined += 1;
-                        SendingMessage = rmdrgm;
-                        break;
-                }
-
-                yield return action;
-            }
-        }
-
-        public void DoAction(IDragonMarbleGameMessage message)
-        {
-            switch (message.MessageType)
-            {
-                case GameMessageType.RollMoveDice:
-                    var rollMoveDiceGameMessage = (RollMoveDiceGameMessage) message;
-                    //RollMoveDice(rollMoveDiceGameMessage.Pressed);
-                    Console.WriteLine("{0}", Dice);
-                    var
-                        rmdrgm = new RollMoveDiceResultGameMessage
-                        {
-                            From = StageManager.Id,
-                            To = Id,
-                            Dices = new List<char> {(char) Dice.result[0], (char) Dice.result[1]}
-                        };
-                    if (Dice.isDouble && Dice.rollCount < 3) ActionRemined += 1;
-                    //SendingMessage = rmdrgm;
-                    break;
-
-                case GameMessageType.RollMoveDiceResult:
-                {
-                    var rollMoveDiceResultGameMessage = (RollMoveDiceResultGameMessage) message;
-                    int diceSum = 0;
-                    foreach (char i in rollMoveDiceResultGameMessage.Dices) diceSum += i;
-                    Go(diceSum);
-
-
-                    break;
-                }
-                case GameMessageType.OrderCardSelect:
-                {
-                    var m = (OrderCardSelectGameMessage) message;
-                    Guid guid = m.To;
-                    m.To = m.From;
-                    m.Actor = Id;
-                    m.OrderCardSelectState = new List<bool> {true, true};
-                    SendingMessage = m;
-                    break;
-                }
             }
         }
     }
