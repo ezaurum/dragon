@@ -10,8 +10,6 @@ namespace Dragon.Server
     public interface IAsyncUserToken
     {
         Socket Socket { get; set; }
-        SocketAsyncEventArgs ReadArg { get; set; }
-        SocketAsyncEventArgs WriteArg { get; set; }
         byte[] SendingMessageByteArray();
     }
 }

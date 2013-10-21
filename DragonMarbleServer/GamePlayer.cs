@@ -38,7 +38,7 @@ namespace DragonMarble
         {
             set
             {
-                //base.SendingMessage = value;
+                base.SendingMessage = value;
                 Console.WriteLine("AI received.");
                 ReceivedMessage = GetMessage(value);
             }

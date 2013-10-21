@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
-using System.Security.Policy;
 using System.Threading;
-using Dragon.Interfaces;
 using log4net;
 
 namespace Dragon.Server
@@ -130,8 +128,6 @@ namespace Dragon.Server
             writeEventArgs.UserToken = token;
 
             token.Socket = acceptedSocket;
-            token.ReadArg = readEventArgs;
-            token.WriteArg = writeEventArgs;
 
             OnAcceptConnection(this, writeEventArgs);
 

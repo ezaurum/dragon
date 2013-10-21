@@ -14,8 +14,6 @@ namespace Dragon.Server
         private readonly Guid _id = Guid.NewGuid();
         public Guid Id { get { return _id; } }
         public Socket Socket { get; set; }
-        public SocketAsyncEventArgs ReadArg { get; set; }
-        public SocketAsyncEventArgs WriteArg { get; set; }
         
         public byte[] SendingMessageByteArray()
         {

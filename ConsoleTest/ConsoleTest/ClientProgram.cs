@@ -9,7 +9,6 @@ namespace ConsoleTest
 {
     class ClientProgram
     {
-        static int counter;
         static void Main(string[] args)
         {
             RollMoveDiceGameMessage rollMessage = new RollMoveDiceGameMessage()
@@ -113,8 +112,6 @@ namespace ConsoleTest
                     Console.WriteLine(((ActivateTurnGameMessage)dragonMarbleGameMessage).From);
                     Console.WriteLine(((ActivateTurnGameMessage)dragonMarbleGameMessage).To);
                     Console.WriteLine(((ActivateTurnGameMessage)dragonMarbleGameMessage).TurnOwner);
-                    
-                    Console.WriteLine(counter++);
                     break;
             }
 
