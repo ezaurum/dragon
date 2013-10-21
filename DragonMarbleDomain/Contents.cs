@@ -180,6 +180,7 @@ namespace DragonMarble
         public UNIT_COLOR unitColor;
         public TEAM_GROUP teamGroup;
 
+        public int usableLoanCount;
         public int gold;
         public Dictionary<int, StageTileInfo> lands;
         public int tileIndex;
@@ -189,6 +190,7 @@ namespace DragonMarble
         public CHANCE_COUPON chanceCoupon;
         public int Order { get; set; }
         public int ActionRemined { get; set; }
+
 
         public bool OwnTurn { get; set; }
         public int DiceId { get; set; }
@@ -201,6 +203,7 @@ namespace DragonMarble
         {
             Id = Guid.NewGuid();
             this.unitColor = unitColor;
+            Dice = new StageDiceInfo();
             gold = initialCapital;
         }
 
@@ -212,8 +215,8 @@ namespace DragonMarble
             lands = new Dictionary<int, StageTileInfo>();
             unitBuff = null;
             chanceCoupon = CHANCE_COUPON.NULL;
+            usableLoanCount = 1;
             DiceId = 1;
-            Dice = new StageDiceInfo();
         }
 
         public int property
@@ -226,6 +229,17 @@ namespace DragonMarble
                     p += t.sellPrice;
                 }
                 return p;
+            }
+        }
+        public bool isAbleToLoan
+        {
+            get
+            {
+                if (usableLoanCount > 0)
+                {
+                    return true;
+                }
+                return false;
             }
         }
 
@@ -262,6 +276,17 @@ namespace DragonMarble
             if (tileIndex >= 32) tileIndex -= 32;
         }
 
+        public bool Loan(int loanGold)
+        {
+            if (usableLoanCount > 0)
+            {
+                usableLoanCount--;
+                AddGold(loanGold);
+                return true;
+            }
+            return false;
+        }
+
         public bool Pay(StageTileInfo tile)
         {
             int fee = tile.fee;
@@ -282,7 +307,10 @@ namespace DragonMarble
                 tile.owner.AddGold(fee);
                 return true;
             }
-            return false;
+            else
+            {
+                return false;
+            }
         }
 
         public int GetTax(int taxPercent)
@@ -433,6 +461,21 @@ namespace DragonMarble
                 return p;
             }
         }
+        public int minBuyPrice
+        {
+            get
+            {
+                foreach (Building b in buildings)
+                {
+                    if (!b.isBuilt)
+                    {
+                        return b.buyPrice;
+                    }
+                }
+                return 0;
+            }
+        }
+
 
         public int builtPrice
         {
