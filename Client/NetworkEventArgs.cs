@@ -20,11 +20,6 @@ namespace Dragon.Client
     public class QueueAsyncClientUserToken : AsyncClientUserToken
     {
         private readonly Queue<IGameMessage> _messages = new Queue<IGameMessage>();
-        
-        private int _bytesTransferred;
-        private Int16 _messageLength;
-        private int _messageStartOffset;
-        private bool _parsing;
 
         public QueueAsyncClientUserToken()
         {
