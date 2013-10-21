@@ -191,7 +191,7 @@ namespace Dragon.Server
         private void ProcessReceive(SocketAsyncEventArgs e)
         {
             // check if the remote host closed the connection
-            IAsyncUserToken token = e.UserToken as IAsyncUserToken;
+            IAsyncUserToken token = (IAsyncUserToken)e.UserToken;
             if (e.BytesTransferred > 0 && e.SocketError == SocketError.Success)
             {
                 //increment the count of the total bytes receive by the server
@@ -255,7 +255,7 @@ namespace Dragon.Server
 
         private void CloseClientSocket(SocketAsyncEventArgs e)
         {
-            QueuedMessageProcessor<IGameMessage> token = e.UserToken as QueuedMessageProcessor<IGameMessage>;
+            IAsyncUserToken token = (IAsyncUserToken) e.UserToken;
 
             // close the socket associated with the client 
             try

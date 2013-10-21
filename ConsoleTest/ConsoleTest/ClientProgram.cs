@@ -76,7 +76,7 @@ namespace ConsoleTest
 
         private static void ProcessClientReceivedMessage(object o, SocketAsyncEventArgs eventArgs)
         {   
-            QueueAsyncClientUserToken token = eventArgs.UserToken as QueueAsyncClientUserToken;
+            QueueAsyncClientUserToken token = (QueueAsyncClientUserToken) eventArgs.UserToken;
 
             Console.WriteLine("Offeset , {0}", eventArgs.Offset);
             Console.WriteLine("Buffer Length , {0}", eventArgs.Buffer.Length);
