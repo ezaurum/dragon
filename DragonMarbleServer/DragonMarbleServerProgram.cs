@@ -83,6 +83,7 @@ namespace DragonMarble
             byte[] m = eventArgs.Buffer.Skip(eventArgs.Offset).Take(messageLength).ToArray();
             
             IDragonMarbleGameMessage gameMessage = GameMessageFactory.GetGameMessage(m);
+            token.ReceivedMessage = gameMessage;
             Logger.DebugFormat("received {0} message from {1}. ", gameMessage.MessageType, gameMessage.From);
         }
     }

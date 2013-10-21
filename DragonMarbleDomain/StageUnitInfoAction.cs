@@ -56,7 +56,7 @@ namespace DragonMarble
                             Actor = this,
                             NeedOther = false,
                             Type = GameMessageType.RollMoveDiceResult,
-                            ArgObjects = new object[] { (char)Dice.result[0], (char)Dice.result[1], (char)Dice.rollCount }
+                            ArgObjects = new object[] {this, (char)Dice.result[0], (char)Dice.result[1], (char)Dice.rollCount }
                         };
 
                         yield return action;
@@ -69,7 +69,9 @@ namespace DragonMarble
                                 yield return new GameAction()
                                 {
                                     Actor = this,
-                                    Type = GameMessageType.BuyLandRequest
+                                    Type = GameMessageType.BuyLandRequest,
+                                    ArgObjects = new object[] {this}
+                                   
                                 };
                                 break;
                         }

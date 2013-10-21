@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using DragonMarble.Message;
 using log4net;
@@ -71,6 +72,23 @@ namespace DragonMarble
             Logger.Debug("Start game");
             InitGame();
             SendOrderCardSelectMessage();
+            Task.Factory.StartNew(OrderEnd);
+            
+
+            //IDragonMarbleGameMessage message = Players[0].ReceivedMessage;
+        }
+
+        
+        private void InitGame()
+        {
+            _availablePlayers = Players;
+
+            Board.Init();
+
+            //send initialize message
+            Notify(GameMessageInstanceFactory.MakeInitializePlayerMessage, _availablePlayers, Board.FeeBoostedTiles);
+
+            _state = GameState.Init;
         }
 
         private void SendOrderCardSelectMessage()
@@ -89,18 +107,6 @@ namespace DragonMarble
                 , (short)-1);
         }
 
-        private void InitGame()
-        {   
-            _availablePlayers = Players;
-
-            Board.Init();
-            
-            //send initialize message
-            Notify(GameMessageInstanceFactory.MakeInitializePlayerMessage, _availablePlayers, Board.FeeBoostedTiles);
-            
-            _state = GameState.Init;
-        }
-
         public void Notify(Func<StageUnitInfo, object[], IDragonMarbleGameMessage> instanceMessage, params object[] parameterObjects)
         {
             Players.ForEach(p =>
@@ -113,35 +119,29 @@ namespace DragonMarble
        
         public void OrderEnd()
         {
-            //TODO
-            var guid = _orderCard[0];
             Players.ForEach(p =>
             {
-                if (p.Id.Equals(guid))
-                    p.Order = 0;
-
-                if (p.ControlMode == StageUnitInfo.ControlModeType.Player)
+                if (p.ControlMode != StageUnitInfo.ControlModeType.Player) return;
+                
+                IDragonMarbleGameMessage message = p.ReceivedMessage;
+                if (message.MessageType == GameMessageType.OrderCardSelect)
                 {
                     
-                    var dragonMarbleGameMessage = p.ReceivedMessage;
-                    p.ResetMessages();
-                    
                 }
-                
             });
-
-            var guid1 = _orderCard[1];
+            
             Players.ForEach(p =>
-            {
-                if (p.Id.Equals(guid1))
-                    p.Order = 1;
-                //TODO 처리가 필요
-                if (p.ControlMode == StageUnitInfo.ControlModeType.Player)
-                {
-                    var dragonMarbleGameMessage = p.ReceivedMessage;
-                    p.ResetMessages();
-                
-                }
+            {       if (p.ControlMode == StageUnitInfo.ControlModeType.Player)
+                    {
+                        p.Order = 0;
+                        var dragonMarbleGameMessage = p.ReceivedMessage;
+                        //p.ResetMessages();
+
+                    }
+                    else
+                    {
+                        p.Order = 1;
+                    }
                 
             });
 
@@ -161,8 +161,9 @@ namespace DragonMarble
             foreach (GameAction action
                 in PlayersOrderByTurn().SelectMany(player => player.Actions()))
             {
+                
                 //turn owner's action
-                Console.WriteLine("Here is playerAcitions");
+                
                 yield return action;
 
                 //if need, other's reactions
@@ -211,7 +212,7 @@ namespace DragonMarble
         {
             foreach (GameAction action in PlayerActions())
             {
-                Logger.Debug("Here is ProcessAction");
+                Logger.DebugFormat("Here is ProcessAction {0}",action.Type);
                 Board.GrossAssets = 0;
                 Players.ForEach(p => Board.GrossAssets += p.Assets);
                 if (Logger.IsDebugEnabled)
@@ -220,6 +221,20 @@ namespace DragonMarble
                 }
               
                 CurrentAction = action;
+
+
+                Func<StageUnitInfo, object[], IDragonMarbleGameMessage> pa = null;
+                switch (action.Type)
+                {
+                    case GameMessageType.BuyLandRequest:
+                        pa = GameMessageInstanceFactory.BuyLandRequest;
+                        break;
+                    case GameMessageType.RollMoveDiceResult:
+                        pa = GameMessageInstanceFactory.RollMoveDiceResult;
+                        break;
+                }
+                
+                Notify(pa,action.ArgObjects);
 
                 //need check game end
             }
