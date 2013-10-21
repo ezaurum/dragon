@@ -9,7 +9,16 @@ namespace DragonMarble
         private readonly StageTileInfo _info;
         public int GroupId { get; set; }
 
-        public bool FeeBoosted { get; set; }
+        public bool FeeBoosted
+        {
+            get {
+                return _info.isFestival;
+            }
+            set
+            {
+                _info.isFestival = value;
+            }
+        }
 
         public Int16 Position
         {
@@ -56,8 +65,5 @@ namespace DragonMarble
 
             GroupId = int.Parse(typeValue);
         }
-
-        public GameActionResult Result { get; set; }
-        
     }
 }
