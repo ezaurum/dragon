@@ -7,12 +7,12 @@ namespace DragonMarble.Message
 public enum GameMessageType
 {
 	OrderCardResult,
+	OrderCardSelect,
+	RollMoveDiceResult,
+	ActivateTurn,
 	InitializeGame,
 	InitializePlayer,
 	RollMoveDice,
-	RollMoveDiceResult,
-	OrderCardSelect,
-	ActivateTurn,
 }
 public static class GameMessageFactory
 {
@@ -31,6 +31,15 @@ public static class GameMessageFactory
 		case GameMessageType.OrderCardResult:
 		message = new OrderCardResultGameMessage();
 		break;
+		case GameMessageType.OrderCardSelect:
+		message = new OrderCardSelectGameMessage();
+		break;
+		case GameMessageType.RollMoveDiceResult:
+		message = new RollMoveDiceResultGameMessage();
+		break;
+		case GameMessageType.ActivateTurn:
+		message = new ActivateTurnGameMessage();
+		break;
 		case GameMessageType.InitializeGame:
 		message = new InitializeGameGameMessage();
 		break;
@@ -39,15 +48,6 @@ public static class GameMessageFactory
 		break;
 		case GameMessageType.RollMoveDice:
 		message = new RollMoveDiceGameMessage();
-		break;
-		case GameMessageType.RollMoveDiceResult:
-		message = new RollMoveDiceResultGameMessage();
-		break;
-		case GameMessageType.OrderCardSelect:
-		message = new OrderCardSelectGameMessage();
-		break;
-		case GameMessageType.ActivateTurn:
-		message = new ActivateTurnGameMessage();
 		break;
 		}
 		return message;
@@ -111,6 +111,223 @@ public void FromByteArray(byte[] bytes)
 		get
 		{
 			return (Int16)(2+sizeof(GameMessageType)+16+16+sizeof(Int16)+16);
+		}
+	}
+}
+
+// 선 뽑기	
+public class OrderCardSelectGameMessage : IDragonMarbleGameMessage	
+{
+	public GameMessageType MessageType {get{return GameMessageType.OrderCardSelect;}}
+	public Guid From { get; set;}
+	public Guid To { get; set;}
+	public Int16 SelectedCardNumber;
+	public Int16 NumberOfPlayers;
+	public List<Boolean> OrderCardSelectState;
+	public Guid Actor { get; set;}
+
+	public byte[] ToByteArray()
+	{
+		byte[] bytes = new byte[Length];
+		int index = 0;
+		BitConverter.GetBytes(Length)
+		.CopyTo(bytes,index);
+		index += sizeof(Int16);
+		BitConverter.GetBytes((Int32)MessageType)
+		.CopyTo(bytes,index);
+		index += sizeof(GameMessageType);
+		From.ToByteArray()
+		.CopyTo(bytes,index);
+		index += 16;
+		To.ToByteArray()
+		.CopyTo(bytes,index);
+		index += 16;
+		BitConverter.GetBytes(SelectedCardNumber)
+		.CopyTo(bytes,index);
+		index += sizeof(Int16);
+		BitConverter.GetBytes(NumberOfPlayers)
+		.CopyTo(bytes,index);
+		index += sizeof(Int16);
+	for (int i = 0; i < NumberOfPlayers ; i++ )
+	{
+		BitConverter.GetBytes(OrderCardSelectState[i])
+		.CopyTo(bytes,index);
+		index += sizeof(Boolean);
+	}
+		Actor.ToByteArray()
+		.CopyTo(bytes,index);
+		index += 16;
+	return bytes;
+}
+
+public void FromByteArray(byte[] bytes)
+{
+		int index = 6;
+		byte[] tempFrom = new byte[16];
+		Buffer.BlockCopy(bytes, index, tempFrom, 0,16);
+		From = new Guid(tempFrom);
+		index += 16;
+		byte[] tempTo = new byte[16];
+		Buffer.BlockCopy(bytes, index, tempTo, 0,16);
+		To = new Guid(tempTo);
+		index += 16;
+		SelectedCardNumber = BitConverter.ToInt16(bytes, index);
+		index += sizeof(Int16);
+		NumberOfPlayers = BitConverter.ToInt16(bytes, index);
+		index += sizeof(Int16);
+		OrderCardSelectState = new List<Boolean>();
+		for(int i = 0; i < NumberOfPlayers; i++)
+		{
+		OrderCardSelectState.Add(BitConverter.ToBoolean(bytes, index));
+		index += sizeof(Boolean);
+		}
+		byte[] tempActor = new byte[16];
+		Buffer.BlockCopy(bytes, index, tempActor, 0,16);
+		Actor = new Guid(tempActor);
+		index += 16;
+}
+
+	public Int16 Length
+	{
+		get
+		{
+			return (Int16)(2+sizeof(GameMessageType)+16+16+sizeof(Int16)+sizeof(Int16)+NumberOfPlayers*(sizeof(Boolean))+16);
+		}
+	}
+}
+
+// 서버에서 주사위 굴리기 결과	
+public class RollMoveDiceResultGameMessage : IDragonMarbleGameMessage	
+{
+	public GameMessageType MessageType {get{return GameMessageType.RollMoveDiceResult;}}
+	public Guid From { get; set;}
+	public Guid To { get; set;}
+	public List<Char> Dices;
+	public Char RollCount;
+	public Guid Actor { get; set;}
+
+	public byte[] ToByteArray()
+	{
+		byte[] bytes = new byte[Length];
+		int index = 0;
+		BitConverter.GetBytes(Length)
+		.CopyTo(bytes,index);
+		index += sizeof(Int16);
+		BitConverter.GetBytes((Int32)MessageType)
+		.CopyTo(bytes,index);
+		index += sizeof(GameMessageType);
+		From.ToByteArray()
+		.CopyTo(bytes,index);
+		index += 16;
+		To.ToByteArray()
+		.CopyTo(bytes,index);
+		index += 16;
+		BitConverter.GetBytes(Dices[0])
+		.CopyTo(bytes,index);
+		index += sizeof(Char);
+		BitConverter.GetBytes(Dices[1])
+		.CopyTo(bytes,index);
+		index += sizeof(Char);
+		BitConverter.GetBytes(RollCount)
+		.CopyTo(bytes,index);
+		index += sizeof(Char);
+		Actor.ToByteArray()
+		.CopyTo(bytes,index);
+		index += 16;
+	return bytes;
+}
+
+public void FromByteArray(byte[] bytes)
+{
+		int index = 6;
+		byte[] tempFrom = new byte[16];
+		Buffer.BlockCopy(bytes, index, tempFrom, 0,16);
+		From = new Guid(tempFrom);
+		index += 16;
+		byte[] tempTo = new byte[16];
+		Buffer.BlockCopy(bytes, index, tempTo, 0,16);
+		To = new Guid(tempTo);
+		index += 16;
+		Dices = new List<Char>();
+		Dices.Add(BitConverter.ToChar(bytes, index));
+		index += sizeof(Char);
+		Dices.Add(BitConverter.ToChar(bytes, index));
+		index += sizeof(Char);
+		RollCount = BitConverter.ToChar(bytes, index);
+		index += sizeof(Char);
+		byte[] tempActor = new byte[16];
+		Buffer.BlockCopy(bytes, index, tempActor, 0,16);
+		Actor = new Guid(tempActor);
+		index += 16;
+}
+
+	public Int16 Length
+	{
+		get
+		{
+			return (Int16)(2+sizeof(GameMessageType)+16+16+2*(sizeof(Char))+sizeof(Char)+16);
+		}
+	}
+}
+
+// Activate player's turn	
+public class ActivateTurnGameMessage : IDragonMarbleGameMessage	
+{
+	public GameMessageType MessageType {get{return GameMessageType.ActivateTurn;}}
+	public Guid From { get; set;}
+	public Guid To { get; set;}
+	public Guid TurnOwner { get; set;}
+	public Int64 ResponseLimit;
+
+	public byte[] ToByteArray()
+	{
+		byte[] bytes = new byte[Length];
+		int index = 0;
+		BitConverter.GetBytes(Length)
+		.CopyTo(bytes,index);
+		index += sizeof(Int16);
+		BitConverter.GetBytes((Int32)MessageType)
+		.CopyTo(bytes,index);
+		index += sizeof(GameMessageType);
+		From.ToByteArray()
+		.CopyTo(bytes,index);
+		index += 16;
+		To.ToByteArray()
+		.CopyTo(bytes,index);
+		index += 16;
+		TurnOwner.ToByteArray()
+		.CopyTo(bytes,index);
+		index += 16;
+		BitConverter.GetBytes(ResponseLimit)
+		.CopyTo(bytes,index);
+		index += sizeof(Int64);
+	return bytes;
+}
+
+public void FromByteArray(byte[] bytes)
+{
+		int index = 6;
+		byte[] tempFrom = new byte[16];
+		Buffer.BlockCopy(bytes, index, tempFrom, 0,16);
+		From = new Guid(tempFrom);
+		index += 16;
+		byte[] tempTo = new byte[16];
+		Buffer.BlockCopy(bytes, index, tempTo, 0,16);
+		To = new Guid(tempTo);
+		index += 16;
+		byte[] tempTurnOwner = new byte[16];
+		Buffer.BlockCopy(bytes, index, tempTurnOwner, 0,16);
+		TurnOwner = new Guid(tempTurnOwner);
+		index += 16;
+		ResponseLimit = BitConverter.ToInt64(bytes, index);
+		index += sizeof(Int64);
+}
+
+	public Int16 Length
+	{
+		get
+		{
+			return (Int16)(2+sizeof(GameMessageType)+16+16+16+sizeof(Int64));
 		}
 	}
 }
@@ -351,223 +568,6 @@ public void FromByteArray(byte[] bytes)
 		get
 		{
 			return (Int16)(2+sizeof(GameMessageType)+16+16+sizeof(Single)+sizeof(Boolean)+sizeof(Boolean)+16);
-		}
-	}
-}
-
-// 서버에서 주사위 굴리기 결과	
-public class RollMoveDiceResultGameMessage : IDragonMarbleGameMessage	
-{
-	public GameMessageType MessageType {get{return GameMessageType.RollMoveDiceResult;}}
-	public Guid From { get; set;}
-	public Guid To { get; set;}
-	public List<Char> Dices;
-	public Char DoubleCount;
-	public Guid Actor { get; set;}
-
-	public byte[] ToByteArray()
-	{
-		byte[] bytes = new byte[Length];
-		int index = 0;
-		BitConverter.GetBytes(Length)
-		.CopyTo(bytes,index);
-		index += sizeof(Int16);
-		BitConverter.GetBytes((Int32)MessageType)
-		.CopyTo(bytes,index);
-		index += sizeof(GameMessageType);
-		From.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
-		To.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
-		BitConverter.GetBytes(Dices[0])
-		.CopyTo(bytes,index);
-		index += sizeof(Char);
-		BitConverter.GetBytes(Dices[1])
-		.CopyTo(bytes,index);
-		index += sizeof(Char);
-		BitConverter.GetBytes(DoubleCount)
-		.CopyTo(bytes,index);
-		index += sizeof(Char);
-		Actor.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
-	return bytes;
-}
-
-public void FromByteArray(byte[] bytes)
-{
-		int index = 6;
-		byte[] tempFrom = new byte[16];
-		Buffer.BlockCopy(bytes, index, tempFrom, 0,16);
-		From = new Guid(tempFrom);
-		index += 16;
-		byte[] tempTo = new byte[16];
-		Buffer.BlockCopy(bytes, index, tempTo, 0,16);
-		To = new Guid(tempTo);
-		index += 16;
-		Dices = new List<Char>();
-		Dices.Add(BitConverter.ToChar(bytes, index));
-		index += sizeof(Char);
-		Dices.Add(BitConverter.ToChar(bytes, index));
-		index += sizeof(Char);
-		DoubleCount = BitConverter.ToChar(bytes, index);
-		index += sizeof(Char);
-		byte[] tempActor = new byte[16];
-		Buffer.BlockCopy(bytes, index, tempActor, 0,16);
-		Actor = new Guid(tempActor);
-		index += 16;
-}
-
-	public Int16 Length
-	{
-		get
-		{
-			return (Int16)(2+sizeof(GameMessageType)+16+16+2*(sizeof(Char))+sizeof(Char)+16);
-		}
-	}
-}
-
-// 선 뽑기	
-public class OrderCardSelectGameMessage : IDragonMarbleGameMessage	
-{
-	public GameMessageType MessageType {get{return GameMessageType.OrderCardSelect;}}
-	public Guid From { get; set;}
-	public Guid To { get; set;}
-	public Int16 SelectedCardNumber;
-	public Int16 NumberOfPlayers;
-	public List<Boolean> OrderCardSelectState;
-	public Guid Actor { get; set;}
-
-	public byte[] ToByteArray()
-	{
-		byte[] bytes = new byte[Length];
-		int index = 0;
-		BitConverter.GetBytes(Length)
-		.CopyTo(bytes,index);
-		index += sizeof(Int16);
-		BitConverter.GetBytes((Int32)MessageType)
-		.CopyTo(bytes,index);
-		index += sizeof(GameMessageType);
-		From.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
-		To.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
-		BitConverter.GetBytes(SelectedCardNumber)
-		.CopyTo(bytes,index);
-		index += sizeof(Int16);
-		BitConverter.GetBytes(NumberOfPlayers)
-		.CopyTo(bytes,index);
-		index += sizeof(Int16);
-	for (int i = 0; i < NumberOfPlayers ; i++ )
-	{
-		BitConverter.GetBytes(OrderCardSelectState[i])
-		.CopyTo(bytes,index);
-		index += sizeof(Boolean);
-	}
-		Actor.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
-	return bytes;
-}
-
-public void FromByteArray(byte[] bytes)
-{
-		int index = 6;
-		byte[] tempFrom = new byte[16];
-		Buffer.BlockCopy(bytes, index, tempFrom, 0,16);
-		From = new Guid(tempFrom);
-		index += 16;
-		byte[] tempTo = new byte[16];
-		Buffer.BlockCopy(bytes, index, tempTo, 0,16);
-		To = new Guid(tempTo);
-		index += 16;
-		SelectedCardNumber = BitConverter.ToInt16(bytes, index);
-		index += sizeof(Int16);
-		NumberOfPlayers = BitConverter.ToInt16(bytes, index);
-		index += sizeof(Int16);
-		OrderCardSelectState = new List<Boolean>();
-		for(int i = 0; i < NumberOfPlayers; i++)
-		{
-		OrderCardSelectState.Add(BitConverter.ToBoolean(bytes, index));
-		index += sizeof(Boolean);
-		}
-		byte[] tempActor = new byte[16];
-		Buffer.BlockCopy(bytes, index, tempActor, 0,16);
-		Actor = new Guid(tempActor);
-		index += 16;
-}
-
-	public Int16 Length
-	{
-		get
-		{
-			return (Int16)(2+sizeof(GameMessageType)+16+16+sizeof(Int16)+sizeof(Int16)+NumberOfPlayers*(sizeof(Boolean))+16);
-		}
-	}
-}
-
-// Activate player's turn	
-public class ActivateTurnGameMessage : IDragonMarbleGameMessage	
-{
-	public GameMessageType MessageType {get{return GameMessageType.ActivateTurn;}}
-	public Guid From { get; set;}
-	public Guid To { get; set;}
-	public Guid TurnOwner { get; set;}
-	public Int64 ResponseLimit;
-
-	public byte[] ToByteArray()
-	{
-		byte[] bytes = new byte[Length];
-		int index = 0;
-		BitConverter.GetBytes(Length)
-		.CopyTo(bytes,index);
-		index += sizeof(Int16);
-		BitConverter.GetBytes((Int32)MessageType)
-		.CopyTo(bytes,index);
-		index += sizeof(GameMessageType);
-		From.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
-		To.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
-		TurnOwner.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
-		BitConverter.GetBytes(ResponseLimit)
-		.CopyTo(bytes,index);
-		index += sizeof(Int64);
-	return bytes;
-}
-
-public void FromByteArray(byte[] bytes)
-{
-		int index = 6;
-		byte[] tempFrom = new byte[16];
-		Buffer.BlockCopy(bytes, index, tempFrom, 0,16);
-		From = new Guid(tempFrom);
-		index += 16;
-		byte[] tempTo = new byte[16];
-		Buffer.BlockCopy(bytes, index, tempTo, 0,16);
-		To = new Guid(tempTo);
-		index += 16;
-		byte[] tempTurnOwner = new byte[16];
-		Buffer.BlockCopy(bytes, index, tempTurnOwner, 0,16);
-		TurnOwner = new Guid(tempTurnOwner);
-		index += 16;
-		ResponseLimit = BitConverter.ToInt64(bytes, index);
-		index += sizeof(Int64);
-}
-
-	public Int16 Length
-	{
-		get
-		{
-			return (Int16)(2+sizeof(GameMessageType)+16+16+16+sizeof(Int64));
 		}
 	}
 }

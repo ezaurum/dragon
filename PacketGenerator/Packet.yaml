@@ -78,7 +78,7 @@ RollMoveDiceResult :
           type : Char
           collection : List
           size : 2
-        - name : DoubleCount
+        - name : RollCount
           type : Char
         - name : Actor
           type : Guid
