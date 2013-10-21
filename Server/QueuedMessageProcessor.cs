@@ -78,6 +78,11 @@ namespace Dragon.Server
             }
         }
 
+        public void ResetMessages()
+        {
+            _receivedMessages.Clear();
+        }
+
         public object Player { get; set; }
     }
 

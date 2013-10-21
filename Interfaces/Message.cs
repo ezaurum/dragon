@@ -13,5 +13,6 @@ namespace Dragon.Interfaces
     {
         T ReceivedMessage { get; set; }
         IGameMessage SendingMessage { get; set; }
+        void ResetMessages();
     }
 }
