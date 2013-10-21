@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
 namespace DragonMarble
@@ -11,6 +10,20 @@ namespace DragonMarble
 
         private readonly StageTileInfo _info;
         public int GroupId { get; set; }
+
+        public bool FeeBoosted { get; set; }
+
+        public Int16 Position
+        {
+            get
+            {
+                return (short) _info.index;
+            }
+            set
+            {
+                _info.index = value;
+            }
+        }
 
         public StageTileInfo.TYPE Type
         {

@@ -117,6 +117,8 @@ namespace DragonMarble
             });
 
             _availablePlayers = Players;
+
+            Board.Init();
             
             _state = GameState.Init;
         }
