@@ -193,9 +193,10 @@ namespace DragonMarble
                 //if need, other's reactions
                 if (action.NeedOther)
                 {
-                    foreach (StageUnitInfo targetUnit in action.TargetUnits)
+                    foreach (GamePlayer targetUnit in action.TargetUnits)
                     {
-                        Console.WriteLine("This action need target units action.");
+                        Logger.Debug("This action need target units action.");
+                        
                         GameAction othersAction = new GameAction();
                         yield return othersAction;
                     }
@@ -214,7 +215,6 @@ namespace DragonMarble
 
         public int Turn { get; set; }
 
-
         private GamePlayer CurrentPlayer
         {
             get { return OrderedByTurnPlayers[Turn % Players.Count]; }
@@ -226,8 +226,6 @@ namespace DragonMarble
         {
             Logger.Debug("end game.");
         }
-
-
 
         private void ProcessAction()
         {
@@ -241,13 +239,13 @@ namespace DragonMarble
                     Logger.DebugFormat("Gross Assets is : {0}", Board.GrossAssets);
                 }
 
-                GameAction action1 = action;
-                foreach (GamePlayer gamePlayer in Players.Where(p => !p.Id.Equals(action1.Actor.Id)))
+                foreach (GamePlayer gamePlayer in Players)
                 {
                     gamePlayer.SendingMessage = new ActivateTurnGameMessage
                     {
                         To = gamePlayer.Id,
                         From = Id,
+                        Actor = action.Actor.Id,
                         TurnOwner = action.Actor.Id,
                         ResponseLimit = 50000
                     };

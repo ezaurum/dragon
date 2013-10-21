@@ -28,7 +28,7 @@ namespace DragonMarble
         {
             XmlConfigurator.Configure(new FileInfo("log4net.xml"));
 
-            List<StageTile> tiles = XmlUtils.LoadXml(@"data_stage.xml", StageTile.Parse);
+            List<StageTile> tiles = XmlUtils.LoadXml(@"data_stage.xml", GameBoard.ParseTiles);
 
             Logger.Debug("Start app.");
 

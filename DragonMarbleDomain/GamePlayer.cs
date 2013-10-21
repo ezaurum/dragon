@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using DragonMarble.Message;
-using log4net;
 
 namespace DragonMarble
 {
     public class GamePlayer : StageUnitInfo
     {
-        private static readonly ILog Logger = LogManager.GetLogger(typeof (GamePlayer));
-
         public GamePlayer(UNIT_COLOR teamColor, int initialCapital)
             : base(teamColor, initialCapital)
         {
@@ -56,7 +53,6 @@ namespace DragonMarble
 
         public void ActivateTurn()
         {
-            Logger.Debug("Activated Turn");
             OwnTurn = true;
         }
 
@@ -122,8 +118,6 @@ namespace DragonMarble
                         SendingMessage = rmdrgm;
                         break;
                 }
-                
-                Logger.Debug( receivedMessage.MessageType);
 
                 yield return action;
             }
