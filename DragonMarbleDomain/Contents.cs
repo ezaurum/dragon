@@ -80,7 +80,7 @@ namespace DragonMarble
         public StageDiceInfo()
         {
             rand = RandomFactory.NewRandom();
-            result = new[] {0, 0};
+            result = new[] { 0, 0 };
             rollCount = 0;
             isDouble = false;
             rollType = ROLL_TYPE.NORMAL;
@@ -105,7 +105,7 @@ namespace DragonMarble
             result[1] = rand.Next(1, 7);
 
             int sum = result[0] + result[1];
-            if ((rollType == ROLL_TYPE.ODD && sum%2 == 0) || (rollType == ROLL_TYPE.EVEN && sum%2 == 1))
+            if ((rollType == ROLL_TYPE.ODD && sum % 2 == 0) || (rollType == ROLL_TYPE.EVEN && sum % 2 == 1))
             {
                 if (result[0] == 1)
                 {
@@ -117,7 +117,7 @@ namespace DragonMarble
                 }
                 else
                 {
-                    int[] r = {1, -1};
+                    int[] r = { 1, -1 };
                     result[0] += r[rand.Next(2)];
                 }
             }
@@ -143,7 +143,7 @@ namespace DragonMarble
             result[1] = 0;
         }
     }
-    
+
     public class StageUnitInfo
     {
         public virtual IMessageProcessor<IDragonMarbleGameMessage> MessageProcessor { get; set; }
@@ -189,7 +189,15 @@ namespace DragonMarble
         public CHANCE_COUPON chanceCoupon;
         public int Order { get; set; }
         public int CapitalOrder { get; set; }
-        public int Capital { get; set; }
+
+        public int Capital
+        {
+            get
+            {
+                return property;
+            }
+        }
+
         public int ActionRemined { get; set; }
 
 
@@ -204,7 +212,6 @@ namespace DragonMarble
         {
             Id = Guid.NewGuid();
             this.unitColor = unitColor;
-            Capital = initialCapital;
             gold = initialCapital;
         }
 
@@ -229,7 +236,6 @@ namespace DragonMarble
                 {
                     p += t.sellPrice;
                 }
-                Capital = p;
                 return p;
             }
         }
@@ -317,6 +323,8 @@ namespace DragonMarble
             {
                 case GameMessageType.RollMoveDice:
                     RollMoveDiceGameMessage rollMoveDiceGameMessage = (RollMoveDiceGameMessage)message;
+                    //RollMoveDice(rollMoveDiceGameMessage.Pressed);
+                    Console.WriteLine("{0}", Dice);
                     RollMoveDiceResultGameMessage
                     rmdrgm = new RollMoveDiceResultGameMessage()
                     {
@@ -393,23 +401,23 @@ namespace DragonMarble
 
         public StageTileInfo(Hashtable data)
         {
-            index = (int) data["Index"];
-            type = (TYPE) Enum.Parse(typeof (TYPE), (string) data["Type"]);
-            name = (string) data["Name"];
-            typeValue = (int) data["TypeValue"];
+            index = (int)data["Index"];
+            type = (TYPE)Enum.Parse(typeof(TYPE), (string)data["Type"]);
+            name = (string)data["Name"];
+            typeValue = (int)data["TypeValue"];
             tileBuff = null;
 
 
             buildings = new List<Building>();
             if (type == TYPE.CITY || type == TYPE.SIGHT)
             {
-                var priceData = (List<Hashtable>) data["Price"];
+                var priceData = (List<Hashtable>)data["Price"];
                 foreach (Hashtable d in priceData)
                 {
                     var building = new Building();
-                    building.buyPrice = (int) d["BuyPrice"];
-                    building.sellPrice = (int) d["SellPrice"];
-                    building.fee = (int) d["Fee"];
+                    building.buyPrice = (int)d["BuyPrice"];
+                    building.sellPrice = (int)d["SellPrice"];
+                    building.fee = (int)d["Fee"];
                     building.isBuilt = false;
 
                     buildings.Add(building);
@@ -433,7 +441,7 @@ namespace DragonMarble
                 {
                     if (tileBuff.type == StageBuffInfo.TYPE.DISCOUNT)
                     {
-                        p += (p*tileBuff.power/100);
+                        p += (p * tileBuff.power / 100);
                     }
                 }
                 return p;
@@ -475,7 +483,7 @@ namespace DragonMarble
 
         public int takeOverPrice
         {
-            get { return builtPrice*2; }
+            get { return builtPrice * 2; }
         }
 
         public void AddBuff(StageBuffInfo.TYPE buffType, int power, int buffTurn)

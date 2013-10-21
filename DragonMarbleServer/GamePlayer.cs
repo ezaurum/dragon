@@ -19,7 +19,7 @@ namespace DragonMarble
         {
             
         }
-        
+
         public int LastSelected { get; set; }
 
         public int Position
