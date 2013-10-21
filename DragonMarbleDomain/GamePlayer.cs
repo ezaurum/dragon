@@ -62,40 +62,12 @@ namespace DragonMarble
             Dice.Clear();
         }
 
-        public void StartTurn(int turn, GameMessageType actionType,
-            bool active = true, GameActionResult result = null)
-        {
-            OwnTurn = active;
-
-            switch (actionType)
-            {
-                case GameMessageType.OrderCardSelect:
-
-                    break;
-                case GameMessageType.RollMoveDice:
-                    break;
-            }
-
-            if (!active && null != result)
-            {
-            }
-        }
-
         public IEnumerable<GameAction> Actions()
         {
             for ( ActionRemined = 1; ActionRemined > 0; ActionRemined--)
             {
                 Console.WriteLine("this is actions in id : {2}, player order {0} mode : {1}",  Order, ControlMode, Id);
                 var action = new GameAction {PlayerNumber = Order, Actor = this};
-
-                //need something to stop running.
-                SendingMessage = new ActivateTurnGameMessage
-                {
-                    To = Id,
-                    From = StageManager.Id,
-                    TurnOwner = Id,
-                    ResponseLimit = 50000
-                };
 
                 IDragonMarbleGameMessage receivedMessage = ReceivedMessage;
 

@@ -100,48 +100,24 @@ namespace DragonMarble
         private void InitGame()
         {
             List<StageUnitInfo> units = Players.Cast<StageUnitInfo>().ToList();
-
-            //send initialize message
-            Players.ForEach(p =>
-            {
-                p.StageManager = this;
-                p.SendingMessage = new InitializeGameGameMessage
-                {
-                    From = Id,
-                    To = p.Id,
-                    Actor = p.Id,
-                    FeeBoostedTiles = Board.FeeBoostedTiles,
-                    NumberOfPlayers = (short)units.Count,
-                    Units = units
-                };
-            });
-
+            
             _availablePlayers = Players;
 
             Board.Init();
             
+            //send initialize message
+            Notify(GameMessageInstanceFactory.MakeInitializePlayerMessage, units, Board.FeeBoostedTiles);
+            
             _state = GameState.Init;
         }
 
-        public void Notify(Guid senderGuid,
-            GameMessageType messageType,
-            Object messageContent)
-        {
-            if (Logger.IsDebugEnabled)
-            {
-                Logger.DebugFormat("Notify from {0}, messageType:{1}"
-                    , senderGuid, messageType);
-            }
+        
 
-            foreach (GamePlayer p in Players.Where(p => p.Id != senderGuid))
-            {
-                IDragonMarbleGameMessage message = GameMessageFactory.GetGameMessage(messageType);
-                //TODO message content setting neeed.
-                p.SendingMessage = message;
-                
-                    //= new GameMessage(Id, p.Id, senderGuid, messageType, messageContent);
-            }
+        public void Notify(Func<GamePlayer, object[], IDragonMarbleGameMessage> makeInitializePlayerMessage, params object[] parameterObjects)
+        {
+            Players.ForEach(p => { p.SendingMessage = makeInitializePlayerMessage(p, parameterObjects); });
         }
+       
 
         public void SelectOrder(short foo, GamePlayer gamePlayer)
         {
@@ -208,7 +184,12 @@ namespace DragonMarble
         {
             for (Turn = 0; Turn < TurnLimit; Turn++)
             {
-                Console.WriteLine("Turn:{0}", Turn + 1);
+                Logger.DebugFormat("Turn:{0}", Turn + 1);
+                
+                CurrentPlayer.ActivateTurn();
+
+                Notify(GameMessageInstanceFactory.ActivateTurn, CurrentPlayer.Id);
+
                 yield return CurrentPlayer;
             }
         }
@@ -238,19 +219,7 @@ namespace DragonMarble
                 {
                     Logger.DebugFormat("Gross Assets is : {0}", Board.GrossAssets);
                 }
-
-                foreach (GamePlayer gamePlayer in Players)
-                {
-                    gamePlayer.SendingMessage = new ActivateTurnGameMessage
-                    {
-                        To = gamePlayer.Id,
-                        From = Id,
-                        Actor = action.Actor.Id,
-                        TurnOwner = action.Actor.Id,
-                        ResponseLimit = 50000
-                    };
-                }
-
+              
                 CurrentAction = action;
 
                 //need check game end
