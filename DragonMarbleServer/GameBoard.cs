@@ -12,6 +12,11 @@ namespace DragonMarble
             _tiles = tiles;
         }
 
+        public void Init()
+        {
+            //StageTile from _tiles
+        }
+
         public List<short> FeeBoostedTiles
         {
             get

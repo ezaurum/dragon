@@ -1,39 +1,49 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
 namespace DragonMarble
 {
     public class StageTile
     {   
-        private readonly string _typeValue;
-        private readonly int[] _buyPrices;
-        private readonly int[] _sellPrices;
-        private readonly int[] _fees;
 
         private readonly StageTileInfo _info;
+        public int GroupId { get; set; }
+
+        public StageTileInfo.TYPE Type
+        {
+            get
+            {
+                return _info.type;
+            }
+            set
+            {
+                _info.type = value;
+            }
+        }
 
         public StageTile(int index, string name, string type, string typeValue,
             int[] buyPrices, int[] sellPrices, int[] fees)
-        {   
-            _typeValue = typeValue;
-            _buyPrices = buyPrices;
-            _sellPrices = sellPrices;
-            _fees = fees;
-            _info = new StageTileInfo(index, name, 
-                (StageTileInfo.TYPE) Enum.Parse(typeof(StageTileInfo.TYPE), type));
-            _info.buildings = new List<StageTileInfo.Building>();
-            
+        {
+            StageTileInfo.TYPE tileType = (StageTileInfo.TYPE)Enum.Parse(typeof(StageTileInfo.TYPE), type);
+            _info = new StageTileInfo(index, name, tileType)
+            {
+                buildings = new List<StageTileInfo.Building>()
+            };
+
             for (int i =0; i < buyPrices.Length ; i++)
             {
                 _info.buildings.Add(new StageTileInfo.Building()
-                {buyPrice = buyPrices[i],
+                {
+                    buyPrice = buyPrices[i],
                     fee = fees[i],
                     sellPrice = sellPrices[i]
-                    
                 });
             }
+
+            GroupId = int.Parse(typeValue);
         }
 
         public GameActionResult Result { get; set; }
