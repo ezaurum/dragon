@@ -228,11 +228,11 @@ namespace Dragon.Server
             if (e.SocketError == SocketError.Success)
             {
                 // done echoing data back to the client
-                QueuedMessageProcessor<IGameMessage> token = e.UserToken as QueuedMessageProcessor<IGameMessage>;
+                IAsyncUserToken token = (IAsyncUserToken)e.UserToken;
                 // read the next block of data send from the client 
 
                 //block until value return
-                byte[] bytes = token.SendingMessage.ToByteArray();
+                byte[] bytes = token.SendingMessageByteArray();
                 bytes.CopyTo(e.Buffer, e.Offset);
 
                 if (Logger.IsDebugEnabled)

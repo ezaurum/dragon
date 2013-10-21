@@ -16,6 +16,11 @@ namespace Dragon.Server
         public Socket Socket { get; set; }
         public SocketAsyncEventArgs ReadArg { get; set; }
         public SocketAsyncEventArgs WriteArg { get; set; }
+        
+        public byte[] SendingMessageByteArray()
+        {
+            return SendingMessage.ToByteArray();
+        }
 
         private readonly Queue<T> _receivedMessages = new Queue<T>();
         private readonly Queue<T> _sendingMessages = new Queue<T>();

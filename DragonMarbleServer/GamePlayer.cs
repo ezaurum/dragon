@@ -28,7 +28,6 @@ namespace DragonMarble
                 base.StageManager = value;
                 ((AIQueuedMessageProcessor) MessageProcessor).GameMasterId = value.Id;
             }
-            get { throw new NotImplementedException(); }
         }
     }
 
@@ -39,7 +38,7 @@ namespace DragonMarble
         {
             set
             {
-                base.SendingMessage = value;
+                //base.SendingMessage = value;
                 Console.WriteLine("AI received.");
                 ReceivedMessage = GetMessage(value);
             }
@@ -50,7 +49,7 @@ namespace DragonMarble
             set
             {
                 if ( null != value )
-                    ReceivedMessage = value;
+                    base.ReceivedMessage = value;
             }
         }
 
@@ -218,7 +217,5 @@ namespace DragonMarble
                 yield return action;
             }
         }
-
-        public int ActionRemined { get; set; }
     }
 }
