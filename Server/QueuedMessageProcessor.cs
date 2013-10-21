@@ -10,7 +10,7 @@ namespace Dragon.Server
     // user token for async process.
     public class QueuedMessageProcessor<T> : IAsyncUserToken, IMessageProcessor<T> where T : IGameMessage
     {
-        private static readonly ILog Logger = LogManager.GetLogger(typeof(QueuedMessageProcessor<>));
+        private static readonly ILog Logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private readonly Guid _id = Guid.NewGuid();
         public Guid Id { get { return _id; } }
         public Socket Socket { get; set; }
