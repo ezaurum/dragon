@@ -188,18 +188,7 @@ namespace DragonMarble
         public StageBuffInfo unitBuff;
         public CHANCE_COUPON chanceCoupon;
         public int Order { get; set; }
-        public int CapitalOrder { get; set; }
-
-        public int Capital
-        {
-            get
-            {
-                return property;
-            }
-        }
-
         public int ActionRemined { get; set; }
-
 
         public bool OwnTurn { get; set; }
         public int DiceId { get; set; }
@@ -293,10 +282,7 @@ namespace DragonMarble
                 tile.owner.AddGold(fee);
                 return true;
             }
-            else
-            {
-                return false;
-            }
+            return false;
         }
 
         public int GetTax(int taxPercent)

@@ -234,7 +234,12 @@ namespace DragonMarble
             foreach (GameAction action in PlayerActions())
             {
                 Logger.Debug("Here is ProcessAction");
-
+                Board.GrossAssets = 0;
+                Players.ForEach(p => Board.GrossAssets += p.Assets);
+                if (Logger.IsDebugEnabled)
+                {
+                    Logger.DebugFormat("Gross Assets is : {0}", Board.GrossAssets);
+                }
 
                 GameAction action1 = action;
                 foreach (GamePlayer gamePlayer in Players.Where(p => !p.Id.Equals(action1.Actor.Id)))

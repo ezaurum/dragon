@@ -10,6 +10,7 @@ namespace DragonMarble
         private static readonly ILog Logger = LogManager.GetLogger(typeof(GameBoard));
 
         private readonly List<StageTile> _tiles;
+        public int GrossAssets { get; set; }
 
         public GameBoard(List<StageTile> tiles)
         {

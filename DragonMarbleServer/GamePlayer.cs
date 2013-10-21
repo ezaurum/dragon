@@ -20,6 +20,14 @@ namespace DragonMarble
             
         }
 
+        public int Assets
+        {
+            get
+            {
+                return property;
+            }
+        }
+
         public int LastSelected { get; set; }
 
         public int Position
