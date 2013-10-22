@@ -9,7 +9,6 @@ namespace Dragon.Interfaces
         void FromByteArray(byte[] bytes);
     }
 
-    
     public interface IGameAction
     {
     }
