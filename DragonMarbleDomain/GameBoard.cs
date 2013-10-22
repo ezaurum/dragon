@@ -8,9 +8,9 @@ namespace DragonMarble
     {   
         public const int IndexOfPrison = 8;
         public int GrossAssets { get; set; }
-        public List<StageTile> Tiles { get; set; }
+        public List<StageTileInfo> Tiles { get; set; }
 
-        public GameBoard(List<StageTile> tiles)
+        public GameBoard(List<StageTileInfo> tiles)
         {
             Tiles = tiles;
             FeeBoostedTiles = new List<short>();
@@ -19,7 +19,7 @@ namespace DragonMarble
         public void Init()
         {
             //StageTile from _tiles
-            IEnumerable<StageTile> citiesAndSights 
+            IEnumerable<StageTileInfo> citiesAndSights 
                 = Tiles.Where(t => StageTileInfo.TYPE.CITY == t.Type 
                     || StageTileInfo.TYPE.SIGHT == t.Type);
             
@@ -28,7 +28,7 @@ namespace DragonMarble
             {
                 int next = r.Next(0, citiesAndSights.Count());
 
-                StageTile citiesAndSight = citiesAndSights.Skip(next).Take(1).Last();
+                StageTileInfo citiesAndSight = citiesAndSights.Skip(next).Take(1).Last();
                 
                 if ( citiesAndSight.FeeBoosted ) continue;
                 

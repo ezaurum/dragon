@@ -86,15 +86,19 @@ namespace Dragon.Server
         // Begins an operation to accept a connection request from the client  
         private void StartAccept()
         {
+            Logger.Debug("Start Accpet");
+            
             _maxNumberAcceptedClients.WaitOne();
 
             SocketAsyncEventArgs acceptEventArg 
                 = _acceptPool.Count > 1 
-                ? _acceptPool.Pop() : _acceptPool.CreateNew(DefaultAfterAccept);
+                ? _acceptPool.Pop() : _acceptPool.CreateNew(OnAfterAccept);
 
+            Logger.Debug("accept async");
             bool willRaiseEvent = _listenSocket.AcceptAsync(acceptEventArg);
             if (!willRaiseEvent)
             {
+                Logger.Debug("Direct run");
                 OnAfterAccept(_listenSocket, acceptEventArg);
             }
         }
