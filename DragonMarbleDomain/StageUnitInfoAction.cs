@@ -78,20 +78,25 @@ namespace DragonMarble
         private GameAction DestinationGameAction()
         {
             StageTileInfo stageTile = Stage.Tiles[tileIndex];
-            switch (stageTile.Type)
+            switch (stageTile.type)
             {
                 case StageTileInfo.TYPE.CITY:
                 case StageTileInfo.TYPE.SIGHT:
-                    return new GameAction()
+                    if (null == stageTile.owner)
                     {
-                        Actor = this,
-                        Type = GameMessageType.BuyLandRequest,
-                        Message = new BuyLandRequestGameMessage
+                        return new GameAction()
                         {
-                            Actor = Id,
-                            ResponseLimit = 50000
-                        }
-                    };
+                            Actor = this,
+                            Type = GameMessageType.BuyLandRequest,
+                            Message = new BuyLandRequestGameMessage
+                            {
+                                Actor = Id,
+                                ResponseLimit = 50000
+                            }
+                        };
+                    }
+                    return null;
+
                 default:
                     return null;
             }
