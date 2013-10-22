@@ -245,14 +245,8 @@ namespace DragonMarble
             for (Turn = 0; Turn < TurnLimit; Turn++)
             {
                 Logger.DebugFormat("Turn:{0}", Turn + 1);
-                
-                CurrentPlayer.ActivateTurn();
 
-                Notify(new ActivateTurnGameMessage
-                {
-                    TurnOwner = CurrentPlayer.Id,
-                    ResponseLimit = 50000
-                });
+                Notify(CurrentPlayer.ActivateTurn());
 
                 yield return CurrentPlayer;
             }

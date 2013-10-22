@@ -5,9 +5,16 @@ namespace DragonMarble
 {
     public partial class StageUnitInfo
     {
-        public void ActivateTurn()
+        public IDragonMarbleGameMessage ActivateTurn()
         {
             OwnTurn = true;
+            IDragonMarbleGameMessage message = new ActivateTurnGameMessage
+            {
+                TurnOwner = Id,
+                ResponseLimit = 50000
+            };
+
+            return message;
         }
 
         public void DeactivateTurn()
