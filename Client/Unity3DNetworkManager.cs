@@ -100,7 +100,7 @@ namespace Dragon.Client
             Console.WriteLine("READ_COMPLETED");
             if (e.SocketError == SocketError.Success && e.BytesTransferred > 0)
             {
-                Console.WriteLine("Has Data");
+                Console.WriteLine("Has Data {0}",e.BytesTransferred);
                 OnAfterMessageReceive(sender, e);
                 Console.WriteLine("Recursive READ");
                 

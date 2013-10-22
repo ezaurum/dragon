@@ -75,16 +75,12 @@ namespace ConsoleTest
             Console.WriteLine("Buffer Length , {0}", eventArgs.Buffer.Length);
 
             short messageLength = BitConverter.ToInt16(eventArgs.Buffer, eventArgs.Offset);
-            if (messageLength < 32) return;
+            if (messageLength < 6) return;
 
             byte[] m = new byte[messageLength];
             Buffer.BlockCopy(eventArgs.Buffer, eventArgs.Offset,m, 0, messageLength);
-            Console.WriteLine("reset buffer");
-            eventArgs.SetBuffer(new byte[1024],0, 1024);
-            Buffer.SetByte(eventArgs.Buffer, eventArgs.Offset, 0);
-            
             var dragonMarbleGameMessage = GameMessageFactory.GetGameMessage(m);
-            Console.WriteLine("receive , {0}/{1}", dragonMarbleGameMessage.MessageType, m.Length);
+            Console.WriteLine("receive , type: {0}, length :{1}", dragonMarbleGameMessage.MessageType, m.Length);
             token.Message = dragonMarbleGameMessage;
 
             switch (dragonMarbleGameMessage.MessageType)
