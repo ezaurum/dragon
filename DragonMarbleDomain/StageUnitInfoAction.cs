@@ -82,26 +82,21 @@ namespace DragonMarble
             {
                 case StageTileInfo.TYPE.CITY:
                 case StageTileInfo.TYPE.SIGHT:
-				if ( stageTile.owner == null ){
-                    return new GameAction()
+                    if (null == stageTile.owner)
                     {
-                        Actor = this,
-                        Type = GameMessageType.BuyLandRequest,
-                        Message = new BuyLandRequestGameMessage
+                        return new GameAction()
                         {
-                            Actor = Id,
-                            ResponseLimit = 50000
-                        }
-                    };
-					
-					
-				}else{
-					
-					
-					
-					return null;
-				}
-				break;
+                            Actor = this,
+                            Type = GameMessageType.BuyLandRequest,
+                            Message = new BuyLandRequestGameMessage
+                            {
+                                Actor = Id,
+                                ResponseLimit = 50000
+                            }
+                        };
+                    }
+                    return null;
+
                 default:
                     return null;
             }
