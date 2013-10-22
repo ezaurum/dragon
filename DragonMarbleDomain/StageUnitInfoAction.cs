@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using DragonMarble.Message;
 
 namespace DragonMarble
@@ -52,17 +51,21 @@ namespace DragonMarble
                         } 
                         
                         Go(Dice.resultSum);
-
-                        GameAction action = new GameAction()
+                        
+                        yield return new GameAction()
                         {
                             Actor = this,
                             NeedOther = false,
                             Type = GameMessageType.RollMoveDiceResult,
-                            ArgObjects = new object[] {this, (char)Dice.result[0], (char)Dice.result[1], (char)Dice.rollCount }
+                            Message = new RollMoveDiceResultGameMessage
+                            {
+                                Actor = Id,
+                                Dices = new List<char> 
+                                {(char)Dice.result[0], (char)Dice.result[1]},
+                                RollCount =  (char)Dice.rollCount,
+                            }
                         };
-						
-                        yield return action;
-                        /*
+                        
                         StageTile stageTile = Stage.Tiles[tileIndex];
                         switch (stageTile.Type)
                         {
@@ -72,14 +75,17 @@ namespace DragonMarble
                                 {
                                     Actor = this,
                                     Type = GameMessageType.BuyLandRequest,
-                                    ArgObjects = new object[] {this}
-                                   
+                                    Message = new BuyLandRequestGameMessage
+                                    {
+                                        Actor = Id,
+                                        ResponseLimit = 50000
+                                    }
                                 };
                                 break;
                         }
                         
                         IDragonMarbleGameMessage afterMovedMessage = ReceivedMessage;
-						*/
+						
                         break;
                 }
                 DeactivateTurn();

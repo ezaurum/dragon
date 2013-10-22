@@ -15,5 +15,6 @@ namespace DragonMarble
         public ICollection<StageUnitInfo> TargetUnits { get; set; }
         public ICollection<StageTile> TargetTiles { get; set; }
         public object[] ArgObjects { get; set; }
+        public IDragonMarbleGameMessage Message { get; set; }
     }
 }

@@ -286,18 +286,7 @@ namespace DragonMarble
               
                 CurrentAction = action;
 
-                Func<StageUnitInfo, object[], IDragonMarbleGameMessage> pa = null;
-                switch (action.Type)
-                {
-                    case GameMessageType.BuyLandRequest:
-                        pa = GameMessageInstanceFactory.BuyLandRequest;
-                        break;
-                    case GameMessageType.RollMoveDiceResult:
-                        pa = GameMessageInstanceFactory.RollMoveDiceResult;
-                        break;
-                }
-                
-                Notify(pa,action.ArgObjects);
+                Notify(action.Message);
 
                 //need check game end
             }
