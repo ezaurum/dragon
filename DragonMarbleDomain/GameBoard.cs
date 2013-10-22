@@ -6,6 +6,7 @@ namespace DragonMarble
 {
     public class GameBoard
     {   
+        public const int IndexOfPrison = 8;
         public int GrossAssets { get; set; }
         public List<StageTile> Tiles { get; set; }
 

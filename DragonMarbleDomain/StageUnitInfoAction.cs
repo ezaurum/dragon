@@ -28,7 +28,8 @@ namespace DragonMarble
                     case GameMessageType.RollMoveDice:
                         var rollMoveDiceGameMessage = (RollMoveDiceGameMessage) receivedMessage;
 
-                        Dice.Roll(rollMoveDiceGameMessage.Pressed
+                        yield return Dice.RollAndGetResultGameAction(this
+                            , rollMoveDiceGameMessage.Pressed
                             , rollMoveDiceGameMessage.Odd
                             , rollMoveDiceGameMessage.Even);
 
@@ -36,59 +37,56 @@ namespace DragonMarble
                         {
                             if (Dice.rollCount > 2)
                             {
-                                yield return new GameAction ()
-                                {
-                                    //TODO prison
-									Actor = this,
-                                    Type = GameMessageType.ThreeDoubleToPrison,
-									ArgObjects = new object[] {this, (char)Dice.result[0], (char)Dice.result[1], (char)Dice.rollCount }
-                                    
-                                };
+                                yield return GoToPrison();
                                 yield break;
                             }
 
                             ActionRemined += 1;
-                        } 
-                        
-                        Go(Dice.resultSum);
-                        
-                        yield return new GameAction()
-                        {
-                            Actor = this,
-                            NeedOther = false,
-                            Type = GameMessageType.RollMoveDiceResult,
-                            Message = new RollMoveDiceResultGameMessage
-                            {
-                                Actor = Id,
-                                Dices = new List<char> 
-                                {(char)Dice.result[0], (char)Dice.result[1]},
-                                RollCount =  (char)Dice.rollCount,
-                            }
-                        };
-                        
-                        StageTile stageTile = Stage.Tiles[tileIndex];
-                        switch (stageTile.Type)
-                        {
-                            case StageTileInfo.TYPE.CITY:
-                            case StageTileInfo.TYPE.SIGHT:
-                                yield return new GameAction()
-                                {
-                                    Actor = this,
-                                    Type = GameMessageType.BuyLandRequest,
-                                    Message = new BuyLandRequestGameMessage
-                                    {
-                                        Actor = Id,
-                                        ResponseLimit = 50000
-                                    }
-                                };
-                                break;
                         }
                         
-                        IDragonMarbleGameMessage afterMovedMessage = ReceivedMessage;
-						
+                        Go(Dice.resultSum);
+
+                        var destinationGameAction = DestinationGameAction();
+                        if ( null != destinationGameAction)
+                            yield return destinationGameAction;
+
                         break;
                 }
                 DeactivateTurn();
+            }
+        }
+
+        private GameAction GoToPrison()
+        {
+            Go(GameBoard.IndexOfPrison);
+            return new GameAction ()
+            {
+                //TODO prison
+                Actor = this,
+                Type = GameMessageType.ForceMoveToPrison,
+                Message = new ForceMoveToPrisonGameMessage()
+            };
+        }
+
+        private GameAction DestinationGameAction()
+        {
+            StageTile stageTile = Stage.Tiles[tileIndex];
+            switch (stageTile.Type)
+            {
+                case StageTileInfo.TYPE.CITY:
+                case StageTileInfo.TYPE.SIGHT:
+                    return new GameAction()
+                    {
+                        Actor = this,
+                        Type = GameMessageType.BuyLandRequest,
+                        Message = new BuyLandRequestGameMessage
+                        {
+                            Actor = Id,
+                            ResponseLimit = 50000
+                        }
+                    };
+                default:
+                    return null;
             }
         }
     }
