@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using Dragon.Interfaces;
 using DragonMarble.Message;
@@ -70,10 +72,69 @@ namespace DragonMarble
             Logger.Debug("Start game");
             InitGame();
             SendOrderCardSelectMessage();
+
+            Task.Factory.StartNew(PlayGame);
+
             //Task.Factory.StartNew(OrderEnd);
-            
+
+            //Task<bool>[] tasks = new Task<bool>[1];
+
+            //Func<object, bool> 
+            /*          static void Main()
+    {
+        // Define a delegate that prints and returns the system tick count
+        Func<object, int> action = (object obj) =>
+        {
+            int i = (int)obj;
+
+            // Make each thread sleep a different time in order to return a different tick count
+            Thread.Sleep(i * 100);
+
+            // The tasks that receive an argument between 2 and 5 throw exceptions 
+            if (2 <= i && i <= 5)
+            {
+                throw new InvalidOperationException("SIMULATED EXCEPTION");
+            }
+
+            int tickCount = Environment.TickCount;
+            Console.WriteLine("Task={0}, i={1}, TickCount={2}, Thread={3}", Task.CurrentId, i, tickCount, Thread.CurrentThread.ManagedThreadId);
+
+            return tickCount;
+        };
+
+        const int n = 10;
+
+        // Construct started tasks
+        Task<int>[] tasks = new Task<int>[n];
+        for (int i = 0; i < n; i++)
+        {
+            tasks[i] = Task<int>.Factory.StartNew(action, i);
+        }
+
+        // Exceptions thrown by tasks will be propagated to the main thread 
+        // while it waits for the tasks. The actual exceptions will be wrapped in AggregateException. 
+        try
+        {
+            // Wait for all the tasks to finish.
+            Task.WaitAll(tasks);
+
+            // We should never get to this point
+            Console.WriteLine("WaitAll() has not thrown exceptions. THIS WAS NOT EXPECTED.");
+        }
+        catch (AggregateException e)
+        {
+            Console.WriteLine("\nThe following exceptions have been thrown by WaitAll(): (THIS WAS EXPECTED)");
+            for (int j = 0; j < e.InnerExceptions.Count; j++)
+            {
+                Console.WriteLine("\n-------------------------------------------------\n{0}", e.InnerExceptions[j].ToString());
+            }
+        }
+            */
+            //PlayGame();
+
 
             //IDragonMarbleGameMessage message = Players[0].ReceivedMessage;
+            //OrderEnd();
         }
 
         
@@ -91,22 +152,6 @@ namespace DragonMarble
                 Units = Players
             });
 
-            Notify(new OrderCardSelectGameMessage
-            {
-                Actor = Id,
-                NumberOfPlayers = (short)Players.Count,
-                OrderCardSelectState = new List<bool> { false, false },
-                SelectedCardNumber = -1
-            });
-
-            Notify(new OrderCardSelectGameMessage
-            {
-                Actor = Id,
-                NumberOfPlayers = (short)Players.Count,
-                OrderCardSelectState = new List<bool> { false, false },
-                SelectedCardNumber = -1
-            });
-
             _state = GameState.Init;
         }
 
@@ -120,7 +165,35 @@ namespace DragonMarble
 
             //order
             //At first, select order
-           
+
+            Notify(new OrderCardSelectGameMessage
+            {
+                Actor = Id,
+                NumberOfPlayers = (short)Players.Count,
+                OrderCardSelectState = new List<bool> { false, false },
+                SelectedCardNumber = -1
+            });
+
+            //TODO
+            Notify(new OrderCardSelectGameMessage
+            {
+                Actor = Id,
+                NumberOfPlayers = (short)Players.Count,
+                OrderCardSelectState = new List<bool> { true, true },
+                SelectedCardNumber = 1
+            });
+
+            
+
+            Notify(new OrderCardResultGameMessage()
+            {
+                FirstPlayerId = Players[0].Id,
+                FirstCardNumber = 1
+            });
+
+            Players[0].Order = 0;
+            Players[1].Order = 1;
+            OrderedByTurnPlayers = Players.OrderBy(player => player.Order).ToList();
         }
 
         public void Notify(Func<StageUnitInfo, object[], IDragonMarbleGameMessage> instanceMessage, params object[] parameterObjects)
@@ -136,40 +209,7 @@ namespace DragonMarble
         {
             Players.ForEach(p => p.SendingMessage = message);
         }
-       
-        public void OrderEnd()
-        {
-            Players.ForEach(p =>
-            {
-                if (p.ControlMode != StageUnitInfo.ControlModeType.Player) return;
-                
-                IDragonMarbleGameMessage message = p.ReceivedMessage;
-                if (message.MessageType == GameMessageType.OrderCardSelect)
-                {
-                    
-                }
-            });
-            
-            Players.ForEach(p =>
-            {       if (p.ControlMode == StageUnitInfo.ControlModeType.Player)
-                    {
-                        p.Order = 0;
-                        //var dragonMarbleGameMessage = p.ReceivedMessage;
-                        //p.ResetMessages();
-
-                    }
-                    else
-                    {
-                        p.Order = 1;
-                    }
-                
-            });
-
-            OrderedByTurnPlayers = Players.OrderBy(player => player.Order).ToList();
-            
-            PlayGame();
-        }
-
+      
         private void PlayGame()
         {
             ProcessAction();
@@ -245,7 +285,6 @@ namespace DragonMarble
                 }
               
                 CurrentAction = action;
-
 
                 Func<StageUnitInfo, object[], IDragonMarbleGameMessage> pa = null;
                 switch (action.Type)
