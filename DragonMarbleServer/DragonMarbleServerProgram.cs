@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using Dragon.Server;
@@ -32,10 +31,14 @@ namespace DragonMarble
 
             gm = new GameMaster(tiles);
 
-            var server = new MultiClientServer(
+            MessageProcessorProvier<IDragonMarbleGameMessage> messageProcessorProvier = new MessageProcessorProvier<IDragonMarbleGameMessage>
+            {
+                MessageFactoryMethod = GameMessageFactory.GetGameMessage
+            };
+
+            var server = new MultiClientServer<IDragonMarbleGameMessage>(
                 MaxConnection, BufferSize, QueueNumber,
-                new IPEndPoint(IPAddress.Any, Port), new MessageProcessorProvier<IDragonMarbleGameMessage>());
-            server.OnReceiveBytes += ConvertBytesToMessage;
+                new IPEndPoint(IPAddress.Any, Port), messageProcessorProvier);
             server.OnAcceptConnection += AddPlayer;
             server.Start();
 
@@ -73,17 +76,6 @@ namespace DragonMarble
             {
                 gm.StartGame();
             }
-        }
-
-        private static void ConvertBytesToMessage(object sender, SocketAsyncEventArgs eventArgs)
-        {
-            QueuedMessageProcessor<IDragonMarbleGameMessage> token = (QueuedMessageProcessor<IDragonMarbleGameMessage>)eventArgs.UserToken;
-            short messageLength = BitConverter.ToInt16(eventArgs.Buffer, eventArgs.Offset);
-            byte[] m = eventArgs.Buffer.Skip(eventArgs.Offset).Take(messageLength).ToArray();
-            
-            IDragonMarbleGameMessage gameMessage = GameMessageFactory.GetGameMessage(m);
-            token.ReceivedMessage = gameMessage;
-            Logger.DebugFormat("received {0}. ", gameMessage.MessageType);
         }
     }
 }

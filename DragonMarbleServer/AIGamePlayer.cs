@@ -32,6 +32,7 @@ namespace DragonMarble
         internal class AIQueuedMessageProcessor : QueuedMessageProcessor<IDragonMarbleGameMessage>, IDragonMarbleMessageProcessor
         {
             private static readonly ILog Logger = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
             public Guid GameMasterId { get; set; }
             public override IGameMessage SendingMessage
             {

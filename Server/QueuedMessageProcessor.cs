@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Sockets;
 using System.Threading;
 using Dragon.Interfaces;
@@ -84,11 +85,27 @@ namespace Dragon.Server
         }
 
         public object Player { get; set; }
+        
+        
+
+        public Func<byte[], T> MessageFactoryMethod { get; set; }
     }
 
     public class MessageProcessorProvier<T> : ITokenProvider where T : IGameMessage
     {
-        public IAsyncUserToken NewAsyncUserToken()
+        public void ConvertBytesToMessage(object sender, SocketAsyncEventArgs eventArgs)
+        {
+            QueuedMessageProcessor<T> token = (QueuedMessageProcessor<T>)eventArgs.UserToken;
+            short messageLength = BitConverter.ToInt16(eventArgs.Buffer, eventArgs.Offset);
+            byte[] m = eventArgs.Buffer.Skip(eventArgs.Offset).Take(messageLength).ToArray();
+
+            T gameMessage = MessageFactoryMethod(m);
+            token.ReceivedMessage = gameMessage;
+        }
+        
+        public Func<byte[], T> MessageFactoryMethod { get; set; }
+
+        public virtual IAsyncUserToken NewAsyncUserToken()
         {
             return new QueuedMessageProcessor<T>();
         }

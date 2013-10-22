@@ -2,14 +2,15 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using Dragon.Interfaces;
 using log4net;
 
 namespace Dragon.Server
 {
-    public class MultiClientServer
+    public class MultiClientServer<T> where T : IGameMessage
     {
         private const int OpsToPreAlloc = 2; // read, write (don't alloc buffer space for accepts)
-        private static readonly ILog Logger = LogManager.GetLogger(typeof(MultiClientServer));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(MultiClientServer<>));
         private readonly int _backlog;
         // the maximum number of connections the sample is designed to handle simultaneously  
 
@@ -34,7 +35,8 @@ namespace Dragon.Server
         // 
         // <param name="numConnections">the maximum number of connections the sample is designed to handle simultaneously</param>
         // <param name="receiveBufferSize">buffer size to use for each socket I/O operation</param>
-        public MultiClientServer(int numConnections, int receiveBufferSize, int backlog, IPEndPoint ipEndpoint, ITokenProvider tokenProvider){
+        public MultiClientServer(int numConnections, int receiveBufferSize, int backlog, IPEndPoint ipEndpoint, MessageProcessorProvier<T> tokenProvider)
+        {
             _totalBytesRead = 0;
             _numConnectedSockets = 0;
             _numConnections = numConnections;
@@ -53,6 +55,8 @@ namespace Dragon.Server
             _acceptPool = new SocketAsyncEventArgsPool(numConnections, AcceptEventArg_Completed);
 
             _maxNumberAcceptedClients = new Semaphore(numConnections, numConnections);
+
+            OnReceiveBytes += tokenProvider.ConvertBytesToMessage;
 
             // create the socket which listens for incoming connections
             _listenSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
