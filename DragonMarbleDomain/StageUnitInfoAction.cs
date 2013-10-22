@@ -77,7 +77,7 @@ namespace DragonMarble
 
         private GameAction DestinationGameAction()
         {
-            StageTile stageTile = Stage.Tiles[tileIndex];
+            StageTileInfo stageTile = Stage.Tiles[tileIndex];
             switch (stageTile.Type)
             {
                 case StageTileInfo.TYPE.CITY:

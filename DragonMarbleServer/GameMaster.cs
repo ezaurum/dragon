@@ -33,7 +33,8 @@ namespace DragonMarble
         private List<StageUnitInfo> _availablePlayers;
         private bool _gameContinue;
 
-        public GameMaster(List<StageTile> tiles) : this()
+        public GameMaster(List<StageTileInfo> tiles)
+            : this()
         {
             Board = new GameBoard(tiles);
         }
@@ -259,10 +260,10 @@ namespace DragonMarble
             set { _gameContinue = value; }
         }
 
-        public static List<StageTile> ParseTiles(XDocument doc)
+        public static List<StageTileInfo> ParseTiles(XDocument doc)
         {
             // Query the data and write out a subset of contacts
-            IEnumerable<StageTile> query = doc.Elements("Category").Elements("Stage").Select(c =>
+            IEnumerable<StageTileInfo> query = doc.Elements("Category").Elements("Stage").Select(c =>
             {
                 IEnumerable<XElement> xElements = c.Elements("Price");
 
@@ -278,7 +279,7 @@ namespace DragonMarble
                     sellPrices[i] = int.Parse(xElement.Attribute("SellPrice").Value.ToString());
                 }
 
-                return new StageTile(
+                return new StageTileInfo(
                     int.Parse(c.Attribute("Index").Value.ToString()),
                     c.Attribute("Name").Value.ToString(),
                     c.Attribute("Type").Value.ToString(),

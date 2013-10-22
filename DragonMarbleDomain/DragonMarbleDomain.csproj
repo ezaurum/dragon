@@ -38,7 +38,6 @@
   <ItemGroup>
     <Compile Include="Contents.cs" />
     <Compile Include="GameAction.cs" />
-    <Compile Include="GameActionResult.cs" />
     <Compile Include="GameBoard.cs" />
     <Compile Include="Message\GameMessage.cs" />
     <Compile Include="Message\IDragonMarbleGameMessage.cs" />
