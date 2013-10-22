@@ -46,7 +46,6 @@ namespace DragonMarble
         {   
             Logger.Debug("connectecd.");
             QueuedMessageProcessor<IDragonMarbleGameMessage> token = (QueuedMessageProcessor<IDragonMarbleGameMessage>)eventArgs.UserToken;
-            //Logger.DebugFormat("token guid : {0}",token.Id);
             StageUnitInfo player = new StageUnitInfo {
                 Id = Guid.NewGuid(),
                 MessageProcessor = token, 
@@ -84,7 +83,7 @@ namespace DragonMarble
             
             IDragonMarbleGameMessage gameMessage = GameMessageFactory.GetGameMessage(m);
             token.ReceivedMessage = gameMessage;
-            Logger.DebugFormat("received {0} message from {1}. ", gameMessage.MessageType);
+            Logger.DebugFormat("received {0}. ", gameMessage.MessageType);
         }
     }
 }

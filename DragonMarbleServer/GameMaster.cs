@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Xml.Linq;
+using Dragon.Interfaces;
 using DragonMarble.Message;
 using log4net;
 
@@ -58,13 +58,11 @@ namespace DragonMarble
             player.Stage = Board;
 
             //set initailize player message
-            InitializePlayerGameMessage idMessage = new InitializePlayerGameMessage
+            player.SendingMessage = new InitializePlayerGameMessage
             {
                 PlayerId = player.Id,
                 Server = Id
-            };
-
-            player.SendingMessage = idMessage;
+            }; 
         }
 
         public void StartGame()
@@ -72,7 +70,7 @@ namespace DragonMarble
             Logger.Debug("Start game");
             InitGame();
             SendOrderCardSelectMessage();
-            Task.Factory.StartNew(OrderEnd);
+            //Task.Factory.StartNew(OrderEnd);
             
 
             //IDragonMarbleGameMessage message = Players[0].ReceivedMessage;
@@ -86,7 +84,28 @@ namespace DragonMarble
             Board.Init();
 
             //send initialize message
-            Notify(GameMessageInstanceFactory.MakeInitializePlayerMessage, _availablePlayers, Board.FeeBoostedTiles);
+            Notify(new InitializeGameGameMessage
+            {
+                FeeBoostedTiles = Board.FeeBoostedTiles,
+                NumberOfPlayers = (short)Players.Count,
+                Units = Players
+            });
+
+            Notify(new OrderCardSelectGameMessage
+            {
+                Actor = Id,
+                NumberOfPlayers = (short)Players.Count,
+                OrderCardSelectState = new List<bool> { false, false },
+                SelectedCardNumber = -1
+            });
+
+            Notify(new OrderCardSelectGameMessage
+            {
+                Actor = Id,
+                NumberOfPlayers = (short)Players.Count,
+                OrderCardSelectState = new List<bool> { false, false },
+                SelectedCardNumber = -1
+            });
 
             _state = GameState.Init;
         }
@@ -101,10 +120,7 @@ namespace DragonMarble
 
             //order
             //At first, select order
-            Notify(GameMessageInstanceFactory.OrderCardSelect
-                , (short)Players.Count
-                , new List<bool> { false, false }
-                , (short)-1);
+           
         }
 
         public void Notify(Func<StageUnitInfo, object[], IDragonMarbleGameMessage> instanceMessage, params object[] parameterObjects)
@@ -114,6 +130,11 @@ namespace DragonMarble
                 IDragonMarbleGameMessage message = instanceMessage(p, parameterObjects);
                 p.SendingMessage = message;
             });
+        }
+
+        public void Notify(IDragonMarbleGameMessage message)
+        {
+            Players.ForEach(p => p.SendingMessage = message);
         }
        
         public void OrderEnd()
@@ -133,7 +154,7 @@ namespace DragonMarble
             {       if (p.ControlMode == StageUnitInfo.ControlModeType.Player)
                     {
                         p.Order = 0;
-                        var dragonMarbleGameMessage = p.ReceivedMessage;
+                        //var dragonMarbleGameMessage = p.ReceivedMessage;
                         //p.ResetMessages();
 
                     }
@@ -155,7 +176,7 @@ namespace DragonMarble
             EndGame();
         }
 
-        private IEnumerable<GameAction> PlayerActions()
+        private IEnumerable<IGameAction> PlayerActions()
         {
             foreach (GameAction action
                 in PlayersOrderByTurn().SelectMany(player => player.Actions()))
@@ -187,7 +208,11 @@ namespace DragonMarble
                 
                 CurrentPlayer.ActivateTurn();
 
-                Notify(GameMessageInstanceFactory.ActivateTurn, CurrentPlayer.Id);
+                Notify(new ActivateTurnGameMessage
+                {
+                    TurnOwner = CurrentPlayer.Id,
+                    ResponseLimit = 50000
+                });
 
                 yield return CurrentPlayer;
             }

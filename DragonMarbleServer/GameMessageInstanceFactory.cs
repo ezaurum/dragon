@@ -1,33 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using DragonMarble.Message;
 
 namespace DragonMarble
 {
     public static class  GameMessageInstanceFactory
     {
-        public static InitializeGameGameMessage MakeInitializePlayerMessage(StageUnitInfo p, object[] parameterObjects)
-        {
-            List<StageUnitInfo> units = (List<StageUnitInfo>)parameterObjects[0];
-            List<short> feeBoostedTiles = (List<short>) parameterObjects[1];
-            
-            return new InitializeGameGameMessage
-            {
-                FeeBoostedTiles = feeBoostedTiles,
-                NumberOfPlayers = (short)units.Count,
-                Units = units
-            };
-        }
-
-        public static ActivateTurnGameMessage ActivateTurn(StageUnitInfo p, object[] arg2)
-        {
-            return new ActivateTurnGameMessage
-              {
-                    TurnOwner = (Guid) arg2[0],
-                    ResponseLimit = 50000
-          };
-        }
-
         /**
          * <summary>
          * order card selected by client
