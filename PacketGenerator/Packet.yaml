@@ -63,7 +63,7 @@ RollMoveDice :
           length : 16
           options : [byte_param_constructor, to_byte_array, property]
 
-ThreeDoubleToPrison :
+ForceMoveToPrison :
     comment : 3더블
 
 RollMoveDiceResult :
