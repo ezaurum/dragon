@@ -62,7 +62,7 @@ namespace DragonMarble
             gm.Join(player);
 
             //TODO dummy ai player
-/**            StageUnitInfo player0 = new AIGamePlayer
+            StageUnitInfo player0 = new AIGamePlayer
             {
                 Id = Guid.NewGuid(),
                 Order = 1,
@@ -70,7 +70,7 @@ namespace DragonMarble
                 CharacterId = 2,
                 Gold = 2000000
             };
-            gm.Join(player0);*/
+            gm.Join(player0);
 
             if (gm.IsGameStartable)
             {
