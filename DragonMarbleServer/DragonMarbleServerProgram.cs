@@ -84,7 +84,7 @@ namespace DragonMarble
             
             IDragonMarbleGameMessage gameMessage = GameMessageFactory.GetGameMessage(m);
             token.ReceivedMessage = gameMessage;
-            Logger.DebugFormat("received {0} message from {1}. ", gameMessage.MessageType, gameMessage.From);
+            Logger.DebugFormat("received {0} message from {1}. ", gameMessage.MessageType);
         }
     }
 }

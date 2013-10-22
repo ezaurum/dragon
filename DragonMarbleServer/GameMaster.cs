@@ -60,8 +60,8 @@ namespace DragonMarble
             //set initailize player message
             InitializePlayerGameMessage idMessage = new InitializePlayerGameMessage
             {
-                To = player.Id,
-                From = Id
+                PlayerId = player.Id,
+                Server = Id
             };
 
             player.SendingMessage = idMessage;
@@ -112,7 +112,6 @@ namespace DragonMarble
             Players.ForEach(p =>
             {
                 IDragonMarbleGameMessage message = instanceMessage(p, parameterObjects);
-                message.From = Id;
                 p.SendingMessage = message;
             });
         }

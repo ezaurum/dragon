@@ -13,15 +13,7 @@ Header :
     fields :
         - type : GameMessageType
           name : MessageType
-          cast : Int32
-        - type : Guid
-          name : From
-          length : 16
-          options : [byte_param_constructor, to_byte_array, property]
-        - type : Guid
-          name : To
-          length : 16
-          options : [byte_param_constructor, to_byte_array, property]        
+          cast : Int32        
 
 InitializeGame :
     comment : 게임 초기화 정보
@@ -113,6 +105,15 @@ OrderCardResult :
 
 InitializePlayer :
   comment : 플레이어 초기화
+  fields :
+    - type : Guid
+      name : Server
+      length : 16
+      options : [byte_param_constructor, to_byte_array, property]
+    - type : Guid
+      name : PlayerId
+      length : 16
+      options : [byte_param_constructor, to_byte_array, property]
 
 ActivateTurn :
   comment : Activate player's turn

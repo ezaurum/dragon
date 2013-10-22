@@ -61,8 +61,6 @@ namespace DragonMarble
                         result = new RollMoveDiceGameMessage()
                         {
                             Pressed = 10,
-                            To = Id,
-                            From = GameMasterId
                         };
                         break;
                 }

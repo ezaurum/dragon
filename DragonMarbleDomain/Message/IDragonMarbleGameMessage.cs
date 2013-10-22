@@ -1,15 +1,11 @@
-﻿using System;
-using Dragon.Interfaces;
+﻿using Dragon.Interfaces;
 
 namespace DragonMarble.Message
 {
-    public interface IDragonMarbleGameMessage : IGameMessage
+    public interface IDragonMarbleGameMessage : IGameMessage, IGameAction
     {
         GameMessageType MessageType { get; }
-        Guid To { get; set; }
-        Guid From { get; set; }
     }
-
 
     public interface IDragonMarbleMessageProcessor : IMessageProcessor<IDragonMarbleGameMessage>
     {

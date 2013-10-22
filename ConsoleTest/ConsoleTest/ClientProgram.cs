@@ -13,8 +13,6 @@ namespace ConsoleTest
         {
             RollMoveDiceGameMessage rollMessage = new RollMoveDiceGameMessage()
             {
-                From = Guid.NewGuid(),
-                To = Guid.NewGuid(),
                 Pressed = new Random().Next(0,int.MaxValue)
             };    
 
@@ -49,8 +47,6 @@ namespace ConsoleTest
                 {
                     OrderCardSelectGameMessage orderCardSelectGameMessage = new OrderCardSelectGameMessage
                     {
-                        From = Guid.NewGuid(),
-                        To = Guid.NewGuid(),
                         SelectedCardNumber = 1,
                         OrderCardSelectState = new List<Boolean> {false,true},
                         NumberOfPlayers = 2
@@ -62,8 +58,6 @@ namespace ConsoleTest
                 {
                     OrderCardSelectGameMessage orderCardSelectGameMessage = new OrderCardSelectGameMessage
                     {
-                        From = Guid.NewGuid(),
-                        To = Guid.NewGuid(),
                         SelectedCardNumber = 0,
                         OrderCardSelectState = new List<Boolean> { true, false },
                         NumberOfPlayers = 2
@@ -109,8 +103,6 @@ namespace ConsoleTest
                     Console.WriteLine("number of players : {0}", ((InitializeGameGameMessage)dragonMarbleGameMessage).Units[1].gold);
                     break;
                     case GameMessageType.ActivateTurn:
-                    Console.WriteLine(((ActivateTurnGameMessage)dragonMarbleGameMessage).From);
-                    Console.WriteLine(((ActivateTurnGameMessage)dragonMarbleGameMessage).To);
                     Console.WriteLine(((ActivateTurnGameMessage)dragonMarbleGameMessage).TurnOwner);
                     break;
             }

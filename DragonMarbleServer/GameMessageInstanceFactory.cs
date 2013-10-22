@@ -13,7 +13,6 @@ namespace DragonMarble
             
             return new InitializeGameGameMessage
             {
-                To = p.Id,
                 FeeBoostedTiles = feeBoostedTiles,
                 NumberOfPlayers = (short)units.Count,
                 Units = units
@@ -24,7 +23,6 @@ namespace DragonMarble
         {
             return new ActivateTurnGameMessage
               {
-                    To = p.Id,
                     TurnOwner = (Guid) arg2[0],
                     ResponseLimit = 50000
           };
@@ -44,7 +42,6 @@ namespace DragonMarble
         {
             return new OrderCardSelectGameMessage
             {
-                To = p.Id,
                 Actor = p.Id,
                 NumberOfPlayers = (short)arg2[0],
                 OrderCardSelectState = (List<bool>) arg2[1],
@@ -57,7 +54,6 @@ namespace DragonMarble
         {
             return new BuyLandRequestGameMessage() 
             {
-                To=arg1.Id,
                 Actor = ((StageUnitInfo)arg2[0]).Id,
                 ResponseLimit = 50000
             };
@@ -67,7 +63,6 @@ namespace DragonMarble
         {
             return new RollMoveDiceResultGameMessage
             {
-                To=arg1.Id,
                 Actor = ((StageUnitInfo) arg2[0]).Id,
                 Dices = new List<char> {(char) arg2[1],(char) arg2[2]},
                 RollCount = (char)arg2[3],

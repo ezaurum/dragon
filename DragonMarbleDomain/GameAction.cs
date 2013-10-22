@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
+using Dragon.Interfaces;
 using DragonMarble.Message;
 
 namespace DragonMarble
 {
-    public class GameAction
+    public class GameAction : IGameAction
     {
         public GameMessageType Type { get; set; }
         public int Selected { get; set; }
