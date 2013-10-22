@@ -160,3 +160,23 @@ BuyLand :
       type : Guid
       length : 16
       options : [byte_param_constructor, to_byte_array, property]
+
+PayFee :
+  comment : pay fee
+  fields :
+    - name : TileIndex
+      type : Char
+    - name : Fee
+      type : Int32
+    - name : Actor
+      type : Guid
+      length : 16
+      options : [byte_param_constructor, to_byte_array, property]
+
+EndTurn :
+  comment : end turn
+  fields :
+    - name : Actor
+      type : Guid
+      length : 16
+      options : [byte_param_constructor, to_byte_array, property]
