@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Dragon.Interfaces;
@@ -64,80 +63,29 @@ namespace DragonMarble
             {
                 PlayerId = player.Id,
                 Server = Id
-            }; 
+            };
         }
 
         public void StartGame()
         {
-            Logger.Debug("Start game");
             InitGame();
             SendOrderCardSelectMessage();
+            EndOrder();
+            
+            Task.Factory.StartNew(CheckOrderEnd);
+        }
 
-            Task.Factory.StartNew(PlayGame);
-
-            //Task.Factory.StartNew(OrderEnd);
-
-            //Task<bool>[] tasks = new Task<bool>[1];
-
-            //Func<object, bool> 
-            /*          static void Main()
-    {
-        // Define a delegate that prints and returns the system tick count
-        Func<object, int> action = (object obj) =>
+        private void CheckOrderEnd()
         {
-            int i = (int)obj;
-
-            // Make each thread sleep a different time in order to return a different tick count
-            Thread.Sleep(i * 100);
-
-            // The tasks that receive an argument between 2 and 5 throw exceptions 
-            if (2 <= i && i <= 5)
-            {
-                throw new InvalidOperationException("SIMULATED EXCEPTION");
+            int i = 0;
+            while (_orderCard.Count < _availablePlayers.Count -1)
+            {   
+                
             }
 
-            int tickCount = Environment.TickCount;
-            Console.WriteLine("Task={0}, i={1}, TickCount={2}, Thread={3}", Task.CurrentId, i, tickCount, Thread.CurrentThread.ManagedThreadId);
-
-            return tickCount;
-        };
-
-        const int n = 10;
-
-        // Construct started tasks
-        Task<int>[] tasks = new Task<int>[n];
-        for (int i = 0; i < n; i++)
-        {
-            tasks[i] = Task<int>.Factory.StartNew(action, i);
+            PlayGame();
         }
 
-        // Exceptions thrown by tasks will be propagated to the main thread 
-        // while it waits for the tasks. The actual exceptions will be wrapped in AggregateException. 
-        try
-        {
-            // Wait for all the tasks to finish.
-            Task.WaitAll(tasks);
-
-            // We should never get to this point
-            Console.WriteLine("WaitAll() has not thrown exceptions. THIS WAS NOT EXPECTED.");
-        }
-        catch (AggregateException e)
-        {
-            Console.WriteLine("\nThe following exceptions have been thrown by WaitAll(): (THIS WAS EXPECTED)");
-            for (int j = 0; j < e.InnerExceptions.Count; j++)
-            {
-                Console.WriteLine("\n-------------------------------------------------\n{0}", e.InnerExceptions[j].ToString());
-            }
-        }
-            */
-            //PlayGame();
-
-
-            //IDragonMarbleGameMessage message = Players[0].ReceivedMessage;
-            //OrderEnd();
-        }
-
-        
         private void InitGame()
         {
             _availablePlayers = Players;
@@ -173,6 +121,7 @@ namespace DragonMarble
                 OrderCardSelectState = new List<bool> { false, false },
                 SelectedCardNumber = -1
             });
+            
 
             //TODO
             Notify(new OrderCardSelectGameMessage
@@ -182,9 +131,10 @@ namespace DragonMarble
                 OrderCardSelectState = new List<bool> { true, true },
                 SelectedCardNumber = 1
             });
+        }
 
-            
-
+        private void EndOrder()
+        {
             Notify(new OrderCardResultGameMessage()
             {
                 FirstPlayerId = Players[0].Id,
@@ -194,15 +144,6 @@ namespace DragonMarble
             Players[0].Order = 0;
             Players[1].Order = 1;
             OrderedByTurnPlayers = Players.OrderBy(player => player.Order).ToList();
-        }
-
-        public void Notify(Func<StageUnitInfo, object[], IDragonMarbleGameMessage> instanceMessage, params object[] parameterObjects)
-        {
-            Players.ForEach(p =>
-            {
-                IDragonMarbleGameMessage message = instanceMessage(p, parameterObjects);
-                p.SendingMessage = message;
-            });
         }
 
         public void Notify(IDragonMarbleGameMessage message)
@@ -221,14 +162,19 @@ namespace DragonMarble
             foreach (GameAction action
                 in PlayersOrderByTurn().SelectMany(player => player.Actions()))
             {
+                _state = GameState.WaitPlayerAction;
                 
                 //turn owner's action
                 
                 yield return action;
 
+                //TODO action result check needed.
+
                 //if need, other's reactions
                 if (action.NeedOther)
                 {
+                    _state = GameState.WaitPlayerAction;
+
                     foreach (StageUnitInfo targetUnit in action.TargetUnits)
                     {
                         Logger.Debug("This action need target units action.");
@@ -248,6 +194,8 @@ namespace DragonMarble
 
                 Notify(CurrentPlayer.ActivateTurn());
 
+                //TODO all ready check needed.
+
                 yield return CurrentPlayer;
             }
         }
@@ -263,6 +211,7 @@ namespace DragonMarble
 
         public void EndGame()
         {
+            _state = GameState.EndGame;
             Logger.Debug("end game.");
         }
 
@@ -279,6 +228,8 @@ namespace DragonMarble
                 }
               
                 CurrentAction = action;
+
+                _state = GameState.ProcessPlayerAction;
 
                 Notify(action.Message);
 
