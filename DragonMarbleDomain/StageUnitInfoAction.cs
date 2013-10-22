@@ -40,7 +40,9 @@ namespace DragonMarble
                                 yield return new GameAction ()
                                 {
                                     //TODO prison
-                                    Type = GameMessageType.RollMoveDiceResult
+									Actor = this,
+                                    Type = GameMessageType.ThreeDoubleToPrison,
+									ArgObjects = new object[] {this, (char)Dice.result[0], (char)Dice.result[1], (char)Dice.rollCount }
                                     
                                 };
                                 yield break;
@@ -58,9 +60,9 @@ namespace DragonMarble
                             Type = GameMessageType.RollMoveDiceResult,
                             ArgObjects = new object[] {this, (char)Dice.result[0], (char)Dice.result[1], (char)Dice.rollCount }
                         };
-
+						
                         yield return action;
-                        
+                        /*
                         StageTile stageTile = Stage.Tiles[tileIndex];
                         switch (stageTile.Type)
                         {
@@ -77,7 +79,7 @@ namespace DragonMarble
                         }
                         
                         IDragonMarbleGameMessage afterMovedMessage = ReceivedMessage;
-
+						*/
                         break;
                 }
                 DeactivateTurn();
