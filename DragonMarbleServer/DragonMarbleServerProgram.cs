@@ -25,7 +25,8 @@ namespace DragonMarble
         {
             InitGame();
 
-            var server = new NetworkManager(MaxConnection, BufferSize, QueueNumber,
+            var server = new NetworkManager(
+                MaxConnection, BufferSize, QueueNumber,
                 new IPEndPoint(IPAddress.Any, Port));
             server.Start();
 
