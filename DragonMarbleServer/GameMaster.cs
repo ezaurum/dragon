@@ -196,15 +196,6 @@ namespace DragonMarble
             OrderedByTurnPlayers = Players.OrderBy(player => player.Order).ToList();
         }
 
-        public void Notify(Func<StageUnitInfo, object[], IDragonMarbleGameMessage> instanceMessage, params object[] parameterObjects)
-        {
-            Players.ForEach(p =>
-            {
-                IDragonMarbleGameMessage message = instanceMessage(p, parameterObjects);
-                p.SendingMessage = message;
-            });
-        }
-
         public void Notify(IDragonMarbleGameMessage message)
         {
             Players.ForEach(p => p.SendingMessage = message);
