@@ -78,10 +78,11 @@ namespace DragonMarble
         private GameAction DestinationGameAction()
         {
             StageTileInfo stageTile = Stage.Tiles[tileIndex];
-            switch (stageTile.Type)
+            switch (stageTile.type)
             {
                 case StageTileInfo.TYPE.CITY:
                 case StageTileInfo.TYPE.SIGHT:
+				if ( stageTile.owner == null ){
                     return new GameAction()
                     {
                         Actor = this,
@@ -92,6 +93,15 @@ namespace DragonMarble
                             ResponseLimit = 50000
                         }
                     };
+					
+					
+				}else{
+					
+					
+					
+					return null;
+				}
+				break;
                 default:
                     return null;
             }
