@@ -1,5 +1,5 @@
 ﻿using System;
-using Dragon.Interfaces;
+using Dragon.Message;
 using Dragon.Server;
 using DragonMarble.Message;
 using log4net;

@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Net.Sockets;
 
-namespace Dragon.Interfaces
+namespace Dragon.Message
 {
     public interface IGameMessage
     {
@@ -18,5 +19,17 @@ namespace Dragon.Interfaces
         T ReceivedMessage { get; set; }
         IGameMessage SendingMessage { get; set; }
         void ResetMessages();
+    }
+
+    
+}
+
+namespace Dragon
+{
+    public delegate void SocketAsyncEventHandler(object sender, SocketAsyncEventArgs e);
+
+    public interface INetworkManager
+    {
+
     }
 }

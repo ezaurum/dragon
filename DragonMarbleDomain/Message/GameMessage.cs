@@ -1,7 +1,7 @@
 // Automatic generate by PacketGenerator.
 using System;
 using System.Collections.Generic;
-using Dragon.Interfaces;
+using Dragon.Message;
 
 namespace DragonMarble.Message
 {

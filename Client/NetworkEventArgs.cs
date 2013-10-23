@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
-using Dragon.Interfaces;
+using Dragon.Message;
 
 namespace Dragon.Client
 {

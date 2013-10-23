@@ -2,7 +2,7 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
-using Dragon.Interfaces;
+using Dragon.Message;
 using log4net;
 
 namespace Dragon.Server

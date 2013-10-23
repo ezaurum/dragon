@@ -34,11 +34,6 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ClientProgram.cs" />
@@ -48,17 +43,17 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Client\ClientNetworkManager.csproj">
+    <ProjectReference Include="..\..\Client\Client.csproj">
       <Project>{e797a74b-09d9-4d8f-823b-42b532215ba0}</Project>
-      <Name>ClientNetworkManager</Name>
+      <Name>Client</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Commons\Commons.csproj">
+      <Project>{6A94673F-AE42-4A0D-BADC-83933C0976C1}</Project>
+      <Name>Commons</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\DragonMarbleDomain\DragonMarbleDomain.csproj">
       <Project>{26208981-e513-4c57-b66e-560cbd88e28d}</Project>
       <Name>DragonMarbleDomain</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Interfaces\Interfaces.csproj">
-      <Project>{6A94673F-AE42-4A0D-BADC-83933C0976C1}</Project>
-      <Name>Interfaces</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

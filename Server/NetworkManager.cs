@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
-using System.Threading.Tasks;
 using log4net;
 using System.Threading;
 
@@ -10,10 +9,12 @@ namespace Dragon.Server
     public class NetworkManager
     {
         private event EventHandler<SocketAsyncEventArgs> OnAfterIO;
+
         private event EventHandler<SocketAsyncEventArgs> OnAfterAccept;
         private event EventHandler<SocketAsyncEventArgs> OnAfterReceiveMessage;
         private event EventHandler<SocketAsyncEventArgs> OnAfterSendMessage;
-        private event EventHandler<SocketAsyncEventArgs> OnAfterDisconnect;
+        private event SocketAsyncEventHandler OnAfterDisconnect;
+        public event EventHandler<SocketAsyncEventArgs> OnReceiveBytes;
 
         private const int OpsToPreAlloc = 2; // read, write (don't alloc buffer space for accepts)
         private static readonly ILog Logger = LogManager.GetLogger(typeof (MultiClientServer<>));
@@ -68,7 +69,7 @@ namespace Dragon.Server
             OnAfterAccept += DefaultAfterAccept;
         }
 
-        public event EventHandler<SocketAsyncEventArgs> OnReceiveBytes;
+        
 
         // Starts the server such that it is listening for  
         // incoming connection requests.     

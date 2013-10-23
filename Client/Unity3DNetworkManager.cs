@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
-using Dragon.Interfaces;
+using Dragon.Message;
 
 namespace Dragon.Client
 {
-    public delegate void SocketAsyncEventHandler(object sender, SocketAsyncEventArgs e);
-    public class Unity3DNetworkManager
+    public class Unity3DNetworkManager : INetworkManager
     {
         private readonly Socket _socket;
         
