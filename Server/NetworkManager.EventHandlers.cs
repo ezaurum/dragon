@@ -56,6 +56,13 @@ namespace Dragon.Server
             IAsyncUserToken token = TokenProvider.NewAsyncUserToken();
             token.Socket = e.AcceptSocket;
 
+            //set read write event args
+            SocketAsyncEventArgs readArgs = _readPool.Pop();
+            readArgs.UserToken = token;
+
+            SocketAsyncEventArgs writeArgs = _writePool.Pop();
+            writeArgs.UserToken = token;
+
             //socket must be cleared since the context object is being reused
             e.AcceptSocket = null;
 
