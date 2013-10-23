@@ -45,7 +45,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AIGamePlayer.cs" />
     <Compile Include="GameMaster.cs" />
     <Compile Include="DragonMarbleServerProgram.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

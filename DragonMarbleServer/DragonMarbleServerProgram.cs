@@ -62,13 +62,15 @@ namespace DragonMarble
             gm.Join(player);
 
             //TODO dummy ai player
-            StageUnitInfo player0 = new AIGamePlayer
+            StageUnitInfo player0 = new AIStageUnitInfo
             {
                 Id = Guid.NewGuid(),
                 Order = 1,
                 UnitColor = StageUnitInfo.UNIT_COLOR.GREEN,
                 CharacterId = 2,
-                Gold = 2000000
+                Gold = 2000000,
+                MessageProcessor = new QueuedMessageProcessor<IDragonMarbleGameMessage>()
+
             };
             gm.Join(player0);
 
