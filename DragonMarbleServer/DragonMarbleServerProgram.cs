@@ -23,18 +23,6 @@ namespace DragonMarble
 
         private static void Main(string[] args)
         {
-            InitGame();
-
-            var server = new NetworkManager(
-                MaxConnection, BufferSize, QueueNumber,
-                new IPEndPoint(IPAddress.Any, Port));
-            server.Start();
-
-            Console.ReadKey();
-        }
-
-        private static void InitGame()
-        {
             XmlConfigurator.Configure(new FileInfo("log4net.xml"));
 
             List<StageTileInfo> tiles = XmlUtils.LoadXml(@"data_stage.xml", GameMaster.ParseTiles);
@@ -43,11 +31,18 @@ namespace DragonMarble
 
             gm = new GameMaster(tiles);
 
-            MessageProcessorProvier<IDragonMarbleGameMessage> messageProcessorProvier = new MessageProcessorProvier
-                <IDragonMarbleGameMessage>
+            MessageProcessorProvier<IDragonMarbleGameMessage> messageProcessorProvier = new MessageProcessorProvier<IDragonMarbleGameMessage>
             {
                 MessageFactoryMethod = GameMessageFactory.GetGameMessage
             };
+
+            var server = new MultiClientServer<IDragonMarbleGameMessage>(
+                MaxConnection, BufferSize, QueueNumber,
+                new IPEndPoint(IPAddress.Any, Port), messageProcessorProvier);
+            server.OnAcceptConnection += AddPlayer;
+            server.Start();
+
+            Console.ReadKey();
         }
 
         private static void AddPlayer(object sender, SocketAsyncEventArgs eventArgs)
@@ -65,6 +60,19 @@ namespace DragonMarble
             token.Player = player;
             
             gm.Join(player);
+
+            //TODO dummy ai player
+            StageUnitInfo player0 = new AIStageUnitInfo
+            {
+                Id = Guid.NewGuid(),
+                Order = 1,
+                UnitColor = StageUnitInfo.UNIT_COLOR.GREEN,
+                CharacterId = 2,
+                Gold = 2000000,
+                MessageProcessor = new QueuedMessageProcessor<IDragonMarbleGameMessage>()
+
+            };
+            gm.Join(player0);
 
             if (gm.IsGameStartable)
             {

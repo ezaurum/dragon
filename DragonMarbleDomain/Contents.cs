@@ -12,6 +12,13 @@ namespace DragonMarble
             return new Random();
         }
     }
+	public static class RandomUtil
+	{
+		public static float Next(float min, float max){
+            return RandomFactory.NewRandom().Next((int)(min * 1000), (int)max * 1000) / 1000f;
+		}
+	}
+	
 
     public class StageBuffInfo
     {
@@ -363,7 +370,22 @@ namespace DragonMarble
                 return p;
             }
         }
-
+		
+		public bool isAbleToBuildLandmark {
+			get {
+				if ( type == StageTileInfo.TYPE.CITY ){
+					for ( int i = 1; i <= 3; i++ ){
+						if ( !buildings[i].isBuilt ){
+							return false;
+						}
+					}
+					if ( !buildings[4].isBuilt ){
+						return true;
+					}
+				}
+				return false;
+			}
+		}
 
         public int takeOverPrice
         {
