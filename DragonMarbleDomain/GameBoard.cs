@@ -41,6 +41,22 @@ namespace DragonMarble
                 citiesAndSight.FeeBoosted = true;
                 FeeBoostedTiles.Add(citiesAndSight.Position);
             }
+
+
+            foreach (StageTileInfo citiesAndSight in citiesAndSights)
+            {
+                if (StageTileInfo.TYPE.OLYMPIC == citiesAndSight.Type)
+                {
+                    TILE_INDEX_IOC = citiesAndSight.index;
+                }
+                else if (StageTileInfo.TYPE.PRISON == citiesAndSight.Type)
+                {
+                    TILE_INDEX_PRISON = citiesAndSight.index;
+                } else if (StageTileInfo.TYPE.TRAVEL == citiesAndSight.Type )
+                {
+                    TILE_INDEX_TRAVEL = citiesAndSight.index;
+                }
+            }
         }
 
         public List<short> FeeBoostedTiles {get; set;}
