@@ -28,17 +28,17 @@ namespace Dragon.Server
 
         private void DefaultAfterDisconnect(object sender, SocketAsyncEventArgs e)
         {
-            throw new NotImplementedException();
+            
         }
 
         private void DefaultAfterSend(object sender, SocketAsyncEventArgs e)
         {
-            throw new NotImplementedException();
+            
         }
 
         private void DefaultAfterReceive(object sender, SocketAsyncEventArgs e)
         {
-            throw new NotImplementedException();
+            
         }
 
         // This method is the callback method associated with Socket.AcceptAsync  
@@ -62,7 +62,11 @@ namespace Dragon.Server
 
             SocketAsyncEventArgs writeArgs = _writePool.Pop();
             writeArgs.UserToken = token;
-
+            
+            //start read write
+            ReadAsyncRecursive(token.Socket, readArgs);
+            WriteAsyncRecursive(token.Socket, writeArgs);
+            
             //socket must be cleared since the context object is being reused
             e.AcceptSocket = null;
 
@@ -70,6 +74,22 @@ namespace Dragon.Server
 
             // Accept the next connection request
             StartAccept();
+        }
+
+        private void ReadAsyncRecursive(Socket socket, SocketAsyncEventArgs readArgs)
+        {
+            if (!socket.ReceiveAsync(readArgs))
+            {
+                OnAfterReceive(socket, readArgs);
+            }
+        }
+
+        private void WriteAsyncRecursive(Socket socket, SocketAsyncEventArgs writeArgs)
+        {
+            if (!socket.SendAsync(writeArgs))
+            {
+                OnAfterSend(socket, writeArgs);
+            }
         }
     }
 }
