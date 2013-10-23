@@ -43,10 +43,9 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="NetworkManager.EventHandlers.cs" />
     <Compile Include="QueuedMessageProcessor.cs" />
     <Compile Include="BufferManager.cs" />
-    <Compile Include="ITokenProvider.cs" />
-    <Compile Include="MultiClientServer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="NetworkManager.cs" />
     <Compile Include="SocketAsyncEventArgsPool.cs" />

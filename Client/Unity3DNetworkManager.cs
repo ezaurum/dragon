@@ -26,6 +26,8 @@ namespace Dragon.Client
                 SocketType.Stream, ProtocolType.Tcp);
 
             _ipEndpoint = new IPEndPoint( IPAddress.Parse(ipAddress), port);
+
+            TokenProvider = new ClientTokenProvider();
         }
         
         public void SendMessage(IGameMessage gameMessage)
@@ -122,8 +124,8 @@ namespace Dragon.Client
 
             if (e.SocketError == SocketError.Success)
             {
-                _readEventArgs.UserToken = new QueueAsyncClientUserToken() ;
-                _writeEventArgs.UserToken = new SimpleAsyncClientUserToken() ;
+                _readEventArgs.UserToken = TokenProvider.NewAsyncUserToken();
+                _writeEventArgs.UserToken = ((ClientTokenProvider)TokenProvider).NewWriteAsyncUserToken();
                 
                 Console.WriteLine("Start to read");
                 Read_Completed(this, _readEventArgs);
@@ -135,7 +137,20 @@ namespace Dragon.Client
             _socket.Disconnect(true);
             Connect();
         }
-
+        
         public ITokenProvider TokenProvider { get; set; }
+    }
+
+    public class ClientTokenProvider : ITokenProvider
+    {
+        public IAsyncUserToken NewAsyncUserToken()
+        {
+            return new QueueAsyncClientUserToken();
+        }
+
+        public IAsyncUserToken NewWriteAsyncUserToken()
+        {
+            return new SimpleAsyncClientUserToken();
+        }
     }
 }

@@ -16,7 +16,6 @@ namespace Dragon.Server
             InitializedHelperObjects,
             Running = 1000
         }
-        
 
         private const int OpsToPreAlloc = 2; // read, write (don't alloc buffer space for accepts)
         private static readonly ILog Logger = LogManager.GetLogger(typeof (NetworkManager));
@@ -183,7 +182,7 @@ namespace Dragon.Server
                 // read the next block of data send from the client 
 
                 //block until value return
-                byte[] bytes = token.SendingMessageByteArray();
+                byte[] bytes = null;//token.SendingMessageByteArray();
                 bytes.CopyTo(e.Buffer, e.Offset);
 
                 if (Logger.IsDebugEnabled)

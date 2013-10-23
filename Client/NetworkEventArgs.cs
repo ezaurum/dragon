@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using Dragon.Message;
 
 namespace Dragon.Client
 {
-    public class AsyncClientUserToken  
-    {
-        public Boolean Result { get; set; }
+    public class AsyncClientUserToken : IAsyncUserToken 
+    {   
         public Socket Socket { get; set; }
     }
 

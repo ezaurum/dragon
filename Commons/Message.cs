@@ -34,7 +34,6 @@ namespace Dragon
     public interface IAsyncUserToken
     {
         Socket Socket { get; set; }
-        byte[] SendingMessageByteArray();
     }
 
     public interface INetworkManager
