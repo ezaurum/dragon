@@ -9,12 +9,10 @@ namespace Dragon.Server
     public class NetworkManager
     {
         private event EventHandler<SocketAsyncEventArgs> OnAfterIO;
-
         private event EventHandler<SocketAsyncEventArgs> OnAfterAccept;
         private event EventHandler<SocketAsyncEventArgs> OnAfterReceiveMessage;
         private event EventHandler<SocketAsyncEventArgs> OnAfterSendMessage;
-        private event SocketAsyncEventHandler OnAfterDisconnect;
-        public event EventHandler<SocketAsyncEventArgs> OnReceiveBytes;
+        private event EventHandler<SocketAsyncEventArgs> OnAfterDisconnect;
 
         private const int OpsToPreAlloc = 2; // read, write (don't alloc buffer space for accepts)
         private static readonly ILog Logger = LogManager.GetLogger(typeof (MultiClientServer<>));
@@ -58,6 +56,9 @@ namespace Dragon.Server
             _readWritePool = new SocketAsyncEventArgsPool(
                 numConnections*OpsToPreAlloc, OnAfterIO, _bufferManager);
 
+            OnAfterAccept += ProcessAccept;
+            OnAfterAccept += DefaultAfterAccept;
+
             _acceptPool = new SocketAsyncEventArgsPool(numConnections, OnAfterAccept);
 
             _maxNumberAcceptedClients = new Semaphore(numConnections, numConnections);
@@ -65,8 +66,6 @@ namespace Dragon.Server
             // create the socket which listens for incoming connections
             _listenSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
-            OnAfterAccept += ProcessAccept;
-            OnAfterAccept += DefaultAfterAccept;
         }
 
         
@@ -94,13 +93,12 @@ namespace Dragon.Server
             SocketAsyncEventArgs acceptEventArg 
                 = _acceptPool.Count > 1 
                 ? _acceptPool.Pop() : _acceptPool.CreateNew(OnAfterAccept);
-
-            Logger.Debug("accept async");
+            
             bool willRaiseEvent = _listenSocket.AcceptAsync(acceptEventArg);
             if (!willRaiseEvent)
             {
                 Logger.Debug("Direct run");
-                OnAfterAccept(_listenSocket, acceptEventArg);
+                OnAfterAccept.Invoke(_listenSocket, acceptEventArg);
             }
         }
 
@@ -123,7 +121,7 @@ namespace Dragon.Server
             // Accept the next connection request
             StartAccept();
 
-            Logger.DebugFormat("WTF?");
+            Logger.DebugFormat("WTF Default ?");
         }
 
         private void ProcessAccept(object sender, SocketAsyncEventArgs e)
@@ -219,7 +217,7 @@ namespace Dragon.Server
                     Logger.Debug(string.Format("The server has Length {0} ", e.Buffer.Length));
                     Logger.Debug(string.Format("The server has Length {0} ", BitConverter.ToInt16(e.Buffer, e.Offset)));
                 }
-                OnReceiveBytes(this, e);
+                //OnReceiveBytes(this, e);
 
                 bool willRaiseEvent = token.Socket.ReceiveAsync(e);
                 if (!willRaiseEvent)
