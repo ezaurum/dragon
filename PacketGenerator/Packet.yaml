@@ -163,8 +163,6 @@ PayFee :
   fields :
     - name : TileIndex
       type : Char
-    - name : Fee
-      type : Int32
     - name : Actor
       type : Guid
       length : 16
