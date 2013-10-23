@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using Dragon;
 using Dragon.Server;
 using DragonMarble.Message;
 using GameUtils;
 using log4net;
-using log4net.Appender;
 using log4net.Config;
 
 namespace DragonMarble
@@ -28,14 +28,38 @@ namespace DragonMarble
 
             var server = new NetworkManager(
                 MaxConnection, BufferSize, QueueNumber,
-                new IPEndPoint(IPAddress.Any, Port));
-            server.OnAfterAccept += delegate(object sender, SocketAsyncEventArgs eventArgs)
+                new IPEndPoint(IPAddress.Any, Port))
             {
-                Console.WriteLine("TTTTTTTTTTTTTTTTTTTT");
+                TokenProvider = new TokenProvider()
             };
+            server.OnAfterAccept += AddPlayer;
+            
             server.Start();
 
             Console.ReadKey();
+        }
+
+        private static void AddPlayer(object sender, SocketAsyncEventArgs eventArgs)
+        {
+            Logger.Debug("connectecd.");
+            QueuedMessageProcessor<IDragonMarbleGameMessage> token = (QueuedMessageProcessor<IDragonMarbleGameMessage>)eventArgs.UserToken;
+            
+            StageUnitInfo player = new StageUnitInfo
+            {
+                Id = Guid.NewGuid(),
+                MessageProcessor = token,
+                Order = 0,
+                UnitColor = StageUnitInfo.UNIT_COLOR.BLUE,
+                CharacterId = 1,
+                Gold = 2000000
+            };
+            
+         /*  gm.Join(player);
+
+            if (gm.IsGameStartable)
+            {
+                gm.StartGame();
+            }*/
         }
 
         private static void InitGame()
@@ -54,38 +78,22 @@ namespace DragonMarble
                 MessageFactoryMethod = GameMessageFactory.GetGameMessage
             };
         }
+    }
 
-        private static void AddPlayer(object sender, SocketAsyncEventArgs eventArgs)
-        {   
-            Logger.Debug("connectecd.");
-            QueuedMessageProcessor<IDragonMarbleGameMessage> token = (QueuedMessageProcessor<IDragonMarbleGameMessage>)eventArgs.UserToken;
-            StageUnitInfo player = new StageUnitInfo {
-                Id = Guid.NewGuid(),
-                MessageProcessor = token, 
-                Order = 0,
-                UnitColor = StageUnitInfo.UNIT_COLOR.BLUE,
-                CharacterId = 1,
-                Gold = 2000000
-            };
-            token.Player = player;
-            
-            gm.Join(player);
+    internal class TokenProvider : ITokenProvider
+    {
+        public IAsyncUserToken NewAsyncUserToken()
+        {
+            return new AsyncUserToken();
+        }
+    }
 
-            //TODO dummy ai player
-/**            StageUnitInfo player0 = new AIGamePlayer
-            {
-                Id = Guid.NewGuid(),
-                Order = 1,
-                UnitColor = StageUnitInfo.UNIT_COLOR.GREEN,
-                CharacterId = 2,
-                Gold = 2000000
-            };
-            gm.Join(player0);*/
-
-            if (gm.IsGameStartable)
-            {
-                gm.StartGame();
-            }
+    internal class AsyncUserToken : IAsyncUserToken
+    {
+        public Socket Socket { get; set; }
+        public byte[] SendingMessageByteArray()
+        {
+            throw new NotImplementedException();
         }
     }
 }

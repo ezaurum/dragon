@@ -6,8 +6,7 @@ using System.Threading;
 
 namespace Dragon.Server
 {
-    
-    public class NetworkManager : INetworkManager
+    public partial class NetworkManager : INetworkManager
     {
         private enum ManagerState
         {
@@ -17,14 +16,10 @@ namespace Dragon.Server
             InitializedHelperObjects,
             Running = 1000
         }
-        public event EventHandler<SocketAsyncEventArgs> OnAfterIO;
-        public event EventHandler<SocketAsyncEventArgs> OnAfterAccept;
-        public event EventHandler<SocketAsyncEventArgs> OnAfterReceive;
-        public event EventHandler<SocketAsyncEventArgs> OnAfterSend;
-        public event EventHandler<SocketAsyncEventArgs> OnAfterDisconnect;
+        
 
         private const int OpsToPreAlloc = 2; // read, write (don't alloc buffer space for accepts)
-        private static readonly ILog Logger = LogManager.GetLogger(typeof (MultiClientServer<>));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof (NetworkManager));
         private readonly int _backlog;
         // the maximum number of connections the sample is designed to handle simultaneously  
 
@@ -43,7 +38,7 @@ namespace Dragon.Server
         private SocketAsyncEventArgsPool _acceptPool;
         private int _numConnectedSockets; // the total number of clients connected to the server 
         private int _totalBytesRead; // counter of the total # bytes received by the server 
-        private ManagerState _state;
+        private ManagerState _state = ManagerState.BeforeInitialized;
 
         // Create an uninitialized server instance.   
         // To start the server listening for connection requests 
@@ -68,23 +63,6 @@ namespace Dragon.Server
         {
             InitializeEventHandler();
             InitializeHelperObject();
-        }
-
-        private void InitializeEventHandler()
-        {
-            //#1 initialize event handlers
-            OnAfterAccept += ProcessAccept;
-            OnAfterAccept += DefaultAfterAccept;
-
-            OnAfterReceive += DefaultAfterReceive;
-            OnAfterReceive += OnAfterIO;
-
-            OnAfterSend += DefaultAfterSend;
-            OnAfterSend += OnAfterIO;
-
-            OnAfterDisconnect = DefaultAfterDisconnect;
-            
-            _state = ManagerState.InitializedEventHandler;
         }
 
         private void InitializeHelperObject()
@@ -116,22 +94,6 @@ namespace Dragon.Server
 
             _state = ManagerState.InitializedHelperObjects;
         }
-
-        private void DefaultAfterDisconnect(object sender, SocketAsyncEventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void DefaultAfterSend(object sender, SocketAsyncEventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void DefaultAfterReceive(object sender, SocketAsyncEventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
 
         // Starts the server such that it is listening for  
         // incoming connection requests.     
@@ -169,74 +131,7 @@ namespace Dragon.Server
             if (!willRaiseEvent)
             {
                 Logger.Debug("Direct run");
-                OnAfterAccept.Invoke(_listenSocket, acceptEventArg);
-            }
-        }
-
-        // This method is the callback method associated with Socket.AcceptAsync  
-        // operations and is invoked when an accept operation is complete 
-        // return accept event arg to pool
-        // 
-        private void DefaultAfterAccept(object sender, SocketAsyncEventArgs e)
-        {
-            if (Logger.IsDebugEnabled)
-            {
-                Logger.DebugFormat("Accepted. {0}", sender.GetType());
-            }
-
-            Interlocked.Add(ref _numConnectedSockets, 2);
-
-            //socket must be cleared since the context object is being reused
-            e.AcceptSocket = null;
-
-            _acceptPool.Push(e);
-
-            // Accept the next connection request
-            StartAccept();
-
-            Logger.DebugFormat("WTF Default ?");
-        }
-
-        private void ProcessAccept(object sender, SocketAsyncEventArgs e)
-        {
-
-            if (Logger.IsDebugEnabled)
-            {
-                Logger.DebugFormat("Client connection accepted. There are {0} clients connected to the server",
-                    _numConnectedSockets/2);
-            }
-
-            if (Logger.IsDebugEnabled)
-            {
-                Logger.DebugFormat("Process");
-            }
-
-        }
-        
-
-        // This method is called whenever a receive or send operation is completed on a socket  
-        // 
-        // <param name="e">SocketAsyncEventArg associated with the completed receive operation</param>
-        private void AfterIO(object sender, SocketAsyncEventArgs e)
-        {
-            // determine which type of operation just completed and call the associated handler 
-            switch (e.LastOperation)
-            {
-                case SocketAsyncOperation.Receive:
-                case SocketAsyncOperation.ReceiveFrom:
-                case SocketAsyncOperation.ReceiveMessageFrom:
-                    ProcessReceive(e);
-                    break;
-                case SocketAsyncOperation.Send:
-                case SocketAsyncOperation.SendPackets:
-                case SocketAsyncOperation.SendTo:
-                    ProcessSend(e);
-                    break;
-                case SocketAsyncOperation.Disconnect:
-                    CloseClientSocket(e);
-                    break;
-                default:
-                    throw new ArgumentException("The last operation completed on the socket was not a receive or send");
+                OnAfterAccept(_listenSocket, acceptEventArg);
             }
         }
 

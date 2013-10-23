@@ -135,5 +135,7 @@ namespace Dragon.Client
             _socket.Disconnect(true);
             Connect();
         }
+
+        public ITokenProvider TokenProvider { get; set; }
     }
 }

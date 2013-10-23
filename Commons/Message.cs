@@ -20,16 +20,25 @@ namespace Dragon.Message
         IGameMessage SendingMessage { get; set; }
         void ResetMessages();
     }
-
-    
 }
 
 namespace Dragon
 {
     public delegate void SocketAsyncEventHandler(object sender, SocketAsyncEventArgs e);
 
+    public interface ITokenProvider
+    {
+        IAsyncUserToken NewAsyncUserToken();
+    }
+
+    public interface IAsyncUserToken
+    {
+        Socket Socket { get; set; }
+        byte[] SendingMessageByteArray();
+    }
+
     public interface INetworkManager
     {
-
+        ITokenProvider TokenProvider { get; set; }
     }
 }
