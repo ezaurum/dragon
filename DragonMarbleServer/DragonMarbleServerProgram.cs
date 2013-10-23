@@ -7,6 +7,7 @@ using Dragon.Server;
 using DragonMarble.Message;
 using GameUtils;
 using log4net;
+using log4net.Appender;
 using log4net.Config;
 
 namespace DragonMarble
@@ -28,6 +29,10 @@ namespace DragonMarble
             var server = new NetworkManager(
                 MaxConnection, BufferSize, QueueNumber,
                 new IPEndPoint(IPAddress.Any, Port));
+            server.OnAfterAccept += delegate(object sender, SocketAsyncEventArgs eventArgs)
+            {
+                Console.WriteLine("TTTTTTTTTTTTTTTTTTTT");
+            };
             server.Start();
 
             Console.ReadKey();

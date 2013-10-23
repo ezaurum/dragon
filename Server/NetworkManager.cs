@@ -6,33 +6,44 @@ using System.Threading;
 
 namespace Dragon.Server
 {
-    public class NetworkManager
+    
+    public class NetworkManager : INetworkManager
     {
-        private event EventHandler<SocketAsyncEventArgs> OnAfterIO;
-        private event EventHandler<SocketAsyncEventArgs> OnAfterAccept;
-        private event EventHandler<SocketAsyncEventArgs> OnAfterReceiveMessage;
-        private event EventHandler<SocketAsyncEventArgs> OnAfterSendMessage;
-        private event EventHandler<SocketAsyncEventArgs> OnAfterDisconnect;
+        private enum ManagerState
+        {
+            BeforeInitialized = 0,
+            InitializedFields = 100,
+            InitializedEventHandler,
+            InitializedHelperObjects,
+            Running = 1000
+        }
+        public event EventHandler<SocketAsyncEventArgs> OnAfterIO;
+        public event EventHandler<SocketAsyncEventArgs> OnAfterAccept;
+        public event EventHandler<SocketAsyncEventArgs> OnAfterReceive;
+        public event EventHandler<SocketAsyncEventArgs> OnAfterSend;
+        public event EventHandler<SocketAsyncEventArgs> OnAfterDisconnect;
 
         private const int OpsToPreAlloc = 2; // read, write (don't alloc buffer space for accepts)
         private static readonly ILog Logger = LogManager.GetLogger(typeof (MultiClientServer<>));
         private readonly int _backlog;
         // the maximum number of connections the sample is designed to handle simultaneously  
 
-        private readonly BufferManager _bufferManager;
+        private BufferManager _bufferManager;
         // represents a large reusable set of buffers for all socket operations 
 
         private readonly IPEndPoint _ipEndpoint;
-        private readonly ITokenProvider _tokenProvider;
 
-        private readonly Socket _listenSocket; // the socket used to listen for incoming connection requests 
-        private readonly Semaphore _maxNumberAcceptedClients;
+        private Socket _listenSocket; // the socket used to listen for incoming connection requests 
+        private Semaphore _maxNumberAcceptedClients;
         private readonly int _numConnections;
+        private readonly int _receiveBufferSize;
         // pool of reusable SocketAsyncEventArgs objects for write, read and accept socket operations
-        private readonly SocketAsyncEventArgsPool _readWritePool;
-        private readonly SocketAsyncEventArgsPool _acceptPool;
+        private SocketAsyncEventArgsPool _readPool;
+        private SocketAsyncEventArgsPool _writePool;
+        private SocketAsyncEventArgsPool _acceptPool;
         private int _numConnectedSockets; // the total number of clients connected to the server 
         private int _totalBytesRead; // counter of the total # bytes received by the server 
+        private ManagerState _state;
 
         // Create an uninitialized server instance.   
         // To start the server listening for connection requests 
@@ -42,39 +53,98 @@ namespace Dragon.Server
         // <param name="receiveBufferSize">buffer size to use for each socket I/O operation</param>
         public NetworkManager(int numConnections, int receiveBufferSize, int backlog, IPEndPoint ipEndpoint)
         {
+            //#0 initialize fields value
             _totalBytesRead = 0;
             _numConnectedSockets = 0;
             _numConnections = numConnections;
+            _receiveBufferSize = receiveBufferSize;
             _backlog = backlog;
             _ipEndpoint = ipEndpoint;
+            
+            _state = ManagerState.InitializedFields;
+        }
 
-            // allocate buffers such that the maximum number of sockets can have one outstanding read and  
-            //write posted to the socket simultaneously  
-            _bufferManager = new BufferManager(receiveBufferSize*numConnections*OpsToPreAlloc,
-                receiveBufferSize);
+        public void Init()
+        {
+            InitializeEventHandler();
+            InitializeHelperObject();
+        }
 
-            _readWritePool = new SocketAsyncEventArgsPool(
-                numConnections*OpsToPreAlloc, OnAfterIO, _bufferManager);
-
+        private void InitializeEventHandler()
+        {
+            //#1 initialize event handlers
             OnAfterAccept += ProcessAccept;
             OnAfterAccept += DefaultAfterAccept;
 
-            _acceptPool = new SocketAsyncEventArgsPool(numConnections, OnAfterAccept);
+            OnAfterReceive += DefaultAfterReceive;
+            OnAfterReceive += OnAfterIO;
 
-            _maxNumberAcceptedClients = new Semaphore(numConnections, numConnections);
+            OnAfterSend += DefaultAfterSend;
+            OnAfterSend += OnAfterIO;
+
+            OnAfterDisconnect = DefaultAfterDisconnect;
+            
+            _state = ManagerState.InitializedEventHandler;
+        }
+
+        private void InitializeHelperObject()
+        {
+            if ( ManagerState.InitializedEventHandler > _state)
+            {
+                throw new InvalidOperationException("Not initialized.");
+            }
+            
+            //#2 initialize helper objects, 
+            // event handlers should be initialized.
+            // allocate buffers such that the maximum number of sockets can have one outstanding read and  
+            //write posted to the socket simultaneously  
+            _bufferManager = new BufferManager(_receiveBufferSize*_numConnections*OpsToPreAlloc,
+                _receiveBufferSize);
+
+            _readPool = new SocketAsyncEventArgsPool(
+                _numConnections, OnAfterReceive, _bufferManager);
+
+            _writePool = new SocketAsyncEventArgsPool(
+                _numConnections, OnAfterSend, _bufferManager);
+
+            _acceptPool = new SocketAsyncEventArgsPool(_numConnections, OnAfterAccept);
+
+            _maxNumberAcceptedClients = new Semaphore(_numConnections, _numConnections);
 
             // create the socket which listens for incoming connections
             _listenSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
+            _state = ManagerState.InitializedHelperObjects;
         }
 
-        
+        private void DefaultAfterDisconnect(object sender, SocketAsyncEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void DefaultAfterSend(object sender, SocketAsyncEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void DefaultAfterReceive(object sender, SocketAsyncEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
 
         // Starts the server such that it is listening for  
         // incoming connection requests.     
         // 
         public void Start()
         {
+            if (ManagerState.InitializedHelperObjects >= _state)
+            {
+                Init();
+            }
+
+            _state = ManagerState.Running;
+
             _listenSocket.Bind(_ipEndpoint);
             // start the server with a listen backlog
             _listenSocket.Listen(_backlog);
@@ -87,13 +157,14 @@ namespace Dragon.Server
         private void StartAccept()
         {
             Logger.Debug("Start Accpet");
-            
+
             _maxNumberAcceptedClients.WaitOne();
 
-            SocketAsyncEventArgs acceptEventArg 
-                = _acceptPool.Count > 1 
-                ? _acceptPool.Pop() : _acceptPool.CreateNew(OnAfterAccept);
-            
+            SocketAsyncEventArgs acceptEventArg
+                = _acceptPool.Count > 1
+                    ? _acceptPool.Pop()
+                    : _acceptPool.CreateNew(OnAfterAccept);
+
             bool willRaiseEvent = _listenSocket.AcceptAsync(acceptEventArg);
             if (!willRaiseEvent)
             {
@@ -110,8 +181,10 @@ namespace Dragon.Server
         {
             if (Logger.IsDebugEnabled)
             {
-                Logger.DebugFormat("Accepted. {0}",sender.GetType());
+                Logger.DebugFormat("Accepted. {0}", sender.GetType());
             }
+
+            Interlocked.Add(ref _numConnectedSockets, 2);
 
             //socket must be cleared since the context object is being reused
             e.AcceptSocket = null;
@@ -126,10 +199,11 @@ namespace Dragon.Server
 
         private void ProcessAccept(object sender, SocketAsyncEventArgs e)
         {
-            Interlocked.Add(ref _numConnectedSockets, 2);
+
             if (Logger.IsDebugEnabled)
             {
-                Logger.DebugFormat("Client connection accepted. There are {0} clients connected to the server", _numConnectedSockets/2);
+                Logger.DebugFormat("Client connection accepted. There are {0} clients connected to the server",
+                    _numConnectedSockets/2);
             }
 
             if (Logger.IsDebugEnabled)
@@ -137,44 +211,13 @@ namespace Dragon.Server
                 Logger.DebugFormat("Process");
             }
 
-
-            // Get the socket for the accepted client connection and put it into the  
-            //ReadEventArg object user token
-            SocketAsyncEventArgs readEventArgs = _readWritePool.Pop();
-            SocketAsyncEventArgs writeEventArgs = _readWritePool.Pop();
-            
-            Socket acceptedSocket = e.AcceptSocket;
-            /*
-            IAsyncUserToken token = _tokenProvider.NewAsyncUserToken();
-
-            readEventArgs.UserToken = token;
-            writeEventArgs.UserToken = token;
-
-            token.Socket = acceptedSocket;*/
-
-            //OnAcceptConnection(this, writeEventArgs);
-
-            // As soon as the client is connected, post a receive to the connection 
-            bool willRaiseEvent = acceptedSocket.ReceiveAsync(readEventArgs);
-            if (!willRaiseEvent)
-            {
-                ProcessReceive(readEventArgs);
-            }
-
-            // As soon as the client is connected, post a send to the connection 
-            bool willRaiseEvent1 = acceptedSocket.SendAsync(writeEventArgs);
-            if (!willRaiseEvent1)
-            {
-                ProcessSend(writeEventArgs);
-            }
-
-            
         }
+        
 
         // This method is called whenever a receive or send operation is completed on a socket  
         // 
         // <param name="e">SocketAsyncEventArg associated with the completed receive operation</param>
-        private void IO_Completed(object sender, SocketAsyncEventArgs e)
+        private void AfterIO(object sender, SocketAsyncEventArgs e)
         {
             // determine which type of operation just completed and call the associated handler 
             switch (e.LastOperation)
@@ -294,7 +337,8 @@ namespace Dragon.Server
                 Interlocked.Decrement(ref _numConnectedSockets);
                 _maxNumberAcceptedClients.Release();
                 // Free the SocketAsyncEventArg so they can be reused by another client
-                _readWritePool.Push(e);
+                //TODO how to return object to pool?
+                _readPool.Push(e);
             }
         }
     }
