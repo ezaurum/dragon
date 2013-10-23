@@ -36,5 +36,13 @@
             PINK,
             SKY
         }
+		
+		public enum SPECIAL_STATE
+		{
+			NULL,
+			PRISON,
+			TRAVEL
+		}
+		
     }
 }

@@ -39,6 +39,8 @@ namespace DragonMarble
         public int tileIndex;
         public StageBuffInfo unitBuff;
         public UNIT_COLOR unitColor;
+		public SPECIAL_STATE specialState;
+		public int specialStateValue;
         public int usableLoanCount;
         public virtual IMessageProcessor<IDragonMarbleGameMessage> MessageProcessor { get; set; }
         public virtual IStageManager StageManager { get; set; }
