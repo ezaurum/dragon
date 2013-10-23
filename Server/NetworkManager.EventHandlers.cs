@@ -33,12 +33,12 @@ namespace Dragon.Server
 
         private void DefaultAfterSend(object sender, SocketAsyncEventArgs e)
         {
-            
+            WriteAsyncRecursive((Socket) sender, e);
         }
 
         private void DefaultAfterReceive(object sender, SocketAsyncEventArgs e)
         {
-            
+            ReadAsyncRecursive((Socket) sender, e);
         }
 
         // This method is the callback method associated with Socket.AcceptAsync  
@@ -81,6 +81,7 @@ namespace Dragon.Server
             if (!socket.ReceiveAsync(readArgs))
             {
                 OnAfterReceive(socket, readArgs);
+                
             }
         }
 
