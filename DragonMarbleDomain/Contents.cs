@@ -249,7 +249,14 @@ namespace DragonMarble
 
             GroupId = int.Parse(typeValue);
         }
-
+		
+		public static readonly char[] BUILDING = {
+			(char)1,
+			(char)2,
+			(char)4,
+			(char)8,
+			(char)16
+		};
         public List<Building> buildings;
 
         public int index;
@@ -427,6 +434,8 @@ namespace DragonMarble
             int price = 0;
             foreach (int i in buildingIndex)
             {
+				if ( i >= 4 ) return false;
+				if ( buildings[i].isBuilt )	return false;
                 price += buildings[i].buyPrice;
             }
 
@@ -448,7 +457,7 @@ namespace DragonMarble
 
         public bool BuyLandmark(StageUnitInfo unit)
         {
-            if (!buildings[4].isBuilt)
+            if ( isAbleToBuildLandmark )
             {
                 if (unit.AddGold(-buildings[4].buyPrice))
                 {
@@ -458,7 +467,19 @@ namespace DragonMarble
             }
             return false;
         }
-
+		public bool IsAbleToBuy(StageUnitInfo unit){
+			if ( type == TYPE.SIGHT || type == TYPE.CITY ){
+				if ( owner == null || owner.Equals( unit ) ){
+					foreach ( Building b in buildings ){
+						if ( !b.isBuilt ){
+							return true;
+						}
+					}
+				}
+			}
+			return false;
+		}
+		
         public bool TakeOver(StageUnitInfo unit)
         {
             int p = takeOverPrice;

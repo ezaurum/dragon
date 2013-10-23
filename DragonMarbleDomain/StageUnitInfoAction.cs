@@ -67,27 +67,29 @@ namespace DragonMarble
 					if (Dice.isDouble) {
 						if (Dice.rollCount > 2) {
 							yield return GoToPrison();
-							yield break;
+							break;
 						}
 
 						ActionRemined += 1;
 					}
                         
 					Go (Dice.resultSum);
-
-					var destinationGameAction = DestinationGameAction ();
-					if (null != destinationGameAction)
-						yield return destinationGameAction;
+					
+					foreach(var destinationGameAction in DestinationGameAction () ) {
+						if (null != destinationGameAction)
+							yield return destinationGameAction;
+					}
 
 					break;
 				}
-				DeactivateTurn ();
 			}
+			DeactivateTurn ();
 		}
 
 		private GameAction GoToPrison ()
 		{
-			Go (GameBoard.IndexOfPrison);
+			Prison();
+			//Go (Stage.TILE_INDEX_PRISON);
 			return new GameAction ()
             {
                 Actor = this,
@@ -96,60 +98,79 @@ namespace DragonMarble
             };
 		}
 		
-		private GameAction DestinationGameAction ()
+		private IEnumerable<GameAction> DestinationGameAction ()
 		{
 			StageTileInfo stageTile = Stage.Tiles [tileIndex];
-			switch (stageTile.type) {
+			switch ( stageTile.type ) {
 			case StageTileInfo.TYPE.CITY:
 			case StageTileInfo.TYPE.SIGHT:
-				if (stageTile.owner == null || stageTile.owner.Equals(this)) {
-					return new GameAction ()
+				if ( stageTile.IsAbleToBuy( this ) ) {
+					yield return new GameAction ()
+                    {
+                        Actor = this,
+                        Type = GameMessageType.BuyLandRequest,
+                        Message = new BuyLandRequestGameMessage
                         {
-                            Actor = this,
-                            Type = GameMessageType.BuyLandRequest,
-                            Message = new BuyLandRequestGameMessage
-                            {
-                                Actor = Id,
-                                ResponseLimit = 50000
-                            }
-                        };
+                            Actor = Id,
+                            ResponseLimit = 50000
+                        }
+                    };
+					IDragonMarbleGameMessage receivedMessage = ReceivedMessage;
+					switch (receivedMessage.MessageType) {
+					case GameMessageType.BuyLand:
+					{
+						if ( BuyLand(receivedMessage) != true ){
+							SelfBan();
+						}
+						
+						break;
+					}
+					}
+					
 				} else {
-
+					if ( !stageTile.IsSameOwner( this ) ){
+						if ( this.Pay( stageTile ) ){
+							yield return new GameAction ()
+	                        {
+	                            Actor = this,
+	                            Type = GameMessageType.PayFee,
+	                            Message = new PayFeeGameMessage
+	                            {
+	                                Actor = Id,
+									TileIndex = (char)stageTile.index
+	                            }
+	                        };
+						}
+						
+					}
 					
 				}
-				return null;
-
+				yield return null;
+				break;
 			default:
-				return null;
+				yield return null;
+				break;
 			}
 		}
 		
-		private void AI_BuyLand(StageTileInfo tile){
-			StageUnitInfo unit = this;
-			if ( tile.owner == null || tile.owner.Equals( unit ) ){
-				if ( tile.isAbleToBuildLandmark ){
-					tile.BuyLandmark(unit);
-				}else{
-					List<int> buildingIndex = new List<int>();
-					int totalPrice = 0;
-					for ( int i = 0; i < tile.buildings.Count; i++ ){
-						if ( i > unit.round || i >= 4 ) break;
-						
-						if ( !tile.buildings[i].isBuilt ){
-							if ( totalPrice + tile.buildings[i].buyPrice > unit.gold ){
-								break;
-							}
-							totalPrice += tile.buildings[i].buyPrice;
-							buildingIndex.Add( i );
-						}
-					}
-					if ( buildingIndex.Count > 0 ){
-						tile.Buy(unit, buildingIndex);
-					}
+		
+		private bool BuyLand(IDragonMarbleGameMessage receivedMessage){
+			BuyLandGameMessage msg = (BuyLandGameMessage) receivedMessage;
+			if ( msg.Buildings == StageTileInfo.BUILDING[4] ){
+				return Stage.Tiles[msg.TileIndex].BuyLandmark(this);
+			}
+			List<int> buildingIndex = new List<int>();
+			for ( int i = 0; i < 3; i++ ){
+				if ( StageTileInfo.BUILDING[i] == ( StageTileInfo.BUILDING[i] & msg.Buildings ) ){
+					buildingIndex.Add(i);
 				}
 			}
+			return Stage.Tiles[msg.TileIndex].Buy(this, buildingIndex);
 		}
 		
+		private void SelfBan(){
+			
+		}
 		
 	}
 }

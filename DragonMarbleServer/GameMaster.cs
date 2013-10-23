@@ -267,7 +267,7 @@ namespace DragonMarble
                     fees[i] = int.Parse(xElement.Attribute("Fee").Value.ToString());
                     sellPrices[i] = int.Parse(xElement.Attribute("SellPrice").Value.ToString());
                 }
-
+                
                 return new StageTileInfo(
                     int.Parse(c.Attribute("Index").Value.ToString()),
                     c.Attribute("Name").Value.ToString(),
