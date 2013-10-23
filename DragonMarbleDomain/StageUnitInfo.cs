@@ -25,6 +25,7 @@ namespace DragonMarble
             unitBuff = null;
             chanceCoupon = CHANCE_COUPON.NULL;
             usableLoanCount = 1;
+			isBankrupt = false;
             DiceId = 1;
             Dice = new StageDiceInfo();
         }
@@ -42,6 +43,7 @@ namespace DragonMarble
 		public SPECIAL_STATE specialState;
 		public int specialStateValue;
         public int usableLoanCount;
+		public bool isBankrupt;
         public virtual IMessageProcessor<IDragonMarbleGameMessage> MessageProcessor { get; set; }
         public virtual IStageManager StageManager { get; set; }
         public StageDiceInfo Dice { get; set; }
@@ -55,6 +57,7 @@ namespace DragonMarble
         public virtual IDragonMarbleGameMessage ReceivedMessage
         {
             get { return MessageProcessor.ReceivedMessage; }
+			internal set { MessageProcessor.ReceivedMessage = value; }
         }
 
         public virtual IDragonMarbleGameMessage SendingMessage

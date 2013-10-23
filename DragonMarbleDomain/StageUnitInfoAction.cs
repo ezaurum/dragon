@@ -3,6 +3,32 @@ using DragonMarble.Message;
 
 namespace DragonMarble
 {
+	public class AIStageUnitInfo : StageUnitInfo {
+		
+		 public override IDragonMarbleGameMessage ReceivedMessage
+        {
+            get { return MessageProcessor.ReceivedMessage; }
+        }
+
+        public override IDragonMarbleGameMessage SendingMessage
+        {
+            set { 
+				MessageProcessor.SendingMessage = value;
+				AIMessageProcess(value);
+			}
+        }
+		
+		private void AIMessageProcess(IDragonMarbleGameMessage message) {
+			switch ( message.MessageType ) {
+			case GameMessageType.ActivateTurn:
+				ReceivedMessage = new RollMoveDiceGameMessage() {
+					Actor = Id,
+					Pressed = RandomUtil.Next(0f, 1f)
+				};
+				break;
+			}
+		}
+	}
 	public partial class StageUnitInfo
 	{
 		public IDragonMarbleGameMessage ActivateTurn ()
@@ -76,7 +102,7 @@ namespace DragonMarble
 			switch (stageTile.type) {
 			case StageTileInfo.TYPE.CITY:
 			case StageTileInfo.TYPE.SIGHT:
-				if (stageTile.owner == null) {
+				if (stageTile.owner == null || stageTile.owner.Equals(this)) {
 					return new GameAction ()
                         {
                             Actor = this,
@@ -88,13 +114,8 @@ namespace DragonMarble
                             }
                         };
 				} else {
-					if ( stageTile.owner.Equals(this) ){
-						
-						
-					}else{
-						
-						
-					}
+
+					
 				}
 				return null;
 
@@ -102,5 +123,33 @@ namespace DragonMarble
 				return null;
 			}
 		}
+		
+		private void AI_BuyLand(StageTileInfo tile){
+			StageUnitInfo unit = this;
+			if ( tile.owner == null || tile.owner.Equals( unit ) ){
+				if ( tile.isAbleToBuildLandmark ){
+					tile.BuyLandmark(unit);
+				}else{
+					List<int> buildingIndex = new List<int>();
+					int totalPrice = 0;
+					for ( int i = 0; i < tile.buildings.Count; i++ ){
+						if ( i > unit.round || i >= 4 ) break;
+						
+						if ( !tile.buildings[i].isBuilt ){
+							if ( totalPrice + tile.buildings[i].buyPrice > unit.gold ){
+								break;
+							}
+							totalPrice += tile.buildings[i].buyPrice;
+							buildingIndex.Add( i );
+						}
+					}
+					if ( buildingIndex.Count > 0 ){
+						tile.Buy(unit, buildingIndex);
+					}
+				}
+			}
+		}
+		
+		
 	}
 }
