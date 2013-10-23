@@ -153,7 +153,11 @@ namespace DragonMarble
             tileIndex += step;
             if (tileIndex >= 32) tileIndex -= 32;
         }
-
+		private void Prison(){
+			specialState = StageUnitInfo.SPECIAL_STATE.PRISON;
+			specialStateValue = 0;
+		}
+		
         public bool Loan(int loanGold)
         {
             if (usableLoanCount > 0)
@@ -164,10 +168,9 @@ namespace DragonMarble
             }
             return false;
         }
-
-        public bool Pay(StageTileInfo tile)
-        {
-            int fee = tile.fee;
+		
+		public int CalculaterFee(StageTileInfo tile){
+			int fee = tile.fee;
             if (unitBuff != null)
             {
                 if (unitBuff.type == StageBuffInfo.TYPE.OVERCHARGE)
@@ -179,7 +182,11 @@ namespace DragonMarble
                     fee -= (fee*unitBuff.power/100);
                 }
             }
-
+			return fee;
+		}
+        public bool Pay(StageTileInfo tile)
+        {
+			int fee = CalculaterFee(tile);
             if (AddGold(-fee))
             {
                 tile.owner.AddGold(fee);
