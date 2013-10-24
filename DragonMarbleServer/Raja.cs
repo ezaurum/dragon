@@ -25,7 +25,6 @@ namespace DragonMarble
         public SocketAsyncEventArgs WriteArgs { get; set; }
         public bool IsDisposed { get; set; }
 
-
         public void Dispose()
         {
             Socket = null;

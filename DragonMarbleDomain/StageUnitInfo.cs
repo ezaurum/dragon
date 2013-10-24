@@ -57,7 +57,14 @@ namespace DragonMarble
         public virtual IDragonMarbleGameMessage ReceivedMessage
         {
             get { return MessageProcessor.ReceivedMessage; }
-			internal set { MessageProcessor.ReceivedMessage = value; }
+            set
+            {
+                foreach (var action in GameActions(value))
+                {
+                    StageManager.Notify(action.Message);
+                }
+                
+            }
         }
 
         public virtual IDragonMarbleGameMessage SendingMessage

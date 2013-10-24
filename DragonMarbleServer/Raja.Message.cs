@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Dragon;
 using Dragon.Message;
 using DragonMarble.Message;
@@ -7,8 +8,44 @@ namespace DragonMarble
 {
     public partial class Raja : IMessageProcessor<IDragonMarbleGameMessage>
     {
-        public IDragonMarbleGameMessage ReceivedMessage { get; set; }
-        public IGameMessage SendingMessage { get; set; }
+        private readonly Queue<IDragonMarbleGameMessage> _sendingMessages 
+            = new Queue<IDragonMarbleGameMessage>();
+
+        private readonly Queue<IDragonMarbleGameMessage> _receivedMessages
+            = new Queue<IDragonMarbleGameMessage>();
+
+        public IDragonMarbleGameMessage ReceivedMessage
+        {
+            get
+            {
+                return _receivedMessages.Dequeue();
+            }
+            set
+            {
+                _receivedMessages.Enqueue(value);
+                Unit.ReceivedMessage = value;
+            }
+        }
+
+        public IDragonMarbleGameMessage SendingMessage
+        {
+            get
+            {
+                return _sendingMessages.Dequeue();
+            }
+            set
+            {
+                _sendingMessages.Enqueue(value);
+
+                SendMessage(value);
+            } 
+        }
+
+        private void SendMessage(IDragonMarbleGameMessage m)
+        {
+            WriteArgs.SetBuffer(m.ToByteArray(), 0, m.Length);
+            NetworkManager.SendBytes(Socket, WriteArgs);
+        }
 
         public void ReceiveBytes(byte[] buffer, int offset, int bytesTransferred)
         {
@@ -18,11 +55,8 @@ namespace DragonMarble
                 var bytes = new byte[bytesTransferred];
                 Buffer.BlockCopy(buffer, offset, bytes, 0, bytesTransferred);
 
-                //TODO
-                //Console.WriteLine(GameMessageFactory.GetGameMessage(bytes).MessageType);
+                ReceivedMessage = GameMessageFactory.GetGameMessage(bytes);
 
-                WriteArgs.SetBuffer(bytes, 0, bytesTransferred);
-                NetworkManager.SendBytes(Socket, WriteArgs);
             }
             else if (messageLength > bytesTransferred)
             {

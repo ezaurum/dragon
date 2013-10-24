@@ -51,42 +51,52 @@ namespace DragonMarble
 
 		public IEnumerable<GameAction> Actions ()
 		{
-			for (ActionRemined = 1; ActionRemined > 0; ActionRemined--) {
-				//wait until player request a action
+			for (ActionRemined = 1; ActionRemined > 0; ActionRemined--)
+			{
+                //wait until player request a action
 				IDragonMarbleGameMessage receivedMessage = ReceivedMessage;
 
-				switch (receivedMessage.MessageType) {
-				case GameMessageType.RollMoveDice:
-					var rollMoveDiceGameMessage = (RollMoveDiceGameMessage)receivedMessage;
-
-					yield return Dice.RollAndGetResultGameAction(this
-                            , rollMoveDiceGameMessage.Pressed
-                            , rollMoveDiceGameMessage.Odd
-                            , rollMoveDiceGameMessage.Even);
-
-					if (Dice.isDouble) {
-						if (Dice.rollCount > 2) {
-							yield return GoToPrison();
-							break;
-						}
-
-						ActionRemined += 1;
-					}
-                        
-					Go (Dice.resultSum);
-					
-					foreach(var destinationGameAction in DestinationGameAction () ) {
-						if (null != destinationGameAction)
-							yield return destinationGameAction;
-					}
-
-					break;
-				}
+			    foreach (var gameAction in GameActions(receivedMessage)) yield return gameAction;
 			}
-			DeactivateTurn ();
+		    DeactivateTurn ();
 		}
 
-		private GameAction GoToPrison ()
+	    private IEnumerable<GameAction> GameActions(IDragonMarbleGameMessage receivedMessage)
+	    {
+	        switch (receivedMessage.MessageType)
+	        {
+	            case GameMessageType.RollMoveDice:
+	                var rollMoveDiceGameMessage = (RollMoveDiceGameMessage) receivedMessage;
+
+	                yield return Dice.RollAndGetResultGameAction(this
+	                    , rollMoveDiceGameMessage.Pressed
+	                    , rollMoveDiceGameMessage.Odd
+	                    , rollMoveDiceGameMessage.Even);
+
+	                if (Dice.isDouble)
+	                {
+	                    if (Dice.rollCount > 2)
+	                    {
+	                        yield return GoToPrison();
+	                        break;
+	                    }
+
+	                    ActionRemined += 1;
+	                }
+
+	                Go(Dice.resultSum);
+
+	                foreach (var destinationGameAction in DestinationGameAction())
+	                {
+	                    if (null != destinationGameAction)
+	                        yield return destinationGameAction;
+	                }
+
+	                break;
+	        }
+	    }
+
+	    private GameAction GoToPrison ()
 		{
 			Prison();
 			//Go (Stage.TILE_INDEX_PRISON);
