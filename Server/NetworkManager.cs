@@ -82,7 +82,7 @@ namespace Dragon.Server
                 _numConnections, OnAfterReceive, _bufferManager);
 
             _writePool = new SocketAsyncEventArgsPool(
-                _numConnections, OnAfterSend, _bufferManager);
+                _numConnections, OnAfterSend);
 
             _acceptPool = new SocketAsyncEventArgsPool(_numConnections, OnAfterAccept);
 
