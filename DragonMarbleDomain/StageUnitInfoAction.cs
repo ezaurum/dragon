@@ -63,6 +63,8 @@ namespace DragonMarble
 
 	    private IEnumerable<GameAction> GameActions(IDragonMarbleGameMessage receivedMessage)
 	    {
+	        if (!OwnTurn) yield break;
+
 	        switch (receivedMessage.MessageType)
 	        {
 	            case GameMessageType.RollMoveDice:
