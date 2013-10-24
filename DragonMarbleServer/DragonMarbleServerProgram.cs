@@ -26,11 +26,17 @@ namespace DragonMarble
         {
             InitGame();
 
+            TokenProvider tokenProvider = new TokenProvider();
+            tokenProvider.MessageProcess = new MessageProcessorProvier<IDragonMarbleGameMessage>
+            {
+                MessageFactoryMethod = GameMessageFactory.GetGameMessage
+            };
+
             var server = new NetworkManager(
                 MaxConnection, BufferSize, QueueNumber,
                 new IPEndPoint(IPAddress.Any, Port))
             {
-                TokenProvider = new TokenProvider()
+                TokenProvider = tokenProvider
             };
             server.OnAfterAccept += AddPlayer;
             
@@ -72,11 +78,7 @@ namespace DragonMarble
 
             gm = new GameMaster(tiles);
 
-            MessageProcessorProvier<IDragonMarbleGameMessage> messageProcessorProvier = new MessageProcessorProvier
-                <IDragonMarbleGameMessage>
-            {
-                MessageFactoryMethod = GameMessageFactory.GetGameMessage
-            };
+           
         }
     }
 
@@ -86,28 +88,7 @@ namespace DragonMarble
         {
             return new AsyncUserToken();
         }
-    }
 
-    internal class AsyncUserToken : IAsyncUserToken
-    {
-        public Socket Socket { get; set; }
-        public SocketAsyncEventArgs ReadArgs { get; set; }
-        public SocketAsyncEventArgs WriteArgs { get; set; }
-        public bool IsDisposed { get; set; }
-
-        public byte[] SendingMessageByteArray()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Dispose()
-        {
-            Socket = null;
-            ReadArgs.UserToken = null;
-            ReadArgs = null;
-            WriteArgs.UserToken = null;
-            WriteArgs = null;
-            IsDisposed = true;
-        }
+        public MessageProcessorProvier<IDragonMarbleGameMessage> MessageProcess { get; set; }
     }
 }

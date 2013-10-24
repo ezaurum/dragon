@@ -36,11 +36,14 @@ namespace Dragon
         Socket Socket { get; set; }
         SocketAsyncEventArgs ReadArgs { get; set; }
         SocketAsyncEventArgs WriteArgs { get; set; }
+        INetworkManager NetworkManager { get; set; }
         bool IsDisposed { get; set; }
+        void ReceiveBytes(byte[] buffer, int offset, int bytesTransferred);
     }
 
     public interface INetworkManager
     {
         ITokenProvider TokenProvider { get; set; }
+        void SendBytes(Socket socket, SocketAsyncEventArgs e);
     }
 }

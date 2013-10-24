@@ -7,6 +7,15 @@ namespace Dragon.Server
     {
         public ITokenProvider TokenProvider { get; set; }
 
+        public void SendBytes(Socket socket, SocketAsyncEventArgs e)
+        {
+            if (e.SocketError != SocketError.Success) return;
+            if (!socket.SendAsync(e))
+            {
+                OnAfterSend(socket, e);
+            }
+        }
+
         public event EventHandler<SocketAsyncEventArgs> OnAfterAccept;
         public event EventHandler<SocketAsyncEventArgs> OnAfterReceive;
         public event EventHandler<SocketAsyncEventArgs> OnAfterSend;
@@ -80,6 +89,15 @@ namespace Dragon.Server
 
         private void DefaultAfterReceive(object sender, SocketAsyncEventArgs e)
         {
+            if (e.BytesTransferred > 0)
+            {
+                if (Logger.IsDebugEnabled)
+                {
+                    Logger.DebugFormat("received {0} bytes",e.BytesTransferred);
+                }
+                IAsyncUserToken token = (IAsyncUserToken) e.UserToken;
+                token.ReceiveBytes(e.Buffer, e.Offset, e.BytesTransferred);
+            }
             ReadAsyncRecursive((Socket) sender, e);
         }
 
@@ -102,6 +120,7 @@ namespace Dragon.Server
             //set accepted socket in token
             IAsyncUserToken token = TokenProvider.NewAsyncUserToken();
             token.Socket = e.AcceptSocket;
+            token.NetworkManager = this;
 
             //set read write event args
             SocketAsyncEventArgs readArgs = _readPool.Pop();

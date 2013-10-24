@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using Dragon.Message;
@@ -10,7 +11,13 @@ namespace Dragon.Client
         public Socket Socket { get; set; }
         public SocketAsyncEventArgs ReadArgs { get; set; }
         public SocketAsyncEventArgs WriteArgs { get; set; }
+        public INetworkManager NetworkManager { get; set; }
         public bool IsDisposed { get; set; }
+        public void ReceiveBytes(byte[] buffer, int offset, int bytesTransferred)
+        {
+
+            throw new NotImplementedException();
+        }
 
         public void Dispose()
         {

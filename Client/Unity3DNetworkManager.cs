@@ -154,6 +154,10 @@ namespace Dragon.Client
         }
         
         public ITokenProvider TokenProvider { get; set; }
+        public void SendBytes(Socket socket, SocketAsyncEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public class ClientTokenProvider : ITokenProvider
