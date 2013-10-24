@@ -52,13 +52,11 @@ namespace DragonMarble
 		public IEnumerable<GameAction> Actions ()
 		{
 			for (ActionRemined = 1; ActionRemined > 0; ActionRemined--) {
-				//wait until player request a action
 				IDragonMarbleGameMessage receivedMessage = ReceivedMessage;
 
-				switch (receivedMessage.MessageType) {
-				case GameMessageType.RollMoveDice:
+				switch (specialState) {
+				case SPECIAL_STATE.NULL:
 					var rollMoveDiceGameMessage = (RollMoveDiceGameMessage)receivedMessage;
-
 					yield return Dice.RollAndGetResultGameAction(this
                             , rollMoveDiceGameMessage.Pressed
                             , rollMoveDiceGameMessage.Odd
@@ -66,36 +64,104 @@ namespace DragonMarble
 
 					if (Dice.isDouble) {
 						if (Dice.rollCount > 2) {
-							yield return GoToPrison();
+							Prison();
 							break;
 						}
-
 						ActionRemined += 1;
 					}
-                        
 					Go (Dice.resultSum);
-					
 					foreach(var destinationGameAction in DestinationGameAction () ) {
 						if (null != destinationGameAction)
 							yield return destinationGameAction;
 					}
-
 					break;
+					
+				case SPECIAL_STATE.PRISON:
+					PrisonActionGameMessage prisonActionMsg = (PrisonActionGameMessage) receivedMessage;
+					Dice.Roll();
+					//yield return Dice.RollAndGetResultGameAction(this, 0.5f, false, false);
+					bool escape = false;
+					switch ( prisonActionMsg.ActionIndex ){
+					case (char)StageUnitInfo.PRISON_ACTION.ROLL:
+						if ( Dice.isDouble ){
+							escape = true;
+						}else{
+							UpdatePrisonState();
+						}
+						break;
+					case (char)StageUnitInfo.PRISON_ACTION.PAY:
+						if ( AddGold( - GameBoard.PRISON_PRICE ) ){
+							if (Dice.isDouble) {
+								ActionRemined += 1;
+							}
+							escape = true;
+						}else{
+							SelfBan();
+						}
+						break;
+					case (char)StageUnitInfo.PRISON_ACTION.CARD:
+						if ( chanceCoupon == CHANCE_COUPON.ESCAPE_ISLAND ){
+							chanceCoupon = CHANCE_COUPON.NULL;
+							escape = true;
+						}else{
+							SelfBan();
+						}
+						break;
+					}
+					
+					yield return new GameAction ()
+                    {
+                        Actor = this,
+                        Type = GameMessageType.PrisonActionResult,
+                        Message = new PrisonActionResultGameMessage
+                        {
+                            Actor = Id,
+							EscapeResult = escape,
+                            EscapeType = prisonActionMsg.ActionIndex
+                        }
+                    };
+					yield return new GameAction ()
+                    {
+                        Actor = this,
+		                NeedOther = false,
+		                Type = GameMessageType.RollMoveDiceResult,
+		                Message = new RollMoveDiceResultGameMessage
+		                {
+		                    Actor = Id,
+		                    Dices = new List<char> { (char)Dice.result[0], (char)Dice.result[1] }
+		                }
+                    };
+					
+					
+					if ( escape ){
+						specialState = SPECIAL_STATE.NULL;
+						specialStateValue = 0;
+						Go (Dice.resultSum);
+						foreach(var destinationGameAction in DestinationGameAction () ) {
+							if (null != destinationGameAction)
+								yield return destinationGameAction;
+						}	
+					}
+					break;
+					
+				case SPECIAL_STATE.TRAVEL:
+					TravelActionGameMessage travelActionMsg = (TravelActionGameMessage) receivedMessage;
+					if ( tileIndex == travelActionMsg.TileIndex ){
+						SelfBan();
+					}else{
+						tileIndex = travelActionMsg.TileIndex;
+					}
+					Go (Dice.resultSum);
+					foreach(var destinationGameAction in DestinationGameAction () ) {
+						if (null != destinationGameAction)
+							yield return destinationGameAction;
+					}
+					
+					break;
+					
 				}
 			}
 			DeactivateTurn ();
-		}
-
-		private GameAction GoToPrison ()
-		{
-			Prison();
-			//Go (Stage.TILE_INDEX_PRISON);
-			return new GameAction ()
-            {
-                Actor = this,
-                Type = GameMessageType.ForceMoveToPrison,
-                Message = new ForceMoveToPrisonGameMessage ()
-            };
 		}
 		
 		private IEnumerable<GameAction> DestinationGameAction ()
@@ -116,19 +182,19 @@ namespace DragonMarble
                         }
                     };
 					IDragonMarbleGameMessage receivedMessage = ReceivedMessage;
-					switch (receivedMessage.MessageType) {
-					case GameMessageType.BuyLand:
-					{
-						if ( BuyLand(receivedMessage) != true ){
-							SelfBan();
-						}
+					if ( BuyLand(receivedMessage) ){
+						yield return new GameAction ()
+	                    {
+	                        Actor = this,
+	                        Type = GameMessageType.BuyLand,
+	                        Message = receivedMessage
+	                    };
 						
-						break;
+					}else{
+						SelfBan();
 					}
-					}
-					
 				} else {
-					if ( !stageTile.IsSameOwner( this ) ){
+					if ( stageTile.owner != null && !stageTile.IsSameOwner( this ) ){
 						if ( this.Pay( stageTile ) ){
 							yield return new GameAction ()
 	                        {
@@ -136,10 +202,59 @@ namespace DragonMarble
 	                            Type = GameMessageType.PayFee,
 	                            Message = new PayFeeGameMessage
 	                            {
-	                                Actor = Id,
-									TileIndex = (char)stageTile.index
+	                                Actor = Id
 	                            }
 	                        };
+						}
+						if ( stageTile.IsAbleToTakeover( this ) ){
+							yield return new GameAction ()
+	                        {
+	                            Actor = this,
+	                            Type = GameMessageType.TakeoverRequest,
+	                            Message = new TakeoverRequestGameMessage
+	                            {
+	                                Actor = Id
+	                            }
+	                        };
+							
+							IDragonMarbleGameMessage receivedMessage = ReceivedMessage;
+							if ( Takeover(receivedMessage) ){
+								yield return new GameAction ()
+			                    {
+			                        Actor = this,
+			                        Type = GameMessageType.Takeover,
+			                        Message = receivedMessage
+			                    };
+								
+								if ( stageTile.IsAbleToBuy( this ) ) {
+									yield return new GameAction ()
+				                    {
+				                        Actor = this,
+				                        Type = GameMessageType.BuyLandRequest,
+				                        Message = new BuyLandRequestGameMessage
+				                        {
+				                            Actor = Id,
+				                            ResponseLimit = 50000
+				                        }
+				                    };
+									receivedMessage = ReceivedMessage;
+									if ( BuyLand(receivedMessage) ){
+										yield return new GameAction ()
+					                    {
+					                        Actor = this,
+					                        Type = GameMessageType.BuyLand,
+					                        Message = receivedMessage
+					                    };
+										
+									}else{
+										SelfBan();
+									}
+								}
+							}else{
+								SelfBan();
+							}
+								
+								
 						}
 						
 					}
@@ -166,6 +281,14 @@ namespace DragonMarble
 				}
 			}
 			return Stage.Tiles[msg.TileIndex].Buy(this, buildingIndex);
+		}
+		
+		private bool Takeover(IDragonMarbleGameMessage receivedMessage){
+			TakeoverGameMessage msg = (TakeoverGameMessage) receivedMessage;
+			if ( msg.Takeover ) {
+				return Stage.Tiles[this.tileIndex].TakeOver( this );
+			}
+			return true;
 		}
 		
 		private void SelfBan(){

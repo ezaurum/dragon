@@ -70,8 +70,6 @@ RollMoveDiceResult :
           type : Char
           collection : List
           size : 2
-        - name : RollCount
-          type : Char
         - name : Actor
           type : Guid
           length : 16
@@ -195,6 +193,8 @@ PrisonActionResult :
   comment : action result in Prison
   fields :
     - name : EscapeResult
+      type : Boolean
+    - name : EscapeType
       type : Char
     - name : Actor
       type : Guid

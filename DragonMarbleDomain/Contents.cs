@@ -165,8 +165,7 @@ namespace DragonMarble
                 Message = new RollMoveDiceResultGameMessage
                 {
                     Actor = stageUnitInfo.Id,
-                    Dices = new List<char> { (char)result[0], (char)result[1] },
-                    RollCount = (char)rollCount,
+                    Dices = new List<char> { (char)result[0], (char)result[1] }
                 }
             };
         }
@@ -330,19 +329,14 @@ namespace DragonMarble
                 return p;
             }
         }
-        public int minBuyPrice
+        public int GetMinBuyPrice(StageUnitInfo unit)
         {
-            get
-            {
-                foreach (Building b in buildings)
-                {
-                    if (!b.isBuilt)
-                    {
-                        return b.buyPrice;
-                    }
-                }
-                return 0;
-            }
+			for ( int i = 0; i < buildings.Count; i++ ){
+				if ( i <= unit.round && buildings[i].isBuilt == false ){
+					return buildings[i].buyPrice;
+				}
+			}
+            return 0;
         }
 
 
@@ -432,7 +426,7 @@ namespace DragonMarble
         public bool Buy(StageUnitInfo unit, List<int> buildingIndex)
         {
             int price = 0;
-            foreach (int i in buildingIndex)
+			foreach (int i in buildingIndex)
             {
 				if ( i >= 4 ) return false;
 				if ( buildings[i].isBuilt )	return false;
@@ -470,11 +464,18 @@ namespace DragonMarble
 		public bool IsAbleToBuy(StageUnitInfo unit){
 			if ( type == TYPE.SIGHT || type == TYPE.CITY ){
 				if ( owner == null || owner.Equals( unit ) ){
-					foreach ( Building b in buildings ){
-						if ( !b.isBuilt ){
-							return true;
-						}
+					int minBuyPrice = GetMinBuyPrice( unit );
+					if ( minBuyPrice > 0 && minBuyPrice <= unit.gold ){
+						return true;
 					}
+				}
+			}
+			return false;
+		}
+		public bool IsAbleToTakeover(StageUnitInfo unit){
+			if ( type == TYPE.CITY && IsSameOwner( unit ) == false && buildings[4].isBuilt == false ){
+				if ( unit.gold >= this.takeOverPrice ){
+					return true;
 				}
 			}
 			return false;
