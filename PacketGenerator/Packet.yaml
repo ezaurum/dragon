@@ -63,9 +63,6 @@ RollMoveDice :
           length : 16
           options : [byte_param_constructor, to_byte_array, property]
 
-ForceMoveToPrison :
-    comment : 3더블
-
 RollMoveDiceResult :
     comment : 서버에서 주사위 굴리기 결과
     fields :
@@ -73,8 +70,6 @@ RollMoveDiceResult :
           type : Char
           collection : List
           size : 2
-        - name : RollCount
-          type : Char
         - name : Actor
           type : Guid
           length : 16
@@ -179,6 +174,38 @@ Takeover :
   fields :
     - name : Takeover
       type : Boolean
+    - name : Actor
+      type : Guid
+      length : 16
+      options : [byte_param_constructor, to_byte_array, property]
+
+PrisonAction :
+  comment : action in Prison
+  fields :
+    - name : ActionIndex
+      type : Char
+    - name : Actor
+      type : Guid
+      length : 16
+      options : [byte_param_constructor, to_byte_array, property]
+
+PrisonActionResult :
+  comment : action result in Prison
+  fields :
+    - name : EscapeResult
+      type : Boolean
+    - name : EscapeType
+      type : Char
+    - name : Actor
+      type : Guid
+      length : 16
+      options : [byte_param_constructor, to_byte_array, property]
+
+TravelAction :
+  comment : action in Travel
+  fields :
+    - name : TileIndex
+      type : Char
     - name : Actor
       type : Guid
       length : 16
