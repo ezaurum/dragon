@@ -42,8 +42,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AsyncUserToken.cs" />
-    <Compile Include="AsyncUserToken.Message.cs" />
+    <Compile Include="Raja.cs" />
+    <Compile Include="Raja.Message.cs" />
     <Compile Include="GameMaster.cs" />
     <Compile Include="DragonMarbleServerProgram.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

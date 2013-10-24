@@ -26,12 +26,12 @@ namespace Dragon
 {
     public delegate void SocketAsyncEventHandler(object sender, SocketAsyncEventArgs e);
 
-    public interface ITokenProvider
+    public interface IRajaProvider
     {
-        IAsyncUserToken NewAsyncUserToken();
+        IRaja NewInstance();
     }
 
-    public interface IAsyncUserToken : IDisposable
+    public interface IRaja : IDisposable
     {
         Socket Socket { get; set; }
         SocketAsyncEventArgs ReadArgs { get; set; }
@@ -43,7 +43,7 @@ namespace Dragon
 
     public interface INetworkManager
     {
-        ITokenProvider TokenProvider { get; set; }
+        IRajaProvider RajaProvider { get; set; }
         void SendBytes(Socket socket, SocketAsyncEventArgs e);
     }
 }

@@ -24,13 +24,13 @@ namespace DragonMarble
         {
             InitGame();
 
-            TokenProvider tokenProvider = new TokenProvider();
+            RajaProvider rajaProvider = new RajaProvider();
 
             var server = new NetworkManager(
                 MaxConnection, BufferSize, QueueNumber,
                 new IPEndPoint(IPAddress.Any, Port))
             {
-                TokenProvider = tokenProvider
+                RajaProvider = rajaProvider
             };
 
             server.OnAfterAccept += DoorMan.AddPlayer;
@@ -61,7 +61,7 @@ namespace DragonMarble
     {
         public static void AddPlayer(object sender, SocketAsyncEventArgs e)
         {
-            IAsyncUserToken token = (IAsyncUserToken) e.UserToken;
+            IRaja token = (IRaja) e.UserToken;
             InitializePlayerGameMessage m 
                 = (InitializePlayerGameMessage) GameMessageFactory.GetGameMessage(GameMessageType.InitializePlayer);
             m.PlayerId = Guid.NewGuid();
@@ -71,11 +71,11 @@ namespace DragonMarble
         }
     }
 
-    internal class TokenProvider : ITokenProvider
+    internal class RajaProvider : IRajaProvider
     {
-        public IAsyncUserToken NewAsyncUserToken()
+        public IRaja NewInstance()
         {
-            return new AsyncUserToken();
+            return new Raja();
         }
     }
 }

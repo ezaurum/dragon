@@ -4,7 +4,7 @@ using DragonMarble.Message;
 
 namespace DragonMarble
 {
-    public partial class AsyncUserToken
+    public partial class Raja : IMessageProcessor<IDragonMarbleGameMessage>
     {
         public IDragonMarbleGameMessage ReceivedMessage { get; set; }
         public IGameMessage SendingMessage { get; set; }

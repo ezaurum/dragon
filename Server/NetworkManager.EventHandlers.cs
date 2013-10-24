@@ -5,7 +5,7 @@ namespace Dragon.Server
 {
     public partial class NetworkManager
     {
-        public ITokenProvider TokenProvider { get; set; }
+        public IRajaProvider RajaProvider { get; set; }
 
         public void SendBytes(Socket socket, SocketAsyncEventArgs e)
         {
@@ -64,7 +64,7 @@ namespace Dragon.Server
                 Logger.DebugFormat("Lost connection : {0}", e.SocketError);
             }
             
-            IAsyncUserToken token = (IAsyncUserToken) e.UserToken;
+            IRaja token = (IRaja) e.UserToken;
 
             if (null == token)
                 return;
@@ -95,7 +95,7 @@ namespace Dragon.Server
                 {
                     Logger.DebugFormat("received {0} bytes",e.BytesTransferred);
                 }
-                IAsyncUserToken token = (IAsyncUserToken) e.UserToken;
+                IRaja token = (IRaja) e.UserToken;
                 token.ReceiveBytes(e.Buffer, e.Offset, e.BytesTransferred);
             }
             ReadAsyncRecursive((Socket) sender, e);
@@ -116,7 +116,7 @@ namespace Dragon.Server
             }
 
             //set accepted socket in token
-            IAsyncUserToken token = TokenProvider.NewAsyncUserToken();
+            IRaja token = RajaProvider.NewInstance();
             token.Socket = e.AcceptSocket;
             token.NetworkManager = this;
 

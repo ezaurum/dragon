@@ -6,7 +6,7 @@ using Dragon.Message;
 
 namespace Dragon.Client
 {
-    public class AsyncClientUserToken : IAsyncUserToken 
+    public class AsyncClientUserToken : IRaja 
     {   
         public Socket Socket { get; set; }
         public SocketAsyncEventArgs ReadArgs { get; set; }

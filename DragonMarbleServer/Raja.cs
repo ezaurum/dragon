@@ -1,13 +1,11 @@
 ﻿using System.Net.Sockets;
 using Dragon;
-using Dragon.Message;
-using DragonMarble.Message;
 
 namespace DragonMarble
 {
-    public partial class AsyncUserToken : IAsyncUserToken, IMessageProcessor<IDragonMarbleGameMessage>
+    public partial class Raja : IRaja
     {
-        public AsyncUserToken()
+        public Raja()
         {
             Unit = new StageUnitInfo {MessageProcessor = this};
         }
