@@ -8,6 +8,14 @@ namespace Dragon.Client
     public class AsyncClientUserToken : IAsyncUserToken 
     {   
         public Socket Socket { get; set; }
+        public SocketAsyncEventArgs ReadArgs { get; set; }
+        public SocketAsyncEventArgs WriteArgs { get; set; }
+        public bool IsDisposed { get; set; }
+
+        public void Dispose()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 
     public class SimpleAsyncClientUserToken : AsyncClientUserToken

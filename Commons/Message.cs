@@ -31,9 +31,12 @@ namespace Dragon
         IAsyncUserToken NewAsyncUserToken();
     }
 
-    public interface IAsyncUserToken
+    public interface IAsyncUserToken : IDisposable
     {
         Socket Socket { get; set; }
+        SocketAsyncEventArgs ReadArgs { get; set; }
+        SocketAsyncEventArgs WriteArgs { get; set; }
+        bool IsDisposed { get; set; }
     }
 
     public interface INetworkManager

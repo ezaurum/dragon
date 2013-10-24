@@ -15,7 +15,10 @@ namespace Dragon.Server
         private readonly Guid _id = Guid.NewGuid();
         public Guid Id { get { return _id; } }
         public Socket Socket { get; set; }
-        
+        public SocketAsyncEventArgs ReadArgs { get; set; }
+        public SocketAsyncEventArgs WriteArgs { get; set; }
+        public bool IsDisposed { get; set; }
+
         public byte[] SendingMessageByteArray()
         {
             return SendingMessage.ToByteArray();
@@ -89,6 +92,15 @@ namespace Dragon.Server
         
 
         public Func<byte[], T> MessageFactoryMethod { get; set; }
+        public void Dispose()
+        {
+            Socket = null;
+            ReadArgs.UserToken = null;
+            ReadArgs = null;
+            WriteArgs.UserToken = null;
+            WriteArgs = null;
+            IsDisposed = true;
+        }
     }
 
     public class MessageProcessorProvier<T> : ITokenProvider where T : IGameMessage
