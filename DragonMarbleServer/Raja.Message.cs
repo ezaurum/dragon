@@ -1,4 +1,5 @@
 ﻿using System;
+using Dragon;
 using Dragon.Message;
 using DragonMarble.Message;
 
@@ -42,6 +43,14 @@ namespace DragonMarble
         public byte[] SendingMessageByteArray()
         {
             throw new NotImplementedException();
+        }
+    }
+
+    public class RajaProvider : IRajaProvider
+    {
+        public IRaja NewInstance()
+        {
+            return new Raja();
         }
     }
 

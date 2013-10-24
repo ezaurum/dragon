@@ -26,7 +26,7 @@ namespace DragonMarble
         public const int TurnLimit = 30;
 
         private static readonly ILog Logger = LogManager.GetLogger(typeof (GameMaster));
-        private GameBoard Board { get; set; }
+        public GameBoard Board { get; set; }
         public List<StageUnitInfo> Players { get;set;}
         private readonly Dictionary<Int16, Guid> _orderCard = new Dictionary<short, Guid>();
         private GameState _state;

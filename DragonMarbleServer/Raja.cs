@@ -5,12 +5,19 @@ namespace DragonMarble
 {
     public partial class Raja : IRaja
     {
-        public Raja()
+        private StageUnitInfo _unit;
+        public StageUnitInfo Unit
         {
-            Unit = new StageUnitInfo {MessageProcessor = this};
+            get
+            {
+                return _unit;
+            }
+            set
+            {
+                _unit = value;
+                _unit.MessageProcessor = this;
+            } 
         }
-
-        public StageUnitInfo Unit { get; set; }
 
         public INetworkManager NetworkManager { get; set; }
         public Socket Socket { get; set; }

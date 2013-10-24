@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
-using Dragon;
 using Dragon.Server;
-using DragonMarble.Message;
 using GameUtils;
 using log4net;
 using log4net.Config;
@@ -19,11 +17,18 @@ namespace DragonMarble
         private const int BufferSize = 1024;
         private const int MaxConnection = 3000;
         private static readonly ILog Logger = LogManager.GetLogger(typeof(DragonMarbleServerProgram));
-
+        private static GameMaster gm;
         private static void Main(string[] args)
         {
-            InitGame();
+            XmlConfigurator.Configure(new FileInfo("log4net.xml"));
+            Logger.Debug("Start app.");
 
+            gm = new GameMaster();
+
+            List<StageTileInfo> tiles = XmlUtils.LoadXml(@"data_stage.xml", GameMaster.ParseTiles);
+
+            gm.Board = new GameBoard(tiles);
+            
             RajaProvider rajaProvider = new RajaProvider();
 
             var server = new NetworkManager(
@@ -33,49 +38,33 @@ namespace DragonMarble
                 RajaProvider = rajaProvider
             };
 
-            server.OnAfterAccept += DoorMan.AddPlayer;
+            server.OnAfterAccept += AddPlayer;
             
             server.Start();
 
             Console.ReadKey();
         }
 
-        
 
-
-        private static void InitGame()
-        {
-            XmlConfigurator.Configure(new FileInfo("log4net.xml"));
-
-            List<StageTileInfo> tiles = XmlUtils.LoadXml(@"data_stage.xml", GameMaster.ParseTiles);
-
-            Logger.Debug("Start app.");
-
-            //gm = new GameMaster(tiles);
-
-           
-        }
-    }
-
-    public class DoorMan
-    {
         public static void AddPlayer(object sender, SocketAsyncEventArgs e)
         {
-            IRaja token = (IRaja) e.UserToken;
-            InitializePlayerGameMessage m 
-                = (InitializePlayerGameMessage) GameMessageFactory.GetGameMessage(GameMessageType.InitializePlayer);
-            m.PlayerId = Guid.NewGuid();
-            m.Server = Guid.NewGuid();
-            token.WriteArgs.SetBuffer(m.ToByteArray(), 0, m.Length);
-            token.Socket.SendAsync(token.WriteArgs);
-        }
-    }
+            Raja token = (Raja)e.UserToken;
+            token.Unit = new StageUnitInfo
+            {
+                Id = Guid.NewGuid(),
+                Order = 0,
+                UnitColor = StageUnitInfo.UNIT_COLOR.BLUE,
+                CharacterId = 1,
+                Gold = 2000000
+            };
 
-    internal class RajaProvider : IRajaProvider
-    {
-        public IRaja NewInstance()
-        {
-            return new Raja();
+            gm.Join(token.Unit);
+
+            if (gm.IsGameStartable)
+            {
+                gm.StartGame();
+            }
         }
+
     }
 }
