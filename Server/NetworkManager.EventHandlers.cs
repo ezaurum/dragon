@@ -10,6 +10,7 @@ namespace Dragon.Server
         public event EventHandler<SocketAsyncEventArgs> OnAfterAccept;
         public event EventHandler<SocketAsyncEventArgs> OnAfterReceive;
         public event EventHandler<SocketAsyncEventArgs> OnAfterSend;
+        public event EventHandler<SocketAsyncEventArgs> OnAfterIO;
         public event EventHandler<SocketAsyncEventArgs> OnAfterDisconnect;
         
         private void InitializeEventHandler()
@@ -23,12 +24,37 @@ namespace Dragon.Server
             
             OnAfterDisconnect = DefaultAfterDisconnect;
 
+            OnAfterIO += DefaultAfterIO;
+
+            OnAfterAccept += OnAfterIO;
+
+            OnAfterReceive += OnAfterIO;
+
+            OnAfterSend += OnAfterIO;
+
             _state = ManagerState.InitializedEventHandler;
+        }
+
+        private void DefaultConnectionAliveCheck(SocketAsyncEventArgs e)
+        {
+            if (e.SocketError == SocketError.ConnectionReset)
+            {
+                OnAfterDisconnect(null, e);
+            }
         }
 
         private void DefaultAfterDisconnect(object sender, SocketAsyncEventArgs e)
         {
-            Logger.DebugFormat("Lost connection : {0}", e.SocketError);
+            CleanUpToken(e);
+        }
+
+        private void CleanUpToken(SocketAsyncEventArgs e)
+        {
+            if (Logger.IsDebugEnabled)
+            {
+                Logger.DebugFormat("Lost connection : {0}", e.SocketError);
+            }
+            
             IAsyncUserToken token = (IAsyncUserToken) e.UserToken;
 
             if (null == token)
@@ -49,28 +75,17 @@ namespace Dragon.Server
         //send doesn't need continuasly run
         private void DefaultAfterSend(object sender, SocketAsyncEventArgs e)
         {
-            if (e.SocketError == SocketError.ConnectionReset)
-            {
-                OnAfterDisconnect(sender, e);
-            }
-            else
-            {
-                Logger.DebugFormat("ERROR : {0}", e.SocketError);
-            }
+
         }
 
         private void DefaultAfterReceive(object sender, SocketAsyncEventArgs e)
         {
             ReadAsyncRecursive((Socket) sender, e);
-            if (e.SocketError == SocketError.ConnectionReset)
-            {
-                OnAfterDisconnect(sender, e);
-            }
-            else
-            {
-                Logger.DebugFormat("ERROR : {0}", e.SocketError);
-            }
+        }
 
+        private void DefaultAfterIO(object sender, SocketAsyncEventArgs e)
+        {
+            DefaultConnectionAliveCheck(e);
         }
 
         // This method is the callback method associated with Socket.AcceptAsync  
