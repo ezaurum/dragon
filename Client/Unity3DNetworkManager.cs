@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
-using System.Runtime.Remoting.Channels;
 using System.Threading;
 using Dragon.Message;
 
@@ -37,8 +36,8 @@ namespace Dragon.Client
             byte[] byteArray = gameMessage.ToByteArray();
 
             Console.WriteLine("send {0} bytes.", byteArray.Length);
-
-            byteArray.CopyTo(_writeEventArgs.Buffer, _writeEventArgs.Offset);
+            
+            _writeEventArgs.SetBuffer(byteArray, 0, byteArray.Length);
             try
             {
                 if (!_socket.SendAsync(_writeEventArgs))
