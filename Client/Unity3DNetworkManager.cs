@@ -47,7 +47,15 @@ namespace Dragon.Client
             }
             catch (InvalidOperationException e)
             {
+                if (typeof (ObjectDisposedException) == e.GetType())
+                {
+                    Reconnect();
+                }
                 Thread.Sleep(1);
+            }
+            catch (SocketException e)
+            {
+                Reconnect();
             }
         }
 
@@ -91,7 +99,6 @@ namespace Dragon.Client
             }
             _writeEventArgs = new SocketAsyncEventArgs();
             _writeEventArgs.Completed += OnAfterMessageSend;
-            _writeEventArgs.SetBuffer(new byte[1024], 0, 1024);
 
             //started
             _started = true;
@@ -142,6 +149,7 @@ namespace Dragon.Client
         public void Reconnect()
         {
             _socket.Disconnect(true);
+            Init();
             Connect();
         }
         
