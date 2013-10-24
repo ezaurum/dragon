@@ -54,6 +54,9 @@ namespace Dragon.Server
             _backlog = backlog;
             _ipEndpoint = ipEndpoint;
             
+            //
+            OnAfterAccept += InitToken;
+            
             _state = ManagerState.InitializedFields;
         }
 

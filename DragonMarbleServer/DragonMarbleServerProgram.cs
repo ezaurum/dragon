@@ -21,8 +21,6 @@ namespace DragonMarble
         private const int MaxConnection = 3000;
         private static readonly ILog Logger = LogManager.GetLogger(typeof(DragonMarbleServerProgram));
 
-        private static GameMaster gm;
-
         private static void Main(string[] args)
         {
             InitGame();
@@ -51,7 +49,7 @@ namespace DragonMarble
 
             Logger.Debug("Start app.");
 
-            gm = new GameMaster(tiles);
+            //gm = new GameMaster(tiles);
 
            
         }
@@ -63,7 +61,5 @@ namespace DragonMarble
         {
             return new AsyncUserToken();
         }
-
-        public IMessageProcessor<IDragonMarbleGameMessage> MessageProcess { get; set; }
     }
 }

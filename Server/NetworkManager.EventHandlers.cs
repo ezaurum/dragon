@@ -25,7 +25,7 @@ namespace Dragon.Server
         private void InitializeEventHandler()
         {
             //#1 initialize event handlers
-            OnAfterAccept += DefaultAfterAccept;
+            OnAfterAccept += ReturnToPoolAfterAccept;
             
             OnAfterReceive += DefaultAfterReceive;
             
@@ -106,11 +106,9 @@ namespace Dragon.Server
             DefaultConnectionAliveCheck(e);
         }
 
-        // This method is the callback method associated with Socket.AcceptAsync  
-        // operations and is invoked when an accept operation is complete 
-        // return accept event arg to pool
-        // 
-        private void DefaultAfterAccept(object sender, SocketAsyncEventArgs e)
+        
+         
+        private void InitToken(object sender, SocketAsyncEventArgs e)
         {
             if (Logger.IsDebugEnabled)
             {
@@ -130,11 +128,17 @@ namespace Dragon.Server
             SocketAsyncEventArgs writeArgs = _writePool.Pop();
             writeArgs.UserToken = token;
             token.WriteArgs = writeArgs;
-            
+
             //start read write
             ReadAsyncRecursive(token.Socket, readArgs);
-            
-            //socket must be cleared since the context object is being reused
+        }
+
+        // This method is the callback method associated with Socket.AcceptAsync  
+        // operations and is invoked when an accept operation is complete 
+        // return accept event arg to pool
+        private void ReturnToPoolAfterAccept(object sender, SocketAsyncEventArgs e)
+        {
+        //socket must be cleared since the context object is being reused
             e.AcceptSocket = null;
 
             _acceptPool.Push(e);
