@@ -470,10 +470,8 @@ namespace DragonMarble
 		public bool IsAbleToBuy(StageUnitInfo unit){
 			if ( type == TYPE.SIGHT || type == TYPE.CITY ){
 				if ( owner == null || owner.Equals( unit ) ){
-					foreach ( Building b in buildings ){
-						if ( !b.isBuilt ){
-							return true;
-						}
+					if ( minBuyPrice > 0 && minBuyPrice <= unit.gold ){
+						return true;
 					}
 				}
 			}
