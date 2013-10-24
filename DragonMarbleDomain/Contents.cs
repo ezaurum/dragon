@@ -69,6 +69,9 @@ namespace DragonMarble
 
     public class StageDiceInfo
     {
+
+        public static int diceCheat;
+
         public enum ROLL_TYPE
         {
             NORMAL,
@@ -129,6 +132,25 @@ namespace DragonMarble
             }
 
 
+            if (diceCheat >= 2)
+            {
+                result[0] = (char)1;
+                result[1] = (char)1;
+                diceCheat -= 2;
+                while (diceCheat > 0)
+                {
+                    diceCheat--;
+                    int r = new Random().Next(0, 2);
+                    if (result[r] == (char)6)
+                    {
+                        r++;
+                        if (r == 2) r = 0;
+                    }
+                    result[r]++;
+                }
+            }
+
+            
             if (result[0] == result[1])
             {
                 isDouble = true;
@@ -473,7 +495,7 @@ namespace DragonMarble
 			return false;
 		}
 		public bool IsAbleToTakeover(StageUnitInfo unit){
-			if ( type == TYPE.CITY && IsSameOwner( unit ) == false && buildings[4].isBuilt == false ){
+			if ( type == TYPE.CITY && owner != null && owner.Equals(unit) == false && buildings[4].isBuilt == false ){
 				if ( unit.gold >= this.takeOverPrice ){
 					return true;
 				}

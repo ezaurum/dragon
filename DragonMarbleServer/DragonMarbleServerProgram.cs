@@ -41,8 +41,20 @@ namespace DragonMarble
                 new IPEndPoint(IPAddress.Any, Port), messageProcessorProvier);
             server.OnAcceptConnection += AddPlayer;
             server.Start();
+            string readLine = "";
 
-            Console.ReadKey();
+            while (true)
+            {
+                readLine = Console.ReadLine();
+                int i = 0;
+                if (int.TryParse(readLine, out i))
+                {
+                    if (i > 1 && i < 13) StageDiceInfo.diceCheat = i;
+                }
+
+                if (readLine.Contains("Q") || readLine.Contains("q")) return;
+            }
+            
         }
 
         private static void AddPlayer(object sender, SocketAsyncEventArgs eventArgs)
