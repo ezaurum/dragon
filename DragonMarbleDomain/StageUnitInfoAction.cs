@@ -4,11 +4,6 @@ using DragonMarble.Message;
 namespace DragonMarble
 {
 	public class AIStageUnitInfo : StageUnitInfo {
-		
-		 public override IDragonMarbleGameMessage ReceivedMessage
-        {
-            get { return MessageProcessor.ReceivedMessage; }
-        }
 
         public override IDragonMarbleGameMessage SendingMessage
         {
@@ -49,8 +44,14 @@ namespace DragonMarble
 			Dice.Clear ();
 		}
 
+        public IEnumerable<IDragonMarbleGameMessage> GetMessageResult(IDragonMarbleGameMessage receivedMessage)
+	    {
+            if (!OwnTurn) yield break;
+	    }
+
 		public IEnumerable<GameAction> Actions ()
 		{
+
 			for (ActionRemined = 1; ActionRemined > 0; ActionRemined--) {
 				IDragonMarbleGameMessage receivedMessage = ReceivedMessage;
 
