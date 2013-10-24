@@ -153,7 +153,7 @@ namespace DragonMarble
             tileIndex += step;
             if (tileIndex >= 32) tileIndex -= 32;
         }
-		private void Prison(){
+		public void Prison(){
 			specialState = StageUnitInfo.SPECIAL_STATE.PRISON;
 			specialStateValue = 0;
 		}

@@ -119,16 +119,23 @@ namespace DragonMarble
 					switch (receivedMessage.MessageType) {
 					case GameMessageType.BuyLand:
 					{
-						if ( BuyLand(receivedMessage) != true ){
+						if ( BuyLand(receivedMessage) ){
+							yield return new GameAction ()
+		                    {
+		                        Actor = this,
+		                        Type = GameMessageType.BuyLand,
+		                        Message = receivedMessage
+		                    };
+							
+						}else{
 							SelfBan();
 						}
 						
 						break;
 					}
 					}
-					
 				} else {
-					if ( !stageTile.IsSameOwner( this ) ){
+					if ( stageTile.owner != null && !stageTile.IsSameOwner( this ) ){
 						if ( this.Pay( stageTile ) ){
 							yield return new GameAction ()
 	                        {
@@ -136,10 +143,34 @@ namespace DragonMarble
 	                            Type = GameMessageType.PayFee,
 	                            Message = new PayFeeGameMessage
 	                            {
-	                                Actor = Id,
-									TileIndex = (char)stageTile.index
+	                                Actor = Id
 	                            }
 	                        };
+						}
+						if ( stageTile.takeOverPrice <= this.gold ){
+							yield return new GameAction ()
+	                        {
+	                            Actor = this,
+	                            Type = GameMessageType.TakeoverRequest,
+	                            Message = new TakeoverRequestGameMessage
+	                            {
+	                                Actor = Id
+	                            }
+	                        };
+							
+							IDragonMarbleGameMessage receivedMessage = ReceivedMessage;
+							if ( Takeover(receivedMessage) ){
+								yield return new GameAction ()
+			                    {
+			                        Actor = this,
+			                        Type = GameMessageType.Takeover,
+			                        Message = receivedMessage
+			                    };
+							}else{
+								SelfBan();
+							}
+								
+								
 						}
 						
 					}
@@ -166,6 +197,14 @@ namespace DragonMarble
 				}
 			}
 			return Stage.Tiles[msg.TileIndex].Buy(this, buildingIndex);
+		}
+		
+		private bool Takeover(IDragonMarbleGameMessage receivedMessage){
+			TakeoverGameMessage msg = (TakeoverGameMessage) receivedMessage;
+			if ( msg.Takeover ) {
+				return Stage.Tiles[this.tileIndex].TakeOver( this );
+			}
+			return true;
 		}
 		
 		private void SelfBan(){

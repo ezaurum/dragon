@@ -161,8 +161,24 @@ BuyLand :
 PayFee :
   comment : pay fee
   fields :
-    - name : TileIndex
-      type : Char
+    - name : Actor
+      type : Guid
+      length : 16
+      options : [byte_param_constructor, to_byte_array, property]
+
+TakeoverRequest :
+  comment : takeover land available
+  fields :
+    - name : Actor
+      type : Guid
+      length : 16
+      options : [byte_param_constructor, to_byte_array, property]
+
+Takeover :
+  comment : takeover land
+  fields :
+    - name : Takeover
+      type : Boolean
     - name : Actor
       type : Guid
       length : 16
