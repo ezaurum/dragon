@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.Remoting.Channels;
+using System.Threading;
 using Dragon.Message;
 
 namespace Dragon.Client
@@ -37,10 +39,16 @@ namespace Dragon.Client
             Console.WriteLine("send {0} bytes.", byteArray.Length);
 
             byteArray.CopyTo(_writeEventArgs.Buffer, _writeEventArgs.Offset);
-            
-            if (!_socket.SendAsync(_writeEventArgs))
+            try
             {
-                Send_Completed(_writeEventArgs);
+                if (!_socket.SendAsync(_writeEventArgs))
+                {
+                    Send_Completed(_writeEventArgs);
+                }
+            }
+            catch (InvalidOperationException e)
+            {
+                Thread.Sleep(1);
             }
         }
 
