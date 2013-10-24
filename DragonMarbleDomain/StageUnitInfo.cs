@@ -157,6 +157,15 @@ namespace DragonMarble
 			specialState = StageUnitInfo.SPECIAL_STATE.PRISON;
 			specialStateValue = 0;
 		}
+		public void UpdatePrisonState(){
+			if ( specialState == StageUnitInfo.SPECIAL_STATE.PRISON ){
+				specialStateValue++;
+				if ( specialStateValue >= 3 ){
+					specialState = SPECIAL_STATE.NULL;
+					specialStateValue = 0;
+				}
+			}
+		}
 		
         public bool Loan(int loanGold)
         {
@@ -169,7 +178,7 @@ namespace DragonMarble
             return false;
         }
 		
-		public int CalculaterFee(StageTileInfo tile){
+		public int GetPayFee(StageTileInfo tile){
 			int fee = tile.fee;
             if (unitBuff != null)
             {
@@ -186,7 +195,7 @@ namespace DragonMarble
 		}
         public bool Pay(StageTileInfo tile)
         {
-			int fee = CalculaterFee(tile);
+			int fee = GetPayFee(tile);
             if (AddGold(-fee))
             {
                 tile.owner.AddGold(fee);

@@ -44,5 +44,12 @@
 			TRAVEL
 		}
 		
+		public enum PRISON_ACTION
+		{
+			ROLL = 0,
+			PAY,
+			CARD
+		}
+		
     }
 }

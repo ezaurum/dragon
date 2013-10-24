@@ -8,6 +8,11 @@ namespace DragonMarble
     {   
        	//public const int IndexOfPrison = 8;
 		
+		public const int SALARY = 200000;
+		public const int PRISON_PRICE = 300000;
+		public const int DONATE_MONEY = 200000;
+		public const int TAX_PERCENT = 5;
+		
 		public int TILE_INDEX_PRISON;
 		public int TILE_INDEX_TRAVEL;
 		public int TILE_INDEX_IOC;
@@ -40,22 +45,6 @@ namespace DragonMarble
                 
                 citiesAndSight.FeeBoosted = true;
                 FeeBoostedTiles.Add(citiesAndSight.Position);
-            }
-
-
-            foreach (StageTileInfo citiesAndSight in citiesAndSights)
-            {
-                if (StageTileInfo.TYPE.OLYMPIC == citiesAndSight.Type)
-                {
-                    TILE_INDEX_IOC = citiesAndSight.index;
-                }
-                else if (StageTileInfo.TYPE.PRISON == citiesAndSight.Type)
-                {
-                    TILE_INDEX_PRISON = citiesAndSight.index;
-                } else if (StageTileInfo.TYPE.TRAVEL == citiesAndSight.Type )
-                {
-                    TILE_INDEX_TRAVEL = citiesAndSight.index;
-                }
             }
         }
 
