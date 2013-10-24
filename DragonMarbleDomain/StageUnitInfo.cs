@@ -59,11 +59,14 @@ namespace DragonMarble
             get { return MessageProcessor.ReceivedMessage; }
             set
             {
-                foreach (var messages in GetMessageResult(value))
+                if (!OwnTurn)
                 {
-                    StageManager.Notify(messages);
+                    foreach (var messages in GetMessageResult(value))
+                    {
+                        StageManager.Notify(messages);
+                    }
+                    
                 }
-                
             }
         }
 
