@@ -4,6 +4,7 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using Dragon;
+using Dragon.Message;
 using Dragon.Server;
 using DragonMarble.Message;
 using GameUtils;
@@ -27,10 +28,6 @@ namespace DragonMarble
             InitGame();
 
             TokenProvider tokenProvider = new TokenProvider();
-            tokenProvider.MessageProcess = new MessageProcessorProvier<IDragonMarbleGameMessage>
-            {
-                MessageFactoryMethod = GameMessageFactory.GetGameMessage
-            };
 
             var server = new NetworkManager(
                 MaxConnection, BufferSize, QueueNumber,
@@ -38,35 +35,13 @@ namespace DragonMarble
             {
                 TokenProvider = tokenProvider
             };
-            server.OnAfterAccept += AddPlayer;
             
             server.Start();
 
             Console.ReadKey();
         }
 
-        private static void AddPlayer(object sender, SocketAsyncEventArgs eventArgs)
-        {
-            Logger.Debug("connectecd.");
-            QueuedMessageProcessor<IDragonMarbleGameMessage> token = (QueuedMessageProcessor<IDragonMarbleGameMessage>)eventArgs.UserToken;
-            
-            StageUnitInfo player = new StageUnitInfo
-            {
-                Id = Guid.NewGuid(),
-                MessageProcessor = token,
-                Order = 0,
-                UnitColor = StageUnitInfo.UNIT_COLOR.BLUE,
-                CharacterId = 1,
-                Gold = 2000000
-            };
-            
-         /*  gm.Join(player);
-
-            if (gm.IsGameStartable)
-            {
-                gm.StartGame();
-            }*/
-        }
+        
 
         private static void InitGame()
         {
@@ -89,6 +64,6 @@ namespace DragonMarble
             return new AsyncUserToken();
         }
 
-        public MessageProcessorProvier<IDragonMarbleGameMessage> MessageProcess { get; set; }
+        public IMessageProcessor<IDragonMarbleGameMessage> MessageProcess { get; set; }
     }
 }

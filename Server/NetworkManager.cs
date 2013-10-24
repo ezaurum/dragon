@@ -36,7 +36,7 @@ namespace Dragon.Server
         private SocketAsyncEventArgsPool _writePool;
         private SocketAsyncEventArgsPool _acceptPool;
         private int _numConnectedSockets; // the total number of clients connected to the server 
-        private int _totalBytesRead; // counter of the total # bytes received by the server 
+        
         private ManagerState _state = ManagerState.BeforeInitialized;
 
         // Create an uninitialized server instance.   
@@ -48,7 +48,6 @@ namespace Dragon.Server
         public NetworkManager(int numConnections, int receiveBufferSize, int backlog, IPEndPoint ipEndpoint)
         {
             //#0 initialize fields value
-            _totalBytesRead = 0;
             _numConnectedSockets = 0;
             _numConnections = numConnections;
             _receiveBufferSize = receiveBufferSize;
