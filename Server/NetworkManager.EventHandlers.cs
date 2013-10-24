@@ -111,13 +111,10 @@ namespace Dragon.Server
 
         private void ReadAsyncRecursive(Socket socket, SocketAsyncEventArgs readArgs)
         {
-            if (readArgs.SocketError == SocketError.Success)
+            if (readArgs.SocketError != SocketError.Success) return;
+            if (!socket.ReceiveAsync(readArgs))
             {
-                if (!socket.ReceiveAsync(readArgs))
-                {
-                    OnAfterReceive(socket, readArgs);
-
-                }
+                OnAfterReceive(socket, readArgs);
             }
         }
     }
