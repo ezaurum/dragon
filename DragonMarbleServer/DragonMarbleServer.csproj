@@ -43,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AsyncUserToken.cs" />
+    <Compile Include="AsyncUserToken.Message.cs" />
     <Compile Include="GameMaster.cs" />
     <Compile Include="DragonMarbleServerProgram.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
