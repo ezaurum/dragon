@@ -120,6 +120,8 @@ namespace Dragon.Server
             token.Socket = e.AcceptSocket;
             token.NetworkManager = this;
 
+            e.UserToken = token;
+
             //set read write event args
             SocketAsyncEventArgs readArgs = _readPool.Pop();
             readArgs.UserToken = token;
@@ -140,6 +142,7 @@ namespace Dragon.Server
         {
         //socket must be cleared since the context object is being reused
             e.AcceptSocket = null;
+            e.UserToken = null;
 
             _acceptPool.Push(e);
 

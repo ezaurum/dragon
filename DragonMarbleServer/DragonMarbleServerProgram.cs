@@ -4,7 +4,6 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using Dragon;
-using Dragon.Message;
 using Dragon.Server;
 using DragonMarble.Message;
 using GameUtils;
@@ -33,6 +32,8 @@ namespace DragonMarble
             {
                 TokenProvider = tokenProvider
             };
+
+            server.OnAfterAccept += DoorMan.AddPlayer;
             
             server.Start();
 
@@ -40,6 +41,7 @@ namespace DragonMarble
         }
 
         
+
 
         private static void InitGame()
         {
@@ -52,6 +54,20 @@ namespace DragonMarble
             //gm = new GameMaster(tiles);
 
            
+        }
+    }
+
+    public class DoorMan
+    {
+        public static void AddPlayer(object sender, SocketAsyncEventArgs e)
+        {
+            IAsyncUserToken token = (IAsyncUserToken) e.UserToken;
+            InitializePlayerGameMessage m 
+                = (InitializePlayerGameMessage) GameMessageFactory.GetGameMessage(GameMessageType.InitializePlayer);
+            m.PlayerId = Guid.NewGuid();
+            m.Server = Guid.NewGuid();
+            token.WriteArgs.SetBuffer(m.ToByteArray(), 0, m.Length);
+            token.Socket.SendAsync(token.WriteArgs);
         }
     }
 
