@@ -78,18 +78,45 @@ namespace Dragon.Server
 
         private void ReadAsyncRecursive(Socket socket, SocketAsyncEventArgs readArgs)
         {
-            if (!socket.ReceiveAsync(readArgs))
+            if (readArgs.SocketError == SocketError.Success)
             {
-                OnAfterReceive(socket, readArgs);
-                
+                if (!socket.ReceiveAsync(readArgs))
+                {
+                    OnAfterReceive(socket, readArgs);
+
+                }
             }
+            else if (readArgs.SocketError == SocketError.ConnectionReset)
+            {
+                Logger.DebugFormat("Lost connection : {0}", readArgs.SocketError);
+                readArgs.UserToken = null;
+                _readPool.Push(readArgs);
+            }
+            else
+            {
+                Logger.DebugFormat("ERROR : {0}",readArgs.SocketError);
+            }
+            
         }
 
         private void WriteAsyncRecursive(Socket socket, SocketAsyncEventArgs writeArgs)
         {
-            if (!socket.SendAsync(writeArgs))
+            if (writeArgs.SocketError == SocketError.Success)
             {
-                OnAfterSend(socket, writeArgs);
+                if (!socket.SendAsync(writeArgs))
+                {
+                    OnAfterSend(socket, writeArgs);
+                }
+            }
+            else if (writeArgs.SocketError == SocketError.ConnectionReset)
+            {
+                Logger.DebugFormat("Lost connection : {0}", writeArgs.SocketError);
+                writeArgs.UserToken = null;
+                _writePool.Push(writeArgs);
+            }
+            else
+            {
+                Logger.DebugFormat("ERROR : {0}", writeArgs.SocketError);
             }
         }
     }
