@@ -166,15 +166,19 @@ namespace DragonMarble
             if (tileIndex >= 32) tileIndex -= 32;
         }
 		public void Prison(){
-			specialState = StageUnitInfo.SPECIAL_STATE.PRISON;
+			specialState = SPECIAL_STATE.PRISON;
 			specialStateValue = 0;
 		}
+		public void Travel(){
+			specialState = SPECIAL_STATE.TRAVEL;
+			specialStateValue = 0;
+		}
+		
 		public void UpdatePrisonState(){
-			if ( specialState == StageUnitInfo.SPECIAL_STATE.PRISON ){
+			if ( specialState == SPECIAL_STATE.PRISON ){
 				specialStateValue++;
-				if ( specialStateValue >= 3 )
-				{
-				    specialState = SPECIAL_STATE.NONE;
+				if ( specialStateValue >= 3 ){
+					specialState = SPECIAL_STATE.NONE;
 					specialStateValue = 0;
 				}
 			}
