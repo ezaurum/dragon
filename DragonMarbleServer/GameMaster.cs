@@ -72,8 +72,7 @@ namespace DragonMarble
             InitGame();
             SendOrderCardSelectMessage();
             EndOrder();
-            
-            Task.Factory.StartNew(PlayGame);
+            PlayGame();
         }
 
         private void InitGame()

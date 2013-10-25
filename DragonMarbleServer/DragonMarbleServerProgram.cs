@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 using Dragon.Server;
 using GameUtils;
 using log4net;
@@ -62,7 +63,7 @@ namespace DragonMarble
 
             if (gm.IsGameStartable)
             {
-                gm.StartGame();
+                Task.Factory.StartNew(gm.StartGame);
             }
         }
 

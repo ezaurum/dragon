@@ -39,6 +39,7 @@ namespace Dragon.Client
             
             _writeEventArgs.SetBuffer(byteArray, 0, byteArray.Length);
             try
+
             {
                 if (!_socket.SendAsync(_writeEventArgs))
                 {

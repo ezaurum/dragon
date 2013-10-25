@@ -56,7 +56,7 @@ namespace DragonMarble
 				IDragonMarbleGameMessage receivedMessage = ReceivedMessage;
 
 				switch (specialState) {
-				case SPECIAL_STATE.NULL:
+				case SPECIAL_STATE.NONE:
 					var rollMoveDiceGameMessage = (RollMoveDiceGameMessage)receivedMessage;
 					yield return Dice.RollAndGetResultGameAction(this
                             , rollMoveDiceGameMessage.Pressed
@@ -102,7 +102,7 @@ namespace DragonMarble
 						break;
 					case (char)StageUnitInfo.PRISON_ACTION.CARD:
 						if ( chanceCoupon == CHANCE_COUPON.ESCAPE_ISLAND ){
-							chanceCoupon = CHANCE_COUPON.NULL;
+							chanceCoupon = CHANCE_COUPON.NONE;
 							escape = true;
 						}else{
 							SelfBan();
@@ -135,7 +135,7 @@ namespace DragonMarble
 					
 					
 					if ( escape ){
-						specialState = SPECIAL_STATE.NULL;
+						specialState = SPECIAL_STATE.NONE;
 						specialStateValue = 0;
 						Go (Dice.resultSum);
 						foreach(var destinationGameAction in DestinationGameAction () ) {

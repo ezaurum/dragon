@@ -1,10 +1,13 @@
 ﻿using System.Net.Sockets;
 using Dragon;
+using log4net;
 
 namespace DragonMarble
 {
     public partial class Raja : IRaja
     {
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(Raja));
+
         private StageUnitInfo _unit;
         public StageUnitInfo Unit
         {

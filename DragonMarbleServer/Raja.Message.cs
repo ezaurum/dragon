@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Dragon;
 using Dragon.Message;
 using DragonMarble.Message;
@@ -14,16 +15,36 @@ namespace DragonMarble
         private readonly Queue<IDragonMarbleGameMessage> _receivedMessages
             = new Queue<IDragonMarbleGameMessage>();
 
+        public event ReceivedMessageEventHandler ReceivedMessageCompleted;
+
+        public delegate void ReceivedMessageEventHandler(object sender, ReceivedMessageEventHandlerArgs args);
+
+        public class ReceivedMessageEventHandlerArgs : EventArgs
+        {
+
+        }
+
         public IDragonMarbleGameMessage ReceivedMessage
         {
             get
             {
+                if (_receivedMessages.Count < 1)
+                {
+                    //TODO is this ok?
+                    Task.WaitAll(new Task(() =>
+                    {
+                        while (_receivedMessages.Count < 1)
+                        {
+                        }}));
+                }
+
                 return _receivedMessages.Dequeue();
             }
             set
             {
                 _receivedMessages.Enqueue(value);
                 Unit.ReceivedMessage = value;
+                Logger.DebugFormat("received message {0}",value.MessageType);
             }
         }
 
@@ -31,6 +52,16 @@ namespace DragonMarble
         {
             get
             {
+                if (_sendingMessages.Count < 1)
+                {
+                    //TODO is this ok?
+                    Task.WaitAll(new Task(() =>
+                    {
+                        while (_receivedMessages.Count < 1)
+                        {
+                        }
+                    }));
+                }
                 return _sendingMessages.Dequeue();
             }
             set
@@ -79,6 +110,8 @@ namespace DragonMarble
             throw new NotImplementedException();
         }
     }
+
+    
 
     public class RajaProvider : IRajaProvider
     {

@@ -23,11 +23,12 @@ namespace DragonMarble
             tileIndex = 0;
             lands = new Dictionary<int, StageTileInfo>();
             unitBuff = null;
-            chanceCoupon = CHANCE_COUPON.NULL;
+            chanceCoupon = CHANCE_COUPON.NONE;
             usableLoanCount = 1;
 			isBankrupt = false;
             DiceId = 1;
             Dice = new StageDiceInfo();
+            specialState = SPECIAL_STATE.NONE;
         }
 
         public Guid Id { get; set; }
@@ -61,6 +62,7 @@ namespace DragonMarble
             {
                 if (!OwnTurn)
                 {
+
                     foreach (var messages in GetMessageResult(value))
                     {
                         StageManager.Notify(messages);
@@ -170,8 +172,9 @@ namespace DragonMarble
 		public void UpdatePrisonState(){
 			if ( specialState == StageUnitInfo.SPECIAL_STATE.PRISON ){
 				specialStateValue++;
-				if ( specialStateValue >= 3 ){
-					specialState = SPECIAL_STATE.NULL;
+				if ( specialStateValue >= 3 )
+				{
+				    specialState = SPECIAL_STATE.NONE;
 					specialStateValue = 0;
 				}
 			}
