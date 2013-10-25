@@ -9,6 +9,7 @@ namespace Dragon.Server
 
         public void SendBytes(Socket socket, SocketAsyncEventArgs e)
         {
+            Logger.DebugFormat("WTF? {0}", e.SocketError);
             if (e.SocketError != SocketError.Success) return;
             if (!socket.SendAsync(e))
             {
@@ -84,7 +85,7 @@ namespace Dragon.Server
         //send doesn't need continuasly run
         private void DefaultAfterSend(object sender, SocketAsyncEventArgs e)
         {
-
+            Logger.DebugFormat("Sended.");
         }
 
         private void DefaultAfterReceive(object sender, SocketAsyncEventArgs e)
