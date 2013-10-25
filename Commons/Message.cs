@@ -17,7 +17,7 @@ namespace Dragon.Message
     public interface IMessageProcessor<T> where T : IGameMessage
     {
         T ReceivedMessage { get; set; }
-        T SendingMessage { get; set; }
+        T SendingMessage { set; }
         void ResetMessages();
     }
 }
