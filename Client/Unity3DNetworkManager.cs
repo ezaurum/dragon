@@ -37,10 +37,9 @@ namespace Dragon.Client
 
             Console.WriteLine("send {0} bytes.", byteArray.Length);
             
-            _writeEventArgs.SetBuffer(byteArray, 0, byteArray.Length);
             try
-
             {
+                _writeEventArgs.SetBuffer(byteArray, 0, byteArray.Length);
                 if (!_socket.SendAsync(_writeEventArgs))
                 {
                     Send_Completed(_writeEventArgs);
@@ -50,13 +49,13 @@ namespace Dragon.Client
             {
                 if (typeof (ObjectDisposedException) == e.GetType())
                 {
-                    Reconnect();
+                  //  Reconnect();
                 }
                 Thread.Sleep(1);
             }
             catch (SocketException e)
             {
-                Reconnect();
+                //Reconnect();
             }
         }
 
