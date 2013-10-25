@@ -4,7 +4,7 @@
     {
         public enum CHANCE_COUPON
         {
-            NULL,
+            NONE,
             DISCOUNT_50,
             ESCAPE_ISLAND,
             SHIELD,
@@ -39,7 +39,7 @@
 		
 		public enum SPECIAL_STATE
 		{
-			NULL,
+			NONE,
 			PRISON,
 			TRAVEL
 		}
