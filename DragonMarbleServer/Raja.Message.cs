@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using System.Threading;
 using Dragon;
 using Dragon.Message;
 using DragonMarble.Message;
@@ -9,73 +9,71 @@ namespace DragonMarble
 {
     public partial class Raja : IMessageProcessor<IDragonMarbleGameMessage>
     {
-        private readonly Queue<IDragonMarbleGameMessage> _sendingMessages 
-            = new Queue<IDragonMarbleGameMessage>();
+        private readonly EventWaitHandle _receiveMessageWaitHandler = new ManualResetEvent(false);
 
         private readonly Queue<IDragonMarbleGameMessage> _receivedMessages
             = new Queue<IDragonMarbleGameMessage>();
 
-        public event ReceivedMessageEventHandler ReceivedMessageCompleted;
-
-        public delegate void ReceivedMessageEventHandler(object sender, ReceivedMessageEventHandlerArgs args);
-
-        public class ReceivedMessageEventHandlerArgs : EventArgs
+        public IEnumerable<IDragonMarbleGameMessage> ReceivedMessages
         {
-
+            set
+            {
+                foreach (IDragonMarbleGameMessage gameMessage in value)
+                {
+                    ReceivedMessage = gameMessage;
+                }
+            }
         }
 
-        public IDragonMarbleGameMessage ReceivedMessage
+        public virtual IDragonMarbleGameMessage ReceivedMessage
         {
             get
             {
                 if (_receivedMessages.Count < 1)
                 {
-                    //TODO is this ok?
-                    Task.WaitAll(new Task(() =>
-                    {
-                        while (_receivedMessages.Count < 1)
-                        {
-                        }}));
+                    _receiveMessageWaitHandler.Reset();
+                    Logger.Debug("no message in queue. wait for message");
                 }
-
+                Logger.DebugFormat("Start waiting. {0}", _receivedMessages.Count);
+                _receiveMessageWaitHandler.WaitOne();
+                Logger.Debug("Deque.");
                 return _receivedMessages.Dequeue();
             }
             set
             {
-                _receivedMessages.Enqueue(value);
-                Unit.ReceivedMessage = value;
-                Logger.DebugFormat("received message {0}",value.MessageType);
+                switch (value.MessageType)
+                {
+                    case GameMessageType.OrderCardSelect:
+                        Unit.ReceivedMessage = value;
+                        Logger.DebugFormat("received {0}, real time.", value.MessageType, _receivedMessages.Count);
+                        break;
+
+                    default:
+                        _receivedMessages.Enqueue(value);
+                        _receiveMessageWaitHandler.Set();
+                        if (Logger.IsDebugEnabled)
+                        {
+                            Logger.DebugFormat("received {0}, It's 1 of {1} queue messages.", value.MessageType,
+                                _receivedMessages.Count);
+                        }
+                        break;
+                }
             }
         }
 
         public IDragonMarbleGameMessage SendingMessage
         {
-            get
-            {
-                if (_sendingMessages.Count < 1)
-                {
-                    //TODO is this ok?
-                    Task.WaitAll(new Task(() =>
-                    {
-                        while (_receivedMessages.Count < 1)
-                        {
-                        }
-                    }));
-                }
-                return _sendingMessages.Dequeue();
-            }
             set
             {
-                _sendingMessages.Enqueue(value);
-
                 SendMessage(value);
-            } 
+            }
+            get { throw new NotImplementedException(); }
         }
 
-        private void SendMessage(IDragonMarbleGameMessage m)
+
+        public void ResetMessages()
         {
-            WriteArgs.SetBuffer(m.ToByteArray(), 0, m.Length);
-            NetworkManager.SendBytes(Socket, WriteArgs);
+            throw new NotImplementedException();
         }
 
         public void ReceiveBytes(byte[] buffer, int offset, int bytesTransferred)
@@ -87,7 +85,6 @@ namespace DragonMarble
                 Buffer.BlockCopy(buffer, offset, bytes, 0, bytesTransferred);
 
                 ReceivedMessage = GameMessageFactory.GetGameMessage(bytes);
-
             }
             else if (messageLength > bytesTransferred)
             {
@@ -99,10 +96,12 @@ namespace DragonMarble
             }
         }
 
-
-        public void ResetMessages()
+        private void SendMessage(IDragonMarbleGameMessage m)
         {
-            throw new NotImplementedException();
+            Logger.DebugFormat("1SendMessage:{0}, {1}bytes", m.MessageType, m.Length);
+            WriteArgs.SetBuffer(m.ToByteArray(), 0, m.Length);
+            NetworkManager.SendBytes(Socket, WriteArgs);
+            Logger.DebugFormat("2SendMessage:{0}, {1}bytes", m.MessageType, m.Length);
         }
 
         public byte[] SendingMessageByteArray()
@@ -111,7 +110,6 @@ namespace DragonMarble
         }
     }
 
-    
 
     public class RajaProvider : IRajaProvider
     {
@@ -120,5 +118,4 @@ namespace DragonMarble
             return new Raja();
         }
     }
-
 }
