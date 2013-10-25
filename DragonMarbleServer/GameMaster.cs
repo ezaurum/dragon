@@ -72,7 +72,8 @@ namespace DragonMarble
             InitGame();
             SendOrderCardSelectMessage();
             EndOrder();
-            PlayGame();
+            //playe game is need another thread.
+            Task.Factory.StartNew(PlayGame);
         }
 
         private void InitGame()
@@ -133,6 +134,8 @@ namespace DragonMarble
             Players[0].Order = 0;
             Players[1].Order = 1;
             OrderedByTurnPlayers = Players.OrderBy(player => player.Order).ToList();
+
+            Logger.Debug("End order");
         }
 
         public void Notify(IDragonMarbleGameMessage message)
@@ -142,16 +145,20 @@ namespace DragonMarble
       
         private void PlayGame()
         {
+            Logger.Debug("Play Game");
             ProcessAction();
             EndGame();
         }
 
         private IEnumerable<IGameAction> PlayerActions()
         {
+            Logger.Debug("Player actions");
             foreach (GameAction action
                 in PlayersOrderByTurn().SelectMany(player => player.Actions()))
             {
                 _state = GameState.WaitPlayerAction;
+
+                Logger.DebugFormat("_state:{0}", _state);
                 
                 //turn owner's action
                 
@@ -206,6 +213,8 @@ namespace DragonMarble
 
         private void ProcessAction()
         {
+            Logger.Debug("Process action");
+
             foreach (GameAction action in PlayerActions())
             {
                 Logger.DebugFormat("Here is ProcessAction {0}",action.Type);
