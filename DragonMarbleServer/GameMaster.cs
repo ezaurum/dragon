@@ -72,8 +72,7 @@ namespace DragonMarble
             InitGame();
             SendOrderCardSelectMessage();
             EndOrder();
-            //playe game is need another thread.
-            Task.Factory.StartNew(PlayGame);
+            Logger.Debug("Starg gmae and");
         }
 
         private void InitGame()
@@ -136,6 +135,9 @@ namespace DragonMarble
             OrderedByTurnPlayers = Players.OrderBy(player => player.Order).ToList();
 
             Logger.Debug("End order");
+
+            //playe game is need another thread.
+            Task.Factory.StartNew(PlayGame);
         }
 
         public void Notify(IDragonMarbleGameMessage message)
