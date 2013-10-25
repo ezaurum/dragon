@@ -21,6 +21,11 @@ namespace DragonMarble
 					Pressed = RandomUtil.Next(0f, 1f)
 				};
 				break;
+			case GameMessageType.RollMoveDiceResult:
+				
+				
+				break;
+				
 			}
 		}
 	}
@@ -171,102 +176,128 @@ namespace DragonMarble
 			switch ( stageTile.type ) {
 			case StageTileInfo.TYPE.CITY:
 			case StageTileInfo.TYPE.SIGHT:
-				if ( stageTile.IsAbleToBuy( this ) ) {
-					yield return new GameAction ()
-                    {
-                        Actor = this,
-                        Type = GameMessageType.BuyLandRequest,
-                        Message = new BuyLandRequestGameMessage
-                        {
-                            Actor = Id,
-                            ResponseLimit = 50000
-                        }
-                    };
-					IDragonMarbleGameMessage receivedMessage = ReceivedMessage;
-					if ( BuyLand(receivedMessage) ){
-						yield return new GameAction ()
-	                    {
-	                        Actor = this,
-	                        Type = GameMessageType.BuyLand,
-	                        Message = receivedMessage
-	                    };
-						
-					}else{
-						SelfBan();
-					}
-				} else {
-					if ( stageTile.owner != null && !stageTile.IsSameOwner( this ) ){
-						if ( this.Pay( stageTile ) ){
-							yield return new GameAction ()
-	                        {
-	                            Actor = this,
-	                            Type = GameMessageType.PayFee,
-	                            Message = new PayFeeGameMessage
-	                            {
-	                                Actor = Id
-	                            }
-	                        };
-						}
-						if ( stageTile.IsAbleToTakeover( this ) ){
-							yield return new GameAction ()
-	                        {
-	                            Actor = this,
-	                            Type = GameMessageType.TakeoverRequest,
-	                            Message = new TakeoverRequestGameMessage
-	                            {
-	                                Actor = Id
-	                            }
-	                        };
-							
-							IDragonMarbleGameMessage receivedMessage = ReceivedMessage;
-							if ( Takeover(receivedMessage) ){
-								yield return new GameAction ()
-			                    {
-			                        Actor = this,
-			                        Type = GameMessageType.Takeover,
-			                        Message = receivedMessage
-			                    };
-								
-								if ( stageTile.IsAbleToBuy( this ) ) {
-									yield return new GameAction ()
-				                    {
-				                        Actor = this,
-				                        Type = GameMessageType.BuyLandRequest,
-				                        Message = new BuyLandRequestGameMessage
-				                        {
-				                            Actor = Id,
-				                            ResponseLimit = 50000
-				                        }
-				                    };
-									receivedMessage = ReceivedMessage;
-									if ( BuyLand(receivedMessage) ){
-										yield return new GameAction ()
-					                    {
-					                        Actor = this,
-					                        Type = GameMessageType.BuyLand,
-					                        Message = receivedMessage
-					                    };
-										
-									}else{
-										SelfBan();
-									}
-								}
-							}else{
-								SelfBan();
-							}
-								
-								
-						}
-						
-					}
-					
-				}
+                foreach (var gameAction in MoveResultCitySight(stageTile)) yield return gameAction;
+			        break;
+			case StageTileInfo.TYPE.PRISON:
+				ActionRemined = 0;
+				Prison();
 				yield return null;
 				break;
+				
 			default:
 				yield return null;
 				break;
 			}
+		}
+
+	    private IEnumerable<GameAction> MoveResultCitySight(StageTileInfo stageTile)
+	    {
+	        if (stageTile.IsAbleToBuy(this))
+	        {
+	            yield return new GameAction()
+	            {
+	                Actor = this,
+	                Type = GameMessageType.BuyLandRequest,
+	                Message = new BuyLandRequestGameMessage
+	                {
+	                    Actor = Id,
+	                    ResponseLimit = 50000
+	                }
+	            };
+	            IDragonMarbleGameMessage receivedMessage = ReceivedMessage;
+	            if (BuyLand(receivedMessage))
+	            {
+	                yield return new GameAction()
+	                {
+	                    Actor = this,
+	                    Type = GameMessageType.BuyLand,
+	                    Message = receivedMessage
+	                };
+	            }
+	            else
+	            {
+	                SelfBan();
+	            }
+	        }
+	        else
+	        {
+	            if (stageTile.owner != null && !stageTile.IsSameOwner(this))
+	            {
+	                if (this.Pay(stageTile))
+	                {
+	                    yield return new GameAction()
+	                    {
+	                        Actor = this,
+	                        Type = GameMessageType.PayFee,
+	                        Message = new PayFeeGameMessage
+	                        {
+	                            Actor = Id
+	                        }
+	                    };
+	                }
+	                if (stageTile.IsAbleToTakeover(this))
+	                {
+	                    yield return new GameAction()
+	                    {
+	                        Actor = this,
+	                        Type = GameMessageType.TakeoverRequest,
+	                        Message = new TakeoverRequestGameMessage
+	                        {
+	                            Actor = Id
+	                        }
+	                    };
+
+	                    IDragonMarbleGameMessage receivedMessage = ReceivedMessage;
+	                    if (Takeover(receivedMessage))
+	                    {
+	                        yield return new GameAction()
+	                        {
+	                            Actor = this,
+	                            Type = GameMessageType.Takeover,
+	                            Message = receivedMessage
+	                        };
+
+	                        if (stageTile.IsAbleToBuy(this))
+	                        {
+	                            yield return new GameAction()
+	                            {
+	                                Actor = this,
+	                                Type = GameMessageType.BuyLandRequest,
+	                                Message = new BuyLandRequestGameMessage
+	                                {
+	                                    Actor = Id,
+	                                    ResponseLimit = 50000
+	                                }
+	                            };
+	                            receivedMessage = ReceivedMessage;
+	                            if (BuyLand(receivedMessage))
+	                            {
+	                                yield return new GameAction()
+	                                {
+	                                    Actor = this,
+	                                    Type = GameMessageType.BuyLand,
+	                                    Message = receivedMessage
+	                                };
+	                            }
+	                            else
+	                            {
+	                                SelfBan();
+	                            }
+	                        }
+	                    }
+	                    else
+	                    {
+	                        SelfBan();
+	                    }
+	                }
+	            }
+	        }
+	        yield return null;
+	    }
+
+	    private IEnumerable<GameAction> MoveResultCitySight(){
+			
+			yield return null;
 		}
 		
 		

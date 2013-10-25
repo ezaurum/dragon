@@ -23,7 +23,7 @@ namespace DragonMarble
             tileIndex = 0;
             lands = new Dictionary<int, StageTileInfo>();
             unitBuff = null;
-            chanceCoupon = CHANCE_COUPON.NULL;
+            chanceCoupon = CHANCE_COUPON.NONE;
             usableLoanCount = 1;
 			isBankrupt = false;
             DiceId = 1;
@@ -157,11 +157,16 @@ namespace DragonMarble
 			specialState = StageUnitInfo.SPECIAL_STATE.PRISON;
 			specialStateValue = 0;
 		}
+		public void Travel(){
+			specialState = StageUnitInfo.SPECIAL_STATE.TRAVEL;
+			specialStateValue = 0;
+		}
+		
 		public void UpdatePrisonState(){
 			if ( specialState == StageUnitInfo.SPECIAL_STATE.PRISON ){
 				specialStateValue++;
 				if ( specialStateValue >= 3 ){
-					specialState = SPECIAL_STATE.NULL;
+					specialState = SPECIAL_STATE.NONE;
 					specialStateValue = 0;
 				}
 			}

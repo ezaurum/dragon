@@ -360,8 +360,7 @@ namespace DragonMarble
 			}
             return 0;
         }
-
-
+		
         public int builtPrice
         {
             get
