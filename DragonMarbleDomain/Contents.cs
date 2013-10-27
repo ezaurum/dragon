@@ -192,7 +192,9 @@ namespace DragonMarble
     public interface IStageManager
     {
         Guid Id { get; set; }
+        List<StageUnitInfo> Players { get; set; }
         void Notify(IDragonMarbleGameMessage gameActions);
+
     }
     
     public class StageTileInfo
