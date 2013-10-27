@@ -88,14 +88,14 @@ namespace DragonMarble
 					//yield return Dice.RollAndGetResultGameAction(this, 0.5f, false, false);
 					bool escape = false;
 					switch ( prisonActionMsg.ActionIndex ){
-					case (char)StageUnitInfo.PRISON_ACTION.ROLL:
+					case (char)PRISON_ACTION.ROLL:
 						if ( Dice.isDouble ){
 							escape = true;
 						}else{
 							UpdatePrisonState();
 						}
 						break;
-					case (char)StageUnitInfo.PRISON_ACTION.PAY:
+					case (char)PRISON_ACTION.PAY:
 						if ( AddGold( - GameBoard.PRISON_PRICE ) ){
 							if (Dice.isDouble) {
 								ActionRemined += 1;
@@ -105,7 +105,7 @@ namespace DragonMarble
 							SelfBan();
 						}
 						break;
-					case (char)StageUnitInfo.PRISON_ACTION.CARD:
+					case (char)PRISON_ACTION.CARD:
 						if ( chanceCoupon == CHANCE_COUPON.ESCAPE_ISLAND ){
 							chanceCoupon = CHANCE_COUPON.NONE;
 							escape = true;
@@ -294,12 +294,6 @@ namespace DragonMarble
 	        }
 	        yield return null;
 	    }
-
-	    private IEnumerable<GameAction> MoveResultCitySight(){
-			
-			yield return null;
-		}
-		
 		
 		private bool BuyLand(IDragonMarbleGameMessage receivedMessage){
 			BuyLandGameMessage msg = (BuyLandGameMessage) receivedMessage;
