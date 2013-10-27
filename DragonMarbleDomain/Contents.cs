@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Dragon.Message;
 using DragonMarble.Message;
 
 namespace DragonMarble
@@ -171,24 +172,18 @@ namespace DragonMarble
             result[1] = 0;
         }
 
-        public GameAction RollAndGetResultGameAction(StageUnitInfo actor, float pressed, bool odd, bool even)
+        public IGameAction RollAndGetResultGameAction(StageUnitInfo actor, float pressed, bool odd, bool even)
         {
             Roll();
             return DiceGameAction(actor);
         }
 
-        private GameAction DiceGameAction(StageUnitInfo stageUnitInfo)
+        private IGameAction DiceGameAction(StageUnitInfo stageUnitInfo)
         {
-            return new GameAction()
+            return new RollMoveDiceResultGameMessage
             {
-                Actor = stageUnitInfo,
-                NeedOther = false,
-                Type = GameMessageType.RollMoveDiceResult,
-                Message = new RollMoveDiceResultGameMessage
-                {
-                    Actor = stageUnitInfo.Id,
-                    Dices = new List<char> { (char)result[0], (char)result[1] }
-                }
+                Actor = stageUnitInfo.Id,
+                Dices = new List<char> {(char) result[0], (char) result[1]}
             };
         }
     }

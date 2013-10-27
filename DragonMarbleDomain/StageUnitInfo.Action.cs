@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Dragon.Message;
 using DragonMarble.Message;
 
 namespace DragonMarble
@@ -54,7 +55,7 @@ namespace DragonMarble
             if (!OwnTurn) yield break;
 	    }
 
-		public IEnumerable<GameAction> Actions ()
+		public IEnumerable<IGameAction> Actions ()
 		{
 
 			for (ActionRemined = 1; ActionRemined > 0; ActionRemined--) {
@@ -114,30 +115,17 @@ namespace DragonMarble
 						}
 						break;
 					}
-					
-					yield return new GameAction ()
-                    {
-                        Actor = this,
-                        Type = GameMessageType.PrisonActionResult,
-                        Message = new PrisonActionResultGameMessage
-                        {
-                            Actor = Id,
-							EscapeResult = escape,
-                            EscapeType = prisonActionMsg.ActionIndex
-                        }
-                    };
-					yield return new GameAction ()
-                    {
-                        Actor = this,
-		                NeedOther = false,
-		                Type = GameMessageType.RollMoveDiceResult,
-		                Message = new RollMoveDiceResultGameMessage
-		                {
-		                    Actor = Id,
-		                    Dices = new List<char> { (char)Dice.result[0], (char)Dice.result[1] }
-		                }
-                    };
-					
+				        yield return new PrisonActionResultGameMessage
+				        {
+				            Actor = Id,
+				            EscapeResult = escape,
+				            EscapeType = prisonActionMsg.ActionIndex
+				        };
+				        yield return new RollMoveDiceResultGameMessage
+				        {
+				            Actor = Id,
+				            Dices = new List<char> {(char) Dice.result[0], (char) Dice.result[1]}
+				        };
 					
 					if ( escape ){
 						specialState = SPECIAL_STATE.NONE;
@@ -170,7 +158,7 @@ namespace DragonMarble
 			DeactivateTurn ();
 		}
 		
-		private IEnumerable<GameAction> DestinationGameAction ()
+		private IEnumerable<IGameAction> DestinationGameAction ()
 		{
 			StageTileInfo stageTile = Stage.Tiles [tileIndex];
 			switch ( stageTile.type ) {
@@ -190,29 +178,19 @@ namespace DragonMarble
 			}
 		}
 
-	    private IEnumerable<GameAction> MoveResultCitySight(StageTileInfo stageTile)
+	    private IEnumerable<IGameAction> MoveResultCitySight(StageTileInfo stageTile)
 	    {
 	        if (stageTile.IsAbleToBuy(this))
 	        {
-	            yield return new GameAction()
+	            yield return new BuyLandRequestGameMessage
 	            {
-	                Actor = this,
-	                Type = GameMessageType.BuyLandRequest,
-	                Message = new BuyLandRequestGameMessage
-	                {
-	                    Actor = Id,
-	                    ResponseLimit = 50000
-	                }
+	                Actor = Id,
+	                ResponseLimit = 50000
 	            };
 	            IDragonMarbleGameMessage receivedMessage = ReceivedMessage;
 	            if (BuyLand(receivedMessage))
 	            {
-	                yield return new GameAction()
-	                {
-	                    Actor = this,
-	                    Type = GameMessageType.BuyLand,
-	                    Message = receivedMessage
-	                };
+	                yield return receivedMessage;
 	            }
 	            else
 	            {
@@ -223,61 +201,36 @@ namespace DragonMarble
 	        {
 	            if (stageTile.owner != null && !stageTile.IsSameOwner(this))
 	            {
-	                if (this.Pay(stageTile))
+	                if (Pay(stageTile))
 	                {
-	                    yield return new GameAction()
+	                    yield return new PayFeeGameMessage
 	                    {
-	                        Actor = this,
-	                        Type = GameMessageType.PayFee,
-	                        Message = new PayFeeGameMessage
-	                        {
-	                            Actor = Id
-	                        }
+	                        Actor = Id
 	                    };
 	                }
 	                if (stageTile.IsAbleToTakeover(this))
 	                {
-	                    yield return new GameAction()
+	                    yield return new TakeoverRequestGameMessage
 	                    {
-	                        Actor = this,
-	                        Type = GameMessageType.TakeoverRequest,
-	                        Message = new TakeoverRequestGameMessage
-	                        {
-	                            Actor = Id
-	                        }
+	                        Actor = Id
 	                    };
 
 	                    IDragonMarbleGameMessage receivedMessage = ReceivedMessage;
 	                    if (Takeover(receivedMessage))
 	                    {
-	                        yield return new GameAction()
-	                        {
-	                            Actor = this,
-	                            Type = GameMessageType.Takeover,
-	                            Message = receivedMessage
-	                        };
+	                        yield return receivedMessage;
 
 	                        if (stageTile.IsAbleToBuy(this))
 	                        {
-	                            yield return new GameAction()
+	                            yield return new BuyLandRequestGameMessage
 	                            {
-	                                Actor = this,
-	                                Type = GameMessageType.BuyLandRequest,
-	                                Message = new BuyLandRequestGameMessage
-	                                {
-	                                    Actor = Id,
-	                                    ResponseLimit = 50000
-	                                }
+	                                Actor = Id,
+	                                ResponseLimit = 50000
 	                            };
 	                            receivedMessage = ReceivedMessage;
 	                            if (BuyLand(receivedMessage))
 	                            {
-	                                yield return new GameAction()
-	                                {
-	                                    Actor = this,
-	                                    Type = GameMessageType.BuyLand,
-	                                    Message = receivedMessage
-	                                };
+	                                yield return receivedMessage;
 	                            }
 	                            else
 	                            {

@@ -155,7 +155,7 @@ namespace DragonMarble
         private IEnumerable<IGameAction> PlayerActions()
         {
             Logger.Debug("Player actions");
-            foreach (GameAction action
+            foreach (IGameAction action
                 in PlayersOrderByTurn().SelectMany(player => player.Actions()))
             {
                 _state = GameState.WaitPlayerAction;
@@ -163,24 +163,7 @@ namespace DragonMarble
                 Logger.DebugFormat("_state:{0}", _state);
                 
                 //turn owner's action
-                
                 yield return action;
-
-                //TODO action result check needed.
-
-                //if need, other's reactions
-                if (action.NeedOther)
-                {
-                    _state = GameState.WaitPlayerAction;
-
-                    foreach (StageUnitInfo targetUnit in action.TargetUnits)
-                    {
-                        Logger.Debug("This action need target units action.");
-                        
-                        GameAction othersAction = new GameAction();
-                        yield return othersAction;
-                    }
-                }
             }
         }
 
@@ -217,9 +200,8 @@ namespace DragonMarble
         {
             Logger.Debug("Process action");
 
-            foreach (GameAction action in PlayerActions())
-            {
-                Logger.DebugFormat("Here is ProcessAction {0}",action.Type);
+            foreach (IGameAction action in PlayerActions())
+            {   
                 Board.GrossAssets = 0;
                 Players.ForEach(p => Board.GrossAssets += p.Assets);
                 if (Logger.IsDebugEnabled)
@@ -231,13 +213,13 @@ namespace DragonMarble
 
                 _state = GameState.ProcessPlayerAction;
 
-                Notify(action.Message);
+                Notify((IDragonMarbleGameMessage) action);
 
                 //need check game end
             }
         }
 
-        public GameAction CurrentAction { get; set; }
+        public IGameAction CurrentAction { get; set; }
 
         public bool GameContinue
         {
