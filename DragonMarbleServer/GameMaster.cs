@@ -152,10 +152,10 @@ namespace DragonMarble
             EndGame();
         }
 
-        private IEnumerable<IGameAction> PlayerActions()
+        private IEnumerable<IGameMessage> PlayerActions()
         {
             Logger.Debug("Player actions");
-            foreach (IGameAction action
+            foreach (IGameMessage action
                 in PlayersOrderByTurn().SelectMany(player => player.Actions()))
             {
                 _state = GameState.WaitPlayerAction;
@@ -200,7 +200,7 @@ namespace DragonMarble
         {
             Logger.Debug("Process action");
 
-            foreach (IGameAction action in PlayerActions())
+            foreach (IGameMessage action in PlayerActions())
             {   
                 Board.GrossAssets = 0;
                 Units.ForEach(p => Board.GrossAssets += p.Assets);
@@ -219,7 +219,7 @@ namespace DragonMarble
             }
         }
 
-        public IGameAction CurrentAction { get; set; }
+        public IGameMessage CurrentAction { get; set; }
 
         public bool GameContinue
         {

@@ -15,7 +15,6 @@ f = codecs.open(output_file, 'w', encoding='utf-8')
 f.write('// Automatic generate by PacketGenerator.\n')
 f.write('using System;\n')
 f.write('using System.Collections.Generic;\n')
-f.write('using Dragon.Message;\n')
 f.write('\nnamespace DragonMarble.Message')
 
 f.write('\n{')
@@ -40,7 +39,7 @@ for packet_name in sorted_packet_names:
 	if packet.get('comment') is not None:
 		f.write('\n// %s'%(packet['comment']))
 	# class declare
-	f.write('\t\npublic class %sGameMessage : IDragonMarbleGameMessage, IGameAction'%(packet_name))
+	f.write('\t\npublic class %sGameMessage : IDragonMarbleGameMessage'%(packet_name))
 	f.write('\t\n{')
 	#header added
 	fields = common_header.get('fields',[])+packet.get('fields',[])

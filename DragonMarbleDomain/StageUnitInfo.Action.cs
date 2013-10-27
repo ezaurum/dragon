@@ -55,7 +55,7 @@ namespace DragonMarble
             if (!OwnTurn) yield break;
 	    }
 
-		public IEnumerable<IGameAction> Actions ()
+        public IEnumerable<IGameMessage> Actions()
 		{
 
 			for (ActionRemined = 1; ActionRemined > 0; ActionRemined--) {
@@ -157,8 +157,8 @@ namespace DragonMarble
 			}
 			DeactivateTurn ();
 		}
-		
-		private IEnumerable<IGameAction> DestinationGameAction ()
+
+        private IEnumerable<IGameMessage> DestinationGameAction()
 		{
 			StageTileInfo stageTile = Stage.Tiles [tileIndex];
 			switch ( stageTile.type ) {
@@ -178,7 +178,7 @@ namespace DragonMarble
 			}
 		}
 
-	    private IEnumerable<IGameAction> MoveResultCitySight(StageTileInfo stageTile)
+        private IEnumerable<IGameMessage> MoveResultCitySight(StageTileInfo stageTile)
 	    {
 	        if (stageTile.IsAbleToBuy(this))
 	        {

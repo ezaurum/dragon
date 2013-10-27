@@ -10,10 +10,6 @@ namespace Dragon.Message
         void FromByteArray(byte[] bytes);
     }
 
-    public interface IGameAction
-    {
-    }
-
     public interface IMessageProcessor<T> where T : IGameMessage
     {
         T ReceivedMessage { get; set; }

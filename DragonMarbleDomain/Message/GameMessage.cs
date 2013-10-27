@@ -1,7 +1,6 @@
 // Automatic generate by PacketGenerator.
 using System;
 using System.Collections.Generic;
-using Dragon.Message;
 
 namespace DragonMarble.Message
 {
@@ -95,7 +94,7 @@ public static class GameMessageFactory
 	}
 }
 // Client received Player's action result signal	
-public class ActionResultCopyGameMessage : IDragonMarbleGameMessage, IGameAction	
+public class ActionResultCopyGameMessage : IDragonMarbleGameMessage	
 {
 	public GameMessageType MessageType {get{return GameMessageType.ActionResultCopy;}}
 
@@ -127,7 +126,7 @@ public void FromByteArray(byte[] bytes)
 }
 
 // Activate player's turn	
-public class ActivateTurnGameMessage : IDragonMarbleGameMessage, IGameAction	
+public class ActivateTurnGameMessage : IDragonMarbleGameMessage	
 {
 	public GameMessageType MessageType {get{return GameMessageType.ActivateTurn;}}
 	public Guid TurnOwner { get; set;}
@@ -173,7 +172,7 @@ public void FromByteArray(byte[] bytes)
 }
 
 // buy lands	
-public class BuyLandGameMessage : IDragonMarbleGameMessage, IGameAction	
+public class BuyLandGameMessage : IDragonMarbleGameMessage	
 {
 	public GameMessageType MessageType {get{return GameMessageType.BuyLand;}}
 	public Char TileIndex;
@@ -225,7 +224,7 @@ public void FromByteArray(byte[] bytes)
 }
 
 // buy lands available	
-public class BuyLandRequestGameMessage : IDragonMarbleGameMessage, IGameAction	
+public class BuyLandRequestGameMessage : IDragonMarbleGameMessage	
 {
 	public GameMessageType MessageType {get{return GameMessageType.BuyLandRequest;}}
 	public Int64 ResponseLimit;
@@ -271,7 +270,7 @@ public void FromByteArray(byte[] bytes)
 }
 
 // 게임 초기화 정보	
-public class InitializeGameGameMessage : IDragonMarbleGameMessage, IGameAction	
+public class InitializeGameGameMessage : IDragonMarbleGameMessage	
 {
 	public GameMessageType MessageType {get{return GameMessageType.InitializeGame;}}
 	public List<Int16> FeeBoostedTiles;
@@ -373,7 +372,7 @@ public void FromByteArray(byte[] bytes)
 }
 
 // 플레이어 초기화	
-public class InitializePlayerGameMessage : IDragonMarbleGameMessage, IGameAction	
+public class InitializePlayerGameMessage : IDragonMarbleGameMessage	
 {
 	public GameMessageType MessageType {get{return GameMessageType.InitializePlayer;}}
 	public Guid Server { get; set;}
@@ -421,7 +420,7 @@ public void FromByteArray(byte[] bytes)
 }
 
 // 할 수 있는게 없을 때	
-public class NothingToDoGameMessage : IDragonMarbleGameMessage, IGameAction	
+public class NothingToDoGameMessage : IDragonMarbleGameMessage	
 {
 	public GameMessageType MessageType {get{return GameMessageType.NothingToDo;}}
 	public Guid Actor { get; set;}
@@ -461,7 +460,7 @@ public void FromByteArray(byte[] bytes)
 }
 
 // 선 뽑기 결과	
-public class OrderCardResultGameMessage : IDragonMarbleGameMessage, IGameAction	
+public class OrderCardResultGameMessage : IDragonMarbleGameMessage	
 {
 	public GameMessageType MessageType {get{return GameMessageType.OrderCardResult;}}
 	public Int16 FirstCardNumber;
@@ -507,7 +506,7 @@ public void FromByteArray(byte[] bytes)
 }
 
 // 선 뽑기	
-public class OrderCardSelectGameMessage : IDragonMarbleGameMessage, IGameAction	
+public class OrderCardSelectGameMessage : IDragonMarbleGameMessage	
 {
 	public GameMessageType MessageType {get{return GameMessageType.OrderCardSelect;}}
 	public Int16 SelectedCardNumber;
@@ -572,7 +571,7 @@ public void FromByteArray(byte[] bytes)
 }
 
 // pay fee	
-public class PayFeeGameMessage : IDragonMarbleGameMessage, IGameAction	
+public class PayFeeGameMessage : IDragonMarbleGameMessage	
 {
 	public GameMessageType MessageType {get{return GameMessageType.PayFee;}}
 	public Guid Actor { get; set;}
@@ -612,7 +611,7 @@ public void FromByteArray(byte[] bytes)
 }
 
 // action in Prison	
-public class PrisonActionGameMessage : IDragonMarbleGameMessage, IGameAction	
+public class PrisonActionGameMessage : IDragonMarbleGameMessage	
 {
 	public GameMessageType MessageType {get{return GameMessageType.PrisonAction;}}
 	public Char ActionIndex;
@@ -658,7 +657,7 @@ public void FromByteArray(byte[] bytes)
 }
 
 // action result in Prison	
-public class PrisonActionResultGameMessage : IDragonMarbleGameMessage, IGameAction	
+public class PrisonActionResultGameMessage : IDragonMarbleGameMessage	
 {
 	public GameMessageType MessageType {get{return GameMessageType.PrisonActionResult;}}
 	public Boolean EscapeResult;
@@ -710,7 +709,7 @@ public void FromByteArray(byte[] bytes)
 }
 
 // 클라이언트에서 이동 주사위 굴리기	
-public class RollMoveDiceGameMessage : IDragonMarbleGameMessage, IGameAction	
+public class RollMoveDiceGameMessage : IDragonMarbleGameMessage	
 {
 	public GameMessageType MessageType {get{return GameMessageType.RollMoveDice;}}
 	public Single Pressed;
@@ -768,7 +767,7 @@ public void FromByteArray(byte[] bytes)
 }
 
 // 서버에서 주사위 굴리기 결과	
-public class RollMoveDiceResultGameMessage : IDragonMarbleGameMessage, IGameAction	
+public class RollMoveDiceResultGameMessage : IDragonMarbleGameMessage	
 {
 	public GameMessageType MessageType {get{return GameMessageType.RollMoveDiceResult;}}
 	public List<Char> Dices;
@@ -820,7 +819,7 @@ public void FromByteArray(byte[] bytes)
 }
 
 // takeover land	
-public class TakeoverGameMessage : IDragonMarbleGameMessage, IGameAction	
+public class TakeoverGameMessage : IDragonMarbleGameMessage	
 {
 	public GameMessageType MessageType {get{return GameMessageType.Takeover;}}
 	public Boolean Takeover;
@@ -866,7 +865,7 @@ public void FromByteArray(byte[] bytes)
 }
 
 // takeover land available	
-public class TakeoverRequestGameMessage : IDragonMarbleGameMessage, IGameAction	
+public class TakeoverRequestGameMessage : IDragonMarbleGameMessage	
 {
 	public GameMessageType MessageType {get{return GameMessageType.TakeoverRequest;}}
 	public Guid Actor { get; set;}
@@ -906,7 +905,7 @@ public void FromByteArray(byte[] bytes)
 }
 
 // action in Travel	
-public class TravelActionGameMessage : IDragonMarbleGameMessage, IGameAction	
+public class TravelActionGameMessage : IDragonMarbleGameMessage	
 {
 	public GameMessageType MessageType {get{return GameMessageType.TravelAction;}}
 	public Char TileIndex;

@@ -172,13 +172,13 @@ namespace DragonMarble
             result[1] = 0;
         }
 
-        public IGameAction RollAndGetResultGameAction(StageUnitInfo actor, float pressed, bool odd, bool even)
+        public IGameMessage RollAndGetResultGameAction(StageUnitInfo actor, float pressed, bool odd, bool even)
         {
             Roll();
             return DiceGameAction(actor);
         }
 
-        private IGameAction DiceGameAction(StageUnitInfo stageUnitInfo)
+        private IGameMessage DiceGameAction(StageUnitInfo stageUnitInfo)
         {
             return new RollMoveDiceResultGameMessage
             {

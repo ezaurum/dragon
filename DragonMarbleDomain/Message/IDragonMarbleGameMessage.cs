@@ -2,7 +2,7 @@
 
 namespace DragonMarble.Message
 {
-    public interface IDragonMarbleGameMessage : IGameMessage, IGameAction
+    public interface IDragonMarbleGameMessage : IGameMessage
     {
         GameMessageType MessageType { get; }
     }
