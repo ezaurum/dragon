@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -140,6 +141,10 @@ namespace DragonMarble
             Task.Factory.StartNew(PlayGame);
         }
 
+/// <summary>
+/// Notify message for every players
+/// </summary>
+/// <param name="message">message to notify</param>
         public void Notify(IDragonMarbleGameMessage message)
         {
             Units.ForEach(p => p.SendingMessage = message);
@@ -176,6 +181,7 @@ namespace DragonMarble
                 Notify(CurrentPlayer.ActivateTurn());
 
                 //TODO all ready check needed.
+                
 
                 yield return CurrentPlayer;
             }
