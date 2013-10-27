@@ -27,7 +27,7 @@ namespace DragonMarble
 
         private static readonly ILog Logger = LogManager.GetLogger(typeof (GameMaster));
         public GameBoard Board { get; set; }
-        public List<StageUnitInfo> Players { get;set;}
+        public List<StageUnitInfo> Units { get;set;}
         private readonly Dictionary<Int16, Guid> _orderCard = new Dictionary<short, Guid>();
         private GameState _state;
         private List<StageUnitInfo> _availablePlayers;
@@ -43,19 +43,19 @@ namespace DragonMarble
         {
             _state = GameState.BeforeInit;
             Id = Guid.NewGuid();
-            Players = new List<StageUnitInfo>();
+            Units = new List<StageUnitInfo>();
         }
 
         public Guid Id { get; set; }
 
         public bool IsGameStartable
         {
-            get { return (Players.Count > 1); }
+            get { return (Units.Count > 1); }
         }
 
         public void Join(StageUnitInfo player)
         {
-            Players.Add(player);
+            Units.Add(player);
             player.StageManager = this;
             player.Stage = Board;
 
@@ -77,7 +77,7 @@ namespace DragonMarble
 
         private void InitGame()
         {
-            _availablePlayers = Players;
+            _availablePlayers = Units;
 
             Board.Init();
 
@@ -85,8 +85,8 @@ namespace DragonMarble
             Notify(new InitializeGameGameMessage
             {
                 FeeBoostedTiles = Board.FeeBoostedTiles,
-                NumberOfPlayers = (short)Players.Count,
-                Units = Players
+                NumberOfPlayers = (short)Units.Count,
+                Units = Units
             });
 
             _state = GameState.Init;
@@ -106,7 +106,7 @@ namespace DragonMarble
             Notify(new OrderCardSelectGameMessage
             {
                 Actor = Id,
-                NumberOfPlayers = (short)Players.Count,
+                NumberOfPlayers = (short)Units.Count,
                 OrderCardSelectState = new List<bool> { false, false },
                 SelectedCardNumber = -1
             });
@@ -116,7 +116,7 @@ namespace DragonMarble
             Notify(new OrderCardSelectGameMessage
             {
                 Actor = Id,
-                NumberOfPlayers = (short)Players.Count,
+                NumberOfPlayers = (short)Units.Count,
                 OrderCardSelectState = new List<bool> { true, true },
                 SelectedCardNumber = 1
             });
@@ -126,13 +126,13 @@ namespace DragonMarble
         {
             Notify(new OrderCardResultGameMessage()
             {
-                FirstPlayerId = Players[0].Id,
+                FirstPlayerId = Units[0].Id,
                 FirstCardNumber = 1
             });
 
-            Players[0].Order = 0;
-            Players[1].Order = 1;
-            OrderedByTurnPlayers = Players.OrderBy(player => player.Order).ToList();
+            Units[0].Order = 0;
+            Units[1].Order = 1;
+            OrderedByTurnPlayers = Units.OrderBy(player => player.Order).ToList();
 
             Logger.Debug("End order");
 
@@ -142,7 +142,7 @@ namespace DragonMarble
 
         public void Notify(IDragonMarbleGameMessage message)
         {
-            Players.ForEach(p => p.SendingMessage = message);
+            Units.ForEach(p => p.SendingMessage = message);
         }
       
         private void PlayGame()
@@ -185,7 +185,7 @@ namespace DragonMarble
 
         private StageUnitInfo CurrentPlayer
         {
-            get { return OrderedByTurnPlayers[Turn % Players.Count]; }
+            get { return OrderedByTurnPlayers[Turn % Units.Count]; }
         }
 
         public List<StageUnitInfo> OrderedByTurnPlayers{ get; set; }
@@ -203,7 +203,7 @@ namespace DragonMarble
             foreach (IGameAction action in PlayerActions())
             {   
                 Board.GrossAssets = 0;
-                Players.ForEach(p => Board.GrossAssets += p.Assets);
+                Units.ForEach(p => Board.GrossAssets += p.Assets);
                 if (Logger.IsDebugEnabled)
                 {
                     Logger.DebugFormat("Gross Assets is : {0}", Board.GrossAssets);
