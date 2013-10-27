@@ -15,22 +15,26 @@ f = codecs.open(output_file, 'w', encoding='utf-8')
 f.write('// Automatic generate by PacketGenerator.\n')
 f.write('using System;\n')
 f.write('using System.Collections.Generic;\n')
-f.write('using Dragon.Interfaces;\n')
+f.write('using Dragon.Message;\n')
 f.write('\nnamespace DragonMarble.Message')
 
 f.write('\n{')
 
-common_header = packet_list.get('Header',{});
+#pop common header
+common_header = packet_list.get('Header',{})
 if common_header is not None:
 	del packet_list['Header']
 
+#sort packet names
+sorted_packet_names = sorted(packet_list)
+
 #make messageType enum
-f.write ( _util.make_message_types(packet_list) )
+f.write ( _util.make_message_types(sorted_packet_names) )
 
 #make message instance maker
-_util.make_message_instance_maker(f, packet_list)
+f.write ( _util.make_message_instance_maker(sorted_packet_names) )
 
-for packet_name in packet_list:
+for packet_name in sorted_packet_names:
 	packet = packet_list[packet_name]
 	# Comment
 	if packet.get('comment') is not None:
