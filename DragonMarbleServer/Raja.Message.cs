@@ -89,10 +89,12 @@ namespace DragonMarble
             else if (messageLength > bytesTransferred)
             {
                 //TODO
+                throw new NotImplementedException("bytes transferred is smaller than message length");
             }
             else if (messageLength < bytesTransferred)
             {
                 //TODO
+                throw new NotImplementedException("bytes transferred is bigger than message length");
             }
         }
 
@@ -102,11 +104,6 @@ namespace DragonMarble
             WriteArgs.SetBuffer(m.ToByteArray(), 0, m.Length);
             NetworkManager.SendBytes(Socket, WriteArgs);
             Logger.DebugFormat("2SendMessage:{0}, {1}bytes", m.MessageType, m.Length);
-        }
-
-        public byte[] SendingMessageByteArray()
-        {
-            throw new NotImplementedException();
         }
     }
 
