@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Dragon.Interfaces;
+using Dragon.Message;
 using DragonMarble.Message;
 
 namespace DragonMarble
@@ -28,6 +28,7 @@ namespace DragonMarble
 			isBankrupt = false;
             DiceId = 1;
             Dice = new StageDiceInfo();
+            specialState = SPECIAL_STATE.NONE;
         }
 
         public Guid Id { get; set; }
@@ -57,7 +58,18 @@ namespace DragonMarble
         public virtual IDragonMarbleGameMessage ReceivedMessage
         {
             get { return MessageProcessor.ReceivedMessage; }
-			internal set { MessageProcessor.ReceivedMessage = value; }
+            set
+            {
+                if (!OwnTurn)
+                {
+
+                    foreach (var messages in GetMessageResult(value))
+                    {
+                        StageManager.Notify(messages);
+                    }
+                    
+                }
+            }
         }
 
         public virtual IDragonMarbleGameMessage SendingMessage
@@ -154,16 +166,16 @@ namespace DragonMarble
             if (tileIndex >= 32) tileIndex -= 32;
         }
 		public void Prison(){
-			specialState = StageUnitInfo.SPECIAL_STATE.PRISON;
+			specialState = SPECIAL_STATE.PRISON;
 			specialStateValue = 0;
 		}
 		public void Travel(){
-			specialState = StageUnitInfo.SPECIAL_STATE.TRAVEL;
+			specialState = SPECIAL_STATE.TRAVEL;
 			specialStateValue = 0;
 		}
 		
 		public void UpdatePrisonState(){
-			if ( specialState == StageUnitInfo.SPECIAL_STATE.PRISON ){
+			if ( specialState == SPECIAL_STATE.PRISON ){
 				specialStateValue++;
 				if ( specialStateValue >= 3 ){
 					specialState = SPECIAL_STATE.NONE;

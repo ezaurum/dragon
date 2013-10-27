@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 using Dragon.Server;
-using DragonMarble.Message;
 using GameUtils;
 using log4net;
 using log4net.Config;
@@ -18,28 +18,29 @@ namespace DragonMarble
         private const int BufferSize = 1024;
         private const int MaxConnection = 3000;
         private static readonly ILog Logger = LogManager.GetLogger(typeof(DragonMarbleServerProgram));
-
         private static GameMaster gm;
-
         private static void Main(string[] args)
         {
             XmlConfigurator.Configure(new FileInfo("log4net.xml"));
+            Logger.Debug("Start app.");
+
+            gm = new GameMaster();
 
             List<StageTileInfo> tiles = XmlUtils.LoadXml(@"data_stage.xml", GameMaster.ParseTiles);
 
-            Logger.Debug("Start app.");
+            gm.Board = new GameBoard(tiles);
+            
+            RajaProvider rajaProvider = new RajaProvider();
 
-            gm = new GameMaster(tiles);
-
-            MessageProcessorProvier<IDragonMarbleGameMessage> messageProcessorProvier = new MessageProcessorProvier<IDragonMarbleGameMessage>
+            var server = new NetworkManager(
+                MaxConnection, BufferSize, QueueNumber,
+                new IPEndPoint(IPAddress.Any, Port))
             {
-                MessageFactoryMethod = GameMessageFactory.GetGameMessage
+                RajaProvider = rajaProvider
             };
 
-            var server = new MultiClientServer<IDragonMarbleGameMessage>(
-                MaxConnection, BufferSize, QueueNumber,
-                new IPEndPoint(IPAddress.Any, Port), messageProcessorProvier);
-            server.OnAcceptConnection += AddPlayer;
+            server.OnAfterAccept += AddPlayer;
+            
             server.Start();
             string readLine = "";
 
@@ -57,39 +58,26 @@ namespace DragonMarble
             
         }
 
-        private static void AddPlayer(object sender, SocketAsyncEventArgs eventArgs)
-        {   
-            Logger.Debug("connectecd.");
-            QueuedMessageProcessor<IDragonMarbleGameMessage> token = (QueuedMessageProcessor<IDragonMarbleGameMessage>)eventArgs.UserToken;
-            StageUnitInfo player = new StageUnitInfo {
+
+        public static void AddPlayer(object sender, SocketAsyncEventArgs e)
+        {
+            Raja token = (Raja)e.UserToken;
+            token.Unit = new StageUnitInfo
+            {
                 Id = Guid.NewGuid(),
-                MessageProcessor = token, 
                 Order = 0,
                 UnitColor = StageUnitInfo.UNIT_COLOR.BLUE,
                 CharacterId = 1,
                 Gold = 2000000
             };
-            token.Player = player;
-            
-            gm.Join(player);
 
-            //TODO dummy ai player
-            StageUnitInfo player0 = new AIStageUnitInfo
-            {
-                Id = Guid.NewGuid(),
-                Order = 1,
-                UnitColor = StageUnitInfo.UNIT_COLOR.GREEN,
-                CharacterId = 2,
-                Gold = 2000000,
-                MessageProcessor = new QueuedMessageProcessor<IDragonMarbleGameMessage>()
-
-            };
-            gm.Join(player0);
+            gm.Join(token.Unit);
 
             if (gm.IsGameStartable)
             {
-                gm.StartGame();
+                Task.Factory.StartNew(gm.StartGame);
             }
         }
+
     }
 }

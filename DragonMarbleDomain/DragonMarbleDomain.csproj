@@ -31,11 +31,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="Contents.cs" />
     <Compile Include="GameAction.cs" />
     <Compile Include="GameBoard.cs" />
@@ -47,9 +42,9 @@
     <Compile Include="StageUnitInfo.Enum.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Interfaces\Interfaces.csproj">
+    <ProjectReference Include="..\Commons\Commons.csproj">
       <Project>{6A94673F-AE42-4A0D-BADC-83933C0976C1}</Project>
-      <Name>Interfaces</Name>
+      <Name>Commons</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

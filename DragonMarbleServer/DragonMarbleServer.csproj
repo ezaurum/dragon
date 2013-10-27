@@ -39,12 +39,11 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Raja.cs" />
+    <Compile Include="Raja.Message.cs" />
     <Compile Include="GameMaster.cs" />
     <Compile Include="DragonMarbleServerProgram.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -54,11 +53,17 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="data_chance.xml" />
-    <Content Include="data_stage.xml" />
+    <Content Include="data_stage.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="lib\log4net.dll" />
     <Content Include="lib\log4net.xml" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Commons\Commons.csproj">
+      <Project>{6A94673F-AE42-4A0D-BADC-83933C0976C1}</Project>
+      <Name>Commons</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DragonMarbleDomain\DragonMarbleDomain.csproj">
       <Project>{26208981-E513-4C57-B66E-560CBD88E28D}</Project>
       <Name>DragonMarbleDomain</Name>
@@ -67,13 +72,9 @@
       <Project>{cb0a9f6c-d5af-4d74-9a77-b491a17b964e}</Project>
       <Name>GameUtils</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Interfaces\Interfaces.csproj">
-      <Project>{6a94673f-ae42-4a0d-badc-83933c0976c1}</Project>
-      <Name>Interfaces</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Server\ServerNetworkManager.csproj">
+    <ProjectReference Include="..\Server\Server.csproj">
       <Project>{ee7bcf44-88e4-48e6-a821-ef8243aba197}</Project>
-      <Name>ServerNetworkManager</Name>
+      <Name>Server</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -21,7 +21,7 @@ namespace ConsoleTest
             nm.OnAfterMessageSend += (sender, eventArgs) => Console.WriteLine("Message Sent");
 
             nm.Start();
-            
+
             while (true)
             {
                 string readLine = Console.ReadLine();
@@ -52,6 +52,13 @@ namespace ConsoleTest
                         NumberOfPlayers = 2
                     };
                     nm.SendMessage(orderCardSelectGameMessage);
+                }
+                
+                if (readLine.Contains("I")) {
+                    while (true)
+                    {
+                        nm.SendMessage(rollMessage);
+                    }
                 }
 
                 if (readLine.Contains("0"))

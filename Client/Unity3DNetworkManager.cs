@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
-using Dragon.Interfaces;
+using System.Threading;
+using Dragon.Message;
 
 namespace Dragon.Client
 {
-    public delegate void SocketAsyncEventHandler(object sender, SocketAsyncEventArgs e);
-    public class Unity3DNetworkManager
+    public class Unity3DNetworkManager : INetworkManager
     {
         private readonly Socket _socket;
         
@@ -27,6 +27,8 @@ namespace Dragon.Client
                 SocketType.Stream, ProtocolType.Tcp);
 
             _ipEndpoint = new IPEndPoint( IPAddress.Parse(ipAddress), port);
+
+            RajaProvider = new ClientRajaProvider();
         }
         
         public void SendMessage(IGameMessage gameMessage)
@@ -34,12 +36,26 @@ namespace Dragon.Client
             byte[] byteArray = gameMessage.ToByteArray();
 
             Console.WriteLine("send {0} bytes.", byteArray.Length);
-
-            byteArray.CopyTo(_writeEventArgs.Buffer, _writeEventArgs.Offset);
             
-            if (!_socket.SendAsync(_writeEventArgs))
+            try
             {
-                Send_Completed(_writeEventArgs);
+                _writeEventArgs.SetBuffer(byteArray, 0, byteArray.Length);
+                if (!_socket.SendAsync(_writeEventArgs))
+                {
+                    Send_Completed(_writeEventArgs);
+                }
+            }
+            catch (InvalidOperationException e)
+            {
+                if (typeof (ObjectDisposedException) == e.GetType())
+                {
+                  //  Reconnect();
+                }
+                Thread.Sleep(1);
+            }
+            catch (SocketException e)
+            {
+                //Reconnect();
             }
         }
 
@@ -83,7 +99,6 @@ namespace Dragon.Client
             }
             _writeEventArgs = new SocketAsyncEventArgs();
             _writeEventArgs.Completed += OnAfterMessageSend;
-            _writeEventArgs.SetBuffer(new byte[1024], 0, 1024);
 
             //started
             _started = true;
@@ -123,8 +138,8 @@ namespace Dragon.Client
 
             if (e.SocketError == SocketError.Success)
             {
-                _readEventArgs.UserToken = new QueueAsyncClientUserToken() ;
-                _writeEventArgs.UserToken = new SimpleAsyncClientUserToken() ;
+                _readEventArgs.UserToken = RajaProvider.NewInstance();
+                _writeEventArgs.UserToken = ((ClientRajaProvider)RajaProvider).NewWriteAsyncUserToken();
                 
                 Console.WriteLine("Start to read");
                 Read_Completed(this, _readEventArgs);
@@ -134,7 +149,27 @@ namespace Dragon.Client
         public void Reconnect()
         {
             _socket.Disconnect(true);
+            Init();
             Connect();
+        }
+        
+        public IRajaProvider RajaProvider { get; set; }
+        public void SendBytes(Socket socket, SocketAsyncEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class ClientRajaProvider : IRajaProvider
+    {
+        public IRaja NewInstance()
+        {
+            return new QueueAsyncClientUserToken();
+        }
+
+        public IRaja NewWriteAsyncUserToken()
+        {
+            return new SimpleAsyncClientUserToken();
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using Dragon.Interfaces;
+﻿using Dragon.Message;
 
 namespace DragonMarble.Message
 {

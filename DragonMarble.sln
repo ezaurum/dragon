@@ -3,9 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientConsoleTest", "ConsoleTest\ConsoleTest\ClientConsoleTest.csproj", "{039BDECD-3A79-4DC7-9BCD-329C1AB2855B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Interfaces", "Interfaces\Interfaces.csproj", "{6A94673F-AE42-4A0D-BADC-83933C0976C1}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerNetworkManager", "Server\ServerNetworkManager.csproj", "{EE7BCF44-88E4-48E6-A821-EF8243ABA197}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "Server\Server.csproj", "{EE7BCF44-88E4-48E6-A821-EF8243ABA197}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DragonMarbleServer", "DragonMarbleServer\DragonMarbleServer.csproj", "{5ADEAF33-F8F8-4DBC-B69D-D6051232DB77}"
 EndProject
@@ -13,7 +11,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameUtils", "GameUtils\Game
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DragonMarbleDomain", "DragonMarbleDomain\DragonMarbleDomain.csproj", "{26208981-E513-4C57-B66E-560CBD88E28D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientNetworkManager", "Client\ClientNetworkManager.csproj", "{E797A74B-09D9-4D8F-823B-42B532215BA0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "Client\Client.csproj", "{E797A74B-09D9-4D8F-823B-42B532215BA0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Commons", "Commons\Commons.csproj", "{6A94673F-AE42-4A0D-BADC-83933C0976C1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,10 +25,6 @@ Global
 		{039BDECD-3A79-4DC7-9BCD-329C1AB2855B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{039BDECD-3A79-4DC7-9BCD-329C1AB2855B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{039BDECD-3A79-4DC7-9BCD-329C1AB2855B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6A94673F-AE42-4A0D-BADC-83933C0976C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6A94673F-AE42-4A0D-BADC-83933C0976C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6A94673F-AE42-4A0D-BADC-83933C0976C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6A94673F-AE42-4A0D-BADC-83933C0976C1}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EE7BCF44-88E4-48E6-A821-EF8243ABA197}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{EE7BCF44-88E4-48E6-A821-EF8243ABA197}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EE7BCF44-88E4-48E6-A821-EF8243ABA197}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -49,6 +45,10 @@ Global
 		{E797A74B-09D9-4D8F-823B-42B532215BA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E797A74B-09D9-4D8F-823B-42B532215BA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E797A74B-09D9-4D8F-823B-42B532215BA0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6A94673F-AE42-4A0D-BADC-83933C0976C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A94673F-AE42-4A0D-BADC-83933C0976C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6A94673F-AE42-4A0D-BADC-83933C0976C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6A94673F-AE42-4A0D-BADC-83933C0976C1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

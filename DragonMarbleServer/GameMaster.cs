@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using Dragon.Interfaces;
+using Dragon.Message;
 using DragonMarble.Message;
 using log4net;
 
@@ -26,7 +26,7 @@ namespace DragonMarble
         public const int TurnLimit = 30;
 
         private static readonly ILog Logger = LogManager.GetLogger(typeof (GameMaster));
-        private GameBoard Board { get; set; }
+        public GameBoard Board { get; set; }
         public List<StageUnitInfo> Players { get;set;}
         private readonly Dictionary<Int16, Guid> _orderCard = new Dictionary<short, Guid>();
         private GameState _state;
@@ -72,8 +72,7 @@ namespace DragonMarble
             InitGame();
             SendOrderCardSelectMessage();
             EndOrder();
-            
-            Task.Factory.StartNew(PlayGame);
+            Logger.Debug("Starg gmae and");
         }
 
         private void InitGame()
@@ -134,6 +133,11 @@ namespace DragonMarble
             Players[0].Order = 0;
             Players[1].Order = 1;
             OrderedByTurnPlayers = Players.OrderBy(player => player.Order).ToList();
+
+            Logger.Debug("End order");
+
+            //playe game is need another thread.
+            Task.Factory.StartNew(PlayGame);
         }
 
         public void Notify(IDragonMarbleGameMessage message)
@@ -143,16 +147,20 @@ namespace DragonMarble
       
         private void PlayGame()
         {
+            Logger.Debug("Play Game");
             ProcessAction();
             EndGame();
         }
 
         private IEnumerable<IGameAction> PlayerActions()
         {
+            Logger.Debug("Player actions");
             foreach (GameAction action
                 in PlayersOrderByTurn().SelectMany(player => player.Actions()))
             {
                 _state = GameState.WaitPlayerAction;
+
+                Logger.DebugFormat("_state:{0}", _state);
                 
                 //turn owner's action
                 
@@ -207,6 +215,8 @@ namespace DragonMarble
 
         private void ProcessAction()
         {
+            Logger.Debug("Process action");
+
             foreach (GameAction action in PlayerActions())
             {
                 Logger.DebugFormat("Here is ProcessAction {0}",action.Type);
