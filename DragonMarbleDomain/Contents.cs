@@ -273,7 +273,8 @@ namespace DragonMarble
         public int index;
 
         public bool isFestival;
-        public bool isOlympicCity;
+        public int olympic;
+		public bool isMonopoly;
         public string name;
 
         public StageUnitInfo owner;
@@ -290,7 +291,8 @@ namespace DragonMarble
             tileBuff = null;
 
             isFestival = false;
-            isOlympicCity = false;
+            olympic = 0;
+			isMonopoly = false;
         }
 
         public StageTileInfo(Hashtable data)
@@ -331,6 +333,10 @@ namespace DragonMarble
                         p += b.fee;
                     }
                 }
+				if ( olympic > 0 ) p = p * olympic;
+				if ( isFestival ) p = p * 2;
+				if ( isMonopoly ) p = p * 2;
+				
                 if (tileBuff != null)
                 {
                     if (tileBuff.type == StageBuffInfo.TYPE.DISCOUNT)
