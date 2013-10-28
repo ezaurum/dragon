@@ -189,15 +189,6 @@ namespace DragonMarble
     }
 
 
-    public interface IStageManager
-    {
-        Guid Id { get; set; }
-        List<StageUnitInfo> Units { get; set; }
-        void Notify(IDragonMarbleGameMessage gameActions);
-
-        void ActionResultCopySended();
-    }
-    
     public class StageTileInfo
     {
         public enum TYPE
