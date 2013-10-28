@@ -31,8 +31,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="AIStageUnitInfo.cs" />
     <Compile Include="Contents.cs" />
     <Compile Include="GameBoard.cs" />
+    <Compile Include="IStageManager.cs" />
     <Compile Include="Message\GameMessage.cs" />
     <Compile Include="Message\IDragonMarbleGameMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

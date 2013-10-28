@@ -15,18 +15,17 @@ namespace DragonMarble
         private void AIMessageProcess(IDragonMarbleGameMessage message) {
             switch ( message.MessageType ) {
                 case GameMessageType.ActivateTurn:
-                    ReceivedMessage = new RollMoveDiceGameMessage() {
+                    ReceivedMessage = new RollMoveDiceGameMessage
+                    {
                         Actor = Id,
                         Pressed = RandomUtil.Next(0f, 1f)
                     };
                     break;
                 case GameMessageType.RollMoveDiceResult:
                     break;
-                case GameMessageType.ActionResultCopy:
-                    MessageProcessor.ReceivedMessage = message;
-                    break;
-
             }
+
+            MessageProcessor.ReceivedMessage = message;
         }
     }
 }

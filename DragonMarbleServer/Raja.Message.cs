@@ -47,11 +47,6 @@ namespace DragonMarble
                         Unit.ReceivedMessage = value;
                         Logger.DebugFormat("received {0}, real time.", value.MessageType);
                         break;
-                    case GameMessageType.ActionResultCopy:
-                        Logger.DebugFormat("received {0}, real time.", value.MessageType);
-                        Unit.IsActionResultCopySended = true;
-                        break;
-
                     default:
                         _receivedMessages.Enqueue(value);
                         _receiveMessageWaitHandler.Set();

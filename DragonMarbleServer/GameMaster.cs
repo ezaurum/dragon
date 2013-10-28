@@ -212,10 +212,6 @@ namespace DragonMarble
         {
             for (Turn = 0; Turn < TurnLimit; Turn++)
             {
-                Logger.DebugFormat("wait for action result copy Turn:{0}", Turn + 1);
-
-                _receiveMessageWaitHandler.WaitOne();
-
                 Logger.DebugFormat("start Turn:{0}", Turn + 1);
 
                 Notify(CurrentPlayer.ActivateTurn());
@@ -246,7 +242,7 @@ namespace DragonMarble
         {
             Logger.Debug("Process action");
 
-            foreach (IGameMessage action in PlayerActions())
+            foreach (IDragonMarbleGameMessage action in PlayerActions())
             {
                 Board.GrossAssets = 0;
                 Units.ForEach(p => Board.GrossAssets += p.Assets);
@@ -260,9 +256,15 @@ namespace DragonMarble
                 _state = GameState.ProcessPlayerAction;
                 _availablePlayers.ForEach(p=>p.IsActionResultCopySended = false);
 
-                Notify((IDragonMarbleGameMessage) action);
+                Notify(action);
+                
+                //wait for action result copy when message is action result copy
+                if (GameMessageType.ActionResultCopy == action.MessageType)
+                {
+                    Logger.DebugFormat("wait for action result copy Turn:{0}", Turn + 1);
 
-                //need check game end
+                    _receiveMessageWaitHandler.WaitOne();
+                }
             }
         }
 

@@ -4,35 +4,10 @@ using DragonMarble.Message;
 
 namespace DragonMarble
 {
-	public class AIStageUnitInfo : StageUnitInfo {
-
-        public override IDragonMarbleGameMessage SendingMessage
-        {
-            set { 
-				MessageProcessor.SendingMessage = value;
-				AIMessageProcess(value);
-			}
-        }
-		
-		private void AIMessageProcess(IDragonMarbleGameMessage message) {
-			switch ( message.MessageType ) {
-			case GameMessageType.ActivateTurn:
-				ReceivedMessage = new RollMoveDiceGameMessage() {
-					Actor = Id,
-					Pressed = RandomUtil.Next(0f, 1f)
-				};
-				break;
-			case GameMessageType.RollMoveDiceResult:
-				break;
-                case GameMessageType.ActionResultCopy:
-                    MessageProcessor.ReceivedMessage = message;
-			        break;
-
-			}
-		}
-	}
-	public partial class StageUnitInfo
+    public partial class StageUnitInfo
 	{
+        public bool IsActionResultCopySended { get; set; }
+
 		public IDragonMarbleGameMessage ActivateTurn ()
 		{
 			OwnTurn = true;
@@ -61,6 +36,16 @@ namespace DragonMarble
 
 			for (ActionRemined = 1; ActionRemined > 0; ActionRemined--) {
 				IDragonMarbleGameMessage receivedMessage = ReceivedMessage;
+
+			    GameMessageType gameMessageType = receivedMessage.MessageType;
+			    if (GameMessageType.ActionResultCopy == gameMessageType)
+			    {
+			        IsActionResultCopySended = true;
+                    StageManager.ActionResultCopySended();
+			    } else if (GameMessageType.OrderCardSelect == gameMessageType)
+			    {
+                    
+			    }
 
 				switch (specialState) {
 				case SPECIAL_STATE.NONE:
@@ -322,24 +307,5 @@ namespace DragonMarble
 		private void SelfBan(){
 			
 		}
-
-	    private bool _actionResultCopySended;
-
-	    public bool IsActionResultCopySended
-	    {
-	        get
-	        {
-	            return _actionResultCopySended;
-	        }
-	        
-            set
-            {
-                _actionResultCopySended = value;
-	            if (value)
-	            {
-                    StageManager.ActionResultCopySended();
-	            }
-	        }
-	    }
 	}
 }
