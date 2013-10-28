@@ -18,9 +18,30 @@ namespace DragonMarble
             TRAVEL,
             TAX
         }
-        
 
-        public int GroupId { get; set; }
+        public enum ColorGroupType
+        {
+            Olive = 1,
+            Green = 2,
+            Sky = 3,
+            Blue = 4,
+            Pink = 5,
+            Violet = 6,
+            Orange = 7,
+            Red = 8
+        }
+
+        public enum LineGroupType
+        {
+            //Bottom is left line from start tile
+            Bottom = 8,
+            //value is tile index
+            Left = 16, Top =24, Right =32,
+
+        }
+        
+        public ColorGroupType Color { get; set; }
+        public LineGroupType Line { get; set; }
 
         public bool FeeBoosted
         {
@@ -73,8 +94,8 @@ namespace DragonMarble
                     sellPrice = sellPrices[i]
                 });
             }
-
-            GroupId = int.Parse(typeValue);
+            
+            this.typeValue = int.Parse(typeValue);
         }
 		
         public static readonly char[] BUILDING = {
@@ -85,8 +106,8 @@ namespace DragonMarble
             (char)16
         };
         public List<Building> buildings;
-        public List<StageTileInfo> colorGroups;
-        public List<StageTileInfo> lineGroups;
+        public List<StageTileInfo> colorGroup;
+        public List<StageTileInfo> lineGroup;
 		
         public int index;
 
@@ -227,7 +248,7 @@ namespace DragonMarble
         {
             get { return builtPrice * 2; }
         }
-
+        
         public void AddBuff(StageBuffInfo.TYPE buffType, int power, int buffTurn)
         {
             if (buffType == StageBuffInfo.TYPE.DESTROY)
