@@ -7,6 +7,11 @@ namespace DragonMarble
 {
     public partial class StageUnitInfo
     {
+        public StageUnitInfo(UNIT_COLOR unitColor, TEAM_GROUP teamGroup, int initialCapital = 2000000)
+            : this(unitColor, initialCapital)
+        {
+            this.teamGroup = teamGroup;
+        }
 
         public StageUnitInfo(UNIT_COLOR unitColor, int initialCapital = 2000000)
             : this()

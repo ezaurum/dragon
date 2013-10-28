@@ -433,6 +433,15 @@ namespace DragonMarble
             return true;
         }
 
+        public bool IsSameTeam(StageUnitInfo unit)
+        {
+            if (owner == null || owner.teamGroup != unit.teamGroup)
+            {
+                return false;
+            }
+            return true;
+        }
+
 
         public bool Buy(StageUnitInfo unit, List<int> buildingIndex)
         {
