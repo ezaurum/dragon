@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Dragon.Message;
@@ -23,16 +23,14 @@ namespace DragonMarble
 
     public class GameMaster : IStageManager
     {
-
         public const int TurnLimit = 30;
 
         private static readonly ILog Logger = LogManager.GetLogger(typeof (GameMaster));
-        public GameBoard Board { get; set; }
-        public List<StageUnitInfo> Units { get;set;}
         private readonly Dictionary<Int16, Guid> _orderCard = new Dictionary<short, Guid>();
-        private GameState _state;
+        public readonly EventWaitHandle _receiveMessageWaitHandler = new ManualResetEvent(false);
         private List<StageUnitInfo> _availablePlayers;
         private bool _gameContinue;
+        private GameState _state;
 
         public GameMaster(List<StageTileInfo> tiles)
             : this()
@@ -47,11 +45,58 @@ namespace DragonMarble
             Units = new List<StageUnitInfo>();
         }
 
-        public Guid Id { get; set; }
+        public GameBoard Board { get; set; }
 
         public bool IsGameStartable
         {
             get { return (Units.Count > 1); }
+        }
+
+        public int Turn { get; set; }
+
+        private StageUnitInfo CurrentPlayer
+        {
+            get { return OrderedByTurnPlayers[Turn%Units.Count]; }
+        }
+
+        public List<StageUnitInfo> OrderedByTurnPlayers { get; set; }
+        public IGameMessage CurrentAction { get; set; }
+
+        public bool GameContinue
+        {
+            get
+            {
+                if (_availablePlayers.Count < 2)
+                {
+                    Logger.Debug("Everyone else is out.");
+                    _gameContinue = false;
+                    return _gameContinue;
+                }
+                if (Turn > 29)
+                {
+                    Logger.Debug("Turn over.");
+                    _gameContinue = false;
+                }
+                return _gameContinue;
+            }
+            set { _gameContinue = value; }
+        }
+
+        public List<StageUnitInfo> Units { get; set; }
+        public Guid Id { get; set; }
+
+        /// <summary>
+        ///     Notify message for every players
+        /// </summary>
+        /// <param name="message">message to notify</param>
+        public void Notify(IDragonMarbleGameMessage message)
+        {
+            Units.ForEach(p => p.SendingMessage = message);
+        }
+
+        public void ActionResultCopySended()
+        {
+            CheckAllPlayerSendActionResultCopy();
         }
 
         public void Join(StageUnitInfo player)
@@ -86,7 +131,7 @@ namespace DragonMarble
             Notify(new InitializeGameGameMessage
             {
                 FeeBoostedTiles = Board.FeeBoostedTiles,
-                NumberOfPlayers = (short)Units.Count,
+                NumberOfPlayers = (short) Units.Count,
                 Units = Units
             });
 
@@ -107,25 +152,25 @@ namespace DragonMarble
             Notify(new OrderCardSelectGameMessage
             {
                 Actor = Id,
-                NumberOfPlayers = (short)Units.Count,
-                OrderCardSelectState = new List<bool> { false, false },
+                NumberOfPlayers = (short) Units.Count,
+                OrderCardSelectState = new List<bool> {false, false},
                 SelectedCardNumber = -1
             });
-            
+
 
             //TODO
             Notify(new OrderCardSelectGameMessage
             {
                 Actor = Id,
-                NumberOfPlayers = (short)Units.Count,
-                OrderCardSelectState = new List<bool> { true, true },
+                NumberOfPlayers = (short) Units.Count,
+                OrderCardSelectState = new List<bool> {true, true},
                 SelectedCardNumber = 1
             });
         }
 
         private void EndOrder()
         {
-            Notify(new OrderCardResultGameMessage()
+            Notify(new OrderCardResultGameMessage
             {
                 FirstPlayerId = Units[0].Id,
                 FirstCardNumber = 1
@@ -141,15 +186,6 @@ namespace DragonMarble
             Task.Factory.StartNew(PlayGame);
         }
 
-/// <summary>
-/// Notify message for every players
-/// </summary>
-/// <param name="message">message to notify</param>
-        public void Notify(IDragonMarbleGameMessage message)
-        {
-            Units.ForEach(p => p.SendingMessage = message);
-        }
-      
         private void PlayGame()
         {
             Logger.Debug("Play Game");
@@ -166,7 +202,7 @@ namespace DragonMarble
                 _state = GameState.WaitPlayerAction;
 
                 Logger.DebugFormat("_state:{0}", _state);
-                
+
                 //turn owner's action
                 yield return action;
             }
@@ -176,25 +212,29 @@ namespace DragonMarble
         {
             for (Turn = 0; Turn < TurnLimit; Turn++)
             {
-                Logger.DebugFormat("Turn:{0}", Turn + 1);
+                Logger.DebugFormat("wait for action result copy Turn:{0}", Turn + 1);
+
+                _receiveMessageWaitHandler.WaitOne();
+
+                Logger.DebugFormat("start Turn:{0}", Turn + 1);
 
                 Notify(CurrentPlayer.ActivateTurn());
 
-                //TODO all ready check needed.
-                
-
                 yield return CurrentPlayer;
+
+                _receiveMessageWaitHandler.Reset();
             }
         }
 
-        public int Turn { get; set; }
-
-        private StageUnitInfo CurrentPlayer
+        public void CheckAllPlayerSendActionResultCopy()
         {
-            get { return OrderedByTurnPlayers[Turn % Units.Count]; }
+            if (_availablePlayers.All(
+                availablePlayer => availablePlayer.IsActionResultCopySended
+                ))
+            {
+                _receiveMessageWaitHandler.Set();
+            }
         }
-
-        public List<StageUnitInfo> OrderedByTurnPlayers{ get; set; }
 
         public void EndGame()
         {
@@ -207,44 +247,23 @@ namespace DragonMarble
             Logger.Debug("Process action");
 
             foreach (IGameMessage action in PlayerActions())
-            {   
+            {
                 Board.GrossAssets = 0;
                 Units.ForEach(p => Board.GrossAssets += p.Assets);
                 if (Logger.IsDebugEnabled)
                 {
                     Logger.DebugFormat("Gross Assets is : {0}", Board.GrossAssets);
                 }
-              
+
                 CurrentAction = action;
 
                 _state = GameState.ProcessPlayerAction;
+                _availablePlayers.ForEach(p=>p.IsActionResultCopySended = false);
 
                 Notify((IDragonMarbleGameMessage) action);
 
                 //need check game end
             }
-        }
-
-        public IGameMessage CurrentAction { get; set; }
-
-        public bool GameContinue
-        {
-            get
-            {
-                if (_availablePlayers.Count < 2)
-                {
-                    Logger.Debug("Everyone else is out.");
-                    _gameContinue = false;
-                    return _gameContinue;
-                }
-                if (Turn > 29)
-                {
-                    Logger.Debug("Turn over.");
-                    _gameContinue = false;
-                }
-                return _gameContinue;
-            }
-            set { _gameContinue = value; }
         }
 
         public static List<StageTileInfo> ParseTiles(XDocument doc)
@@ -265,7 +284,7 @@ namespace DragonMarble
                     fees[i] = int.Parse(xElement.Attribute("Fee").Value.ToString());
                     sellPrices[i] = int.Parse(xElement.Attribute("SellPrice").Value.ToString());
                 }
-                
+
                 return new StageTileInfo(
                     int.Parse(c.Attribute("Index").Value.ToString()),
                     c.Attribute("Name").Value.ToString(),

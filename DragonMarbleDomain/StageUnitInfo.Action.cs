@@ -273,6 +273,24 @@ namespace DragonMarble
 		private void SelfBan(){
 			
 		}
-		
+
+	    private bool _actionResultCopySended;
+
+	    public bool IsActionResultCopySended
+	    {
+	        get
+	        {
+	            return _actionResultCopySended;
+	        }
+	        
+            set
+            {
+                _actionResultCopySended = value;
+	            if (value)
+	            {
+                    StageManager.ActionResultCopySended();
+	            }
+	        }
+	    }
 	}
 }

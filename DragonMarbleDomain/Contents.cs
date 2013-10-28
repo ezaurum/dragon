@@ -195,6 +195,7 @@ namespace DragonMarble
         List<StageUnitInfo> Units { get; set; }
         void Notify(IDragonMarbleGameMessage gameActions);
 
+        void ActionResultCopySended();
     }
     
     public class StageTileInfo

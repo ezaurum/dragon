@@ -43,6 +43,11 @@ namespace ConsoleTest
                     nm.SendMessage(rollMessage);
                 }
 
+                if (readLine.Contains("A"))
+                {
+                    nm.SendMessage(new ActionResultCopyGameMessage());
+                }
+
                 if (readLine.Contains("1"))
                 {
                     OrderCardSelectGameMessage orderCardSelectGameMessage = new OrderCardSelectGameMessage
