@@ -4,35 +4,27 @@ using DragonMarble.Message;
 
 namespace DragonMarble
 {
-	public class AIStageUnitInfo : StageUnitInfo {
+    public partial class StageUnitInfo
+    {
+        public bool _isActionResultCopySended;
 
-        public override IDragonMarbleGameMessage SendingMessage
+        public bool IsActionResultCopySended
         {
-            set { 
-				MessageProcessor.SendingMessage = value;
-				AIMessageProcess(value);
-			}
+            get
+            {
+                return _isActionResultCopySended;
+            }
+            set
+            {
+                _isActionResultCopySended = value;
+                if (value)
+                {
+                    StageManager.ActionResultCopySended();
+                }
+            }
         }
-		
-		private void AIMessageProcess(IDragonMarbleGameMessage message) {
-			switch ( message.MessageType ) {
-			case GameMessageType.ActivateTurn:
-				ReceivedMessage = new RollMoveDiceGameMessage() {
-					Actor = Id,
-					Pressed = RandomUtil.Next(0f, 1f)
-				};
-				break;
-			case GameMessageType.RollMoveDiceResult:
-				
-				
-				break;
-				
-			}
-		}
-	}
-	public partial class StageUnitInfo
-	{
-		public IDragonMarbleGameMessage ActivateTurn ()
+
+        public IDragonMarbleGameMessage ActivateTurn ()
 		{
 			OwnTurn = true;
 			IDragonMarbleGameMessage message = new ActivateTurnGameMessage
@@ -139,19 +131,37 @@ namespace DragonMarble
 					break;
 					
 				case SPECIAL_STATE.TRAVEL:
-					TravelActionGameMessage travelActionMsg = (TravelActionGameMessage) receivedMessage;
-					if ( tileIndex == travelActionMsg.TileIndex ){
-						SelfBan();
-					}else{
-						tileIndex = travelActionMsg.TileIndex;
-					}
-					Go (Dice.resultSum);
-					foreach(var destinationGameAction in DestinationGameAction () ) {
-						if (null != destinationGameAction)
-							yield return destinationGameAction;
-					}
-					
-					break;
+                    {
+                        IDragonMarbleGameMessage travelActionMsg = receivedMessage;
+                        if (travelActionMsg.MessageType == GameMessageType.TravelAction)
+                        {
+                            TravelActionGameMessage msg = (TravelActionGameMessage)travelActionMsg;
+                            yield return msg;
+                            if (tileIndex == msg.TileIndex || msg.TileIndex < 0 || msg.TileIndex > 32)
+                            {
+                                SelfBan();
+                            }
+                            else
+                            {
+                                tileIndex = msg.TileIndex;
+                            }
+                        }
+                        else if (travelActionMsg.MessageType == GameMessageType.RollMoveDice)
+                        {
+                            RollMoveDiceGameMessage msg = (RollMoveDiceGameMessage)travelActionMsg;
+                            yield return Dice.RollAndGetResultGameAction(this, msg.Pressed, msg.Odd, msg.Even);
+                            Go(Dice.resultSum);
+                        }
+                        specialState = SPECIAL_STATE.NONE;
+                        specialStateValue = 0;
+                        foreach (var destinationGameAction in DestinationGameAction())
+                        {
+                            if (null != destinationGameAction)
+                                yield return destinationGameAction;
+                        }
+
+                        break;
+                    }
 					
 				}
 			}
@@ -166,12 +176,38 @@ namespace DragonMarble
 			case StageTileInfo.TYPE.SIGHT:
                 foreach (var gameAction in MoveResultCitySight(stageTile)) yield return gameAction;
 			        break;
-			case StageTileInfo.TYPE.PRISON:
-				ActionRemined = 0;
-				Prison();
-				yield return null;
+            case StageTileInfo.TYPE.PRISON:
+                    ActionRemined = 0;
+                    Prison();
+                    yield return null;
+                    break;
+            case StageTileInfo.TYPE.TRAVEL:
+                    ActionRemined = 0;
+                    Travel();
+                    yield return null;
+                    break;
+            case StageTileInfo.TYPE.START:
+                    bool isAbleToBuild = false;
+                    foreach (StageTileInfo t in lands.Values)
+                    {
+                        if (t.type == StageTileInfo.TYPE.CITY && t.buildings[4].isBuilt == false)
+                        {
+                            isAbleToBuild = true;
+                            break;
+                        }
+                    }
+                    if (isAbleToBuild)
+                    {
+                        BuyLandGameMessage receivedMessage = (BuyLandGameMessage)ReceivedMessage;
+                        if (receivedMessage.Buildings > (char)0)
+                        {
+                            if (!BuyLand(receivedMessage))
+                            {
+                                SelfBan();
+                            }
+                        }
+                    }
 				break;
-				
 			default:
 				yield return null;
 				break;
@@ -250,6 +286,10 @@ namespace DragonMarble
 		
 		private bool BuyLand(IDragonMarbleGameMessage receivedMessage){
 			BuyLandGameMessage msg = (BuyLandGameMessage) receivedMessage;
+            if (Stage.Tiles[msg.TileIndex].IsSameOwner(this) == false)
+            {
+                return false;
+            }
 			if ( msg.Buildings == StageTileInfo.BUILDING[4] ){
 				return Stage.Tiles[msg.TileIndex].BuyLandmark(this);
 			}
@@ -273,24 +313,5 @@ namespace DragonMarble
 		private void SelfBan(){
 			
 		}
-
-	    private bool _actionResultCopySended;
-
-	    public bool IsActionResultCopySended
-	    {
-	        get
-	        {
-	            return _actionResultCopySended;
-	        }
-	        
-            set
-            {
-                _actionResultCopySended = value;
-	            if (value)
-	            {
-                    StageManager.ActionResultCopySended();
-	            }
-	        }
-	    }
 	}
 }
