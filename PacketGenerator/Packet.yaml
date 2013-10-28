@@ -153,9 +153,29 @@ BuyLand :
       length : 16
       options : [byte_param_constructor, to_byte_array, property]
 
+UseCouponRequest :
+  comment : request use chance chance coupon
+  fields :
+    - name : Actor
+      type : Guid
+      length : 16
+      options : [byte_param_constructor, to_byte_array, property]
+
+UseCoupon :
+  comment : use chance chance coupon
+  fields :
+    - name : Use
+      type : Boolean
+    - name : Actor
+      type : Guid
+      length : 16
+      options : [byte_param_constructor, to_byte_array, property]
+
 PayFee :
   comment : pay fee
   fields :
+    - name : Fee
+      type : Int32
     - name : Actor
       type : Guid
       length : 16
@@ -207,6 +227,48 @@ TravelAction :
     - name : TileIndex
       type : Char
     - name : Actor
+      type : Guid
+      length : 16
+      options : [byte_param_constructor, to_byte_array, property]
+
+NeedMoneyRequest :
+  comment : request loan money
+  fields :
+    - name : NeedMoney
+      type : Int32
+    - name : Actor
+      type : Guid
+      length : 16
+      options : [byte_param_constructor, to_byte_array, property]
+
+LoanMoney :
+  comment : loan money from bank
+  fields :
+    - name : LoanMoney
+      type : Int32
+    - name : Actor
+      type : Guid
+      length : 16
+      options : [byte_param_constructor, to_byte_array, property]
+
+SellLands :
+  comment : sell lands
+  fields :
+    - name : LandCount
+      type : Char
+    - name : LandList
+      type : Char
+      collection : List
+      size : LandCount
+    - name : Actor
+      type : Guid
+      length : 16
+      options : [byte_param_constructor, to_byte_array, property]
+
+GameResult :
+  comment : game result
+  fields :
+    - name : LoseUnit
       type : Guid
       length : 16
       options : [byte_param_constructor, to_byte_array, property]
