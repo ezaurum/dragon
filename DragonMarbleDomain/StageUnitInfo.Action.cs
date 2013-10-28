@@ -5,10 +5,26 @@ using DragonMarble.Message;
 namespace DragonMarble
 {
     public partial class StageUnitInfo
-	{
-        public bool IsActionResultCopySended { get; set; }
+    {
+        public bool _isActionResultCopySended;
 
-		public IDragonMarbleGameMessage ActivateTurn ()
+        public bool IsActionResultCopySended
+        {
+            get
+            {
+                return _isActionResultCopySended;
+            }
+            set
+            {
+                _isActionResultCopySended = value;
+                if (value)
+                {
+                    StageManager.ActionResultCopySended();
+                }
+            }
+        }
+
+        public IDragonMarbleGameMessage ActivateTurn ()
 		{
 			OwnTurn = true;
 			IDragonMarbleGameMessage message = new ActivateTurnGameMessage
@@ -36,16 +52,6 @@ namespace DragonMarble
 
 			for (ActionRemined = 1; ActionRemined > 0; ActionRemined--) {
 				IDragonMarbleGameMessage receivedMessage = ReceivedMessage;
-
-			    GameMessageType gameMessageType = receivedMessage.MessageType;
-			    if (GameMessageType.ActionResultCopy == gameMessageType)
-			    {
-			        IsActionResultCopySended = true;
-                    StageManager.ActionResultCopySended();
-			    } else if (GameMessageType.OrderCardSelect == gameMessageType)
-			    {
-                    
-			    }
 
 				switch (specialState) {
 				case SPECIAL_STATE.NONE:

@@ -252,17 +252,23 @@ namespace DragonMarble
                 }
 
                 CurrentAction = action;
-
                 _state = GameState.ProcessPlayerAction;
-                _availablePlayers.ForEach(p=>p.IsActionResultCopySended = false);
+                if (GameMessageType.ActionResultCopy == action.MessageType)
+                {
+                    _receiveMessageWaitHandler.Reset();
+                    _availablePlayers.ForEach(p => p.IsActionResultCopySended = false);
+                }
 
-                Notify(action);
-                
+                if (GameMessageType.ActionResultCopy != action.MessageType)
+                {
+                    Notify(action);
+                }
+
                 //wait for action result copy when message is action result copy
                 if (GameMessageType.ActionResultCopy == action.MessageType)
                 {
+                    _receiveMessageWaitHandler.Reset();
                     Logger.DebugFormat("wait for action result copy Turn:{0}", Turn + 1);
-
                     _receiveMessageWaitHandler.WaitOne();
                 }
             }
