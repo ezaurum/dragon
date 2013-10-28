@@ -23,10 +23,11 @@ namespace DragonMarble
 				};
 				break;
 			case GameMessageType.RollMoveDiceResult:
-				
-				
 				break;
-				
+                case GameMessageType.ActionResultCopy:
+                    MessageProcessor.ReceivedMessage = message;
+			        break;
+
 			}
 		}
 	}
