@@ -7,7 +7,6 @@ namespace DragonMarble
         public override IDragonMarbleGameMessage SendingMessage
         {
             set { 
-                MessageProcessor.SendingMessage = value;
                 AIMessageProcess(value);
             }
         }
@@ -23,9 +22,7 @@ namespace DragonMarble
                     break;
                 case GameMessageType.RollMoveDiceResult:
                     break;
-            }
-
-            MessageProcessor.ReceivedMessage = message;
+            }            
         }
     }
 }

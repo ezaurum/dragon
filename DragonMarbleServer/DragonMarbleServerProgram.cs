@@ -73,6 +73,17 @@ namespace DragonMarble
 
             gm.Join(token.Unit);
 
+            StageUnitInfo dummyAI = new AIStageUnitInfo()
+            {
+                Id = Guid.NewGuid(),
+                Order = 1,
+                UnitColor = StageUnitInfo.UNIT_COLOR.GREEN,
+                CharacterId = 1,
+                Gold = 2000000,
+                ControlMode = StageUnitInfo.ControlModeType.AI_0
+            };
+            gm.Join(dummyAI);
+
             if (gm.IsGameStartable)
             {
                 Task.Factory.StartNew(gm.StartGame);
