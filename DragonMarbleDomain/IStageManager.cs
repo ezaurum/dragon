@@ -9,7 +9,10 @@ namespace DragonMarble
         Guid Id { get; set; }
         List<StageUnitInfo> Units { get; set; }
         void Notify(IDragonMarbleGameMessage gameActions);
+        void Join(StageUnitInfo player);
 
+        //real time checker
         void ActionResultCopySended();
+        void OrderSelectSended();
     }
 }

@@ -42,7 +42,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GameMaster.Fields.cs" />
+    <Compile Include="GameMaster.Notify.cs" />
     <Compile Include="GameMaster.Parser.cs" />
+    <Compile Include="GameMaster.RealTime.cs" />
     <Compile Include="Raja.cs" />
     <Compile Include="Raja.Message.cs" />
     <Compile Include="GameMaster.cs" />
