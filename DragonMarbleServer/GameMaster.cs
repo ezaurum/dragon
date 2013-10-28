@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 using Dragon.Message;
 using DragonMarble.Message;
 using log4net;
@@ -21,13 +20,21 @@ namespace DragonMarble
         EndGame
     }
 
-    public class GameMaster : IStageManager
+    public partial class GameMaster : IStageManager
     {
-        public const int TurnLimit = 30;
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(GameMaster));
 
-        private static readonly ILog Logger = LogManager.GetLogger(typeof (GameMaster));
+        //turn limit
+        public const int TurnLimit = 30;
+        public GameBoard Board { get; set; }
+        public int Turn { get; set; }
+        public List<StageUnitInfo> Units { get; set; }
+        public Guid Id { get; set; }
+        public List<StageUnitInfo> OrderedByTurnPlayers { get; set; }
+        public IGameMessage CurrentAction { get; set; }
+
         private readonly Dictionary<Int16, Guid> _orderCard = new Dictionary<short, Guid>();
-        public readonly EventWaitHandle _receiveMessageWaitHandler = new ManualResetEvent(false);
+        private readonly EventWaitHandle _receiveMessageWaitHandler = new ManualResetEvent(false);
         private List<StageUnitInfo> _availablePlayers;
         private bool _gameContinue;
         private GameState _state;
@@ -45,23 +52,16 @@ namespace DragonMarble
             Units = new List<StageUnitInfo>();
         }
 
-        public GameBoard Board { get; set; }
-
         public bool IsGameStartable
         {
             get { return (Units.Count > 1); }
         }
-
-        public int Turn { get; set; }
-
+        
         private StageUnitInfo CurrentPlayer
         {
             get { return OrderedByTurnPlayers[Turn%Units.Count]; }
         }
-
-        public List<StageUnitInfo> OrderedByTurnPlayers { get; set; }
-        public IGameMessage CurrentAction { get; set; }
-
+        
         public bool GameContinue
         {
             get
@@ -81,10 +81,7 @@ namespace DragonMarble
             }
             set { _gameContinue = value; }
         }
-
-        public List<StageUnitInfo> Units { get; set; }
-        public Guid Id { get; set; }
-
+        
         /// <summary>
         ///     Notify message for every players
         /// </summary>
@@ -92,11 +89,6 @@ namespace DragonMarble
         public void Notify(IDragonMarbleGameMessage message)
         {
             Units.ForEach(p => p.SendingMessage = message);
-        }
-
-        public void ActionResultCopySended()
-        {
-            CheckAllPlayerSendActionResultCopy();
         }
 
         public void Join(StageUnitInfo player)
@@ -156,7 +148,6 @@ namespace DragonMarble
                 OrderCardSelectState = new List<bool> {false, false},
                 SelectedCardNumber = -1
             });
-
 
             //TODO
             Notify(new OrderCardSelectGameMessage
@@ -222,11 +213,23 @@ namespace DragonMarble
             }
         }
 
-        public void CheckAllPlayerSendActionResultCopy()
+        public void ActionResultCopySended()
         {
             if (_availablePlayers.All(
                 availablePlayer => availablePlayer.IsActionResultCopySended
                 ))
+            {
+                _receiveMessageWaitHandler.Set();
+            }
+        }
+
+        public void OrderSelectSended()
+        {
+            if (_orderCard.Count == _availablePlayers.Count -1)
+            {
+
+            }
+            if (_orderCard.Count == _availablePlayers.Count )
             {
                 _receiveMessageWaitHandler.Set();
             }
@@ -274,32 +277,6 @@ namespace DragonMarble
             }
         }
 
-        public static List<StageTileInfo> ParseTiles(XDocument doc)
-        {
-            // Query the data and write out a subset of contacts
-            IEnumerable<StageTileInfo> query = doc.Elements("Category").Elements("Stage").Select(c =>
-            {
-                IEnumerable<XElement> xElements = c.Elements("Price");
-
-                var buyPrices = new int[4];
-                var sellPrices = new int[4];
-                var fees = new int[4];
-
-                int i = 0;
-                foreach (XElement xElement in xElements)
-                {
-                    buyPrices[i] = int.Parse(xElement.Attribute("BuyPrice").Value.ToString());
-                    fees[i] = int.Parse(xElement.Attribute("Fee").Value.ToString());
-                    sellPrices[i] = int.Parse(xElement.Attribute("SellPrice").Value.ToString());
-                }
-
-                return new StageTileInfo(
-                    int.Parse(c.Attribute("Index").Value.ToString()),
-                    c.Attribute("Name").Value.ToString(),
-                    c.Attribute("Type").Value.ToString(),
-                    c.Attribute("TypeValue").Value.ToString(), buyPrices, sellPrices, fees);
-            });
-            return query.ToList();
-        }
+      
     }
 }
