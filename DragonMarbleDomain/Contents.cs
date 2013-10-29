@@ -5,20 +5,6 @@ using DragonMarble.Message;
 
 namespace DragonMarble
 {
-    public static class RandomFactory
-    {
-        public static Random NewRandom()
-        {
-            return new Random();
-        }
-    }
-	public static class RandomUtil
-	{
-		public static float Next(float min, float max){
-            return RandomFactory.NewRandom().Next((int)(min * 1000), (int)max * 1000) / 1000f;
-		}
-	}
-
     public class StageBuffInfo
     {
         public enum TARGET
