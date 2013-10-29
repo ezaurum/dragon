@@ -275,3 +275,69 @@ GameResult :
 
 ActionResultCopy :
   comment : Client received Player's action result signal
+
+ReadyState :
+  comment : Indicate Ready or not for game Start
+  fields :
+    - name : Actor
+      type : Guid
+      length : 16
+      options : [byte_param_constructor, to_byte_array, property]
+    - name : Ready
+      type : Boolean
+
+RoomOwner :
+  comment : Indicate who is room owner
+  fields :
+    - name : RoomOwner
+      type : Guid
+      length : 16
+      options : [byte_param_constructor, to_byte_array, property]
+    - name : Startable
+      type : Boolean
+
+EveryoneIsReady :
+  comment : Everyone is ready for game start
+  fields :
+    - name : ResponseLimit
+      type : Int32
+
+BuyItemInGame :
+  comment : Buy a game item in waiting room or game playing
+  fields :
+    - name : ItemId
+      type : Guid
+      length : 16
+      options : [byte_param_constructor, to_byte_array, property]
+
+ExitWaitingRoom :
+  comment : Exit waiting room
+  fields :
+    - name : Actor
+      type : Guid
+      length : 16
+      options : [byte_param_constructor, to_byte_array, property]
+
+InitializeWaitingRoom :
+    comment : 게임 대기방 초기화 정보
+    fields :
+        - name : BoardType
+          type : Int16
+        - type : Int16
+          name : NumberOfPlayers
+        - type : Int16
+          name : CurrentNumberOfPlayers
+        - name : Units
+          type : StageUnitInfo
+          options : [constructor]
+          collection : List
+          length : sizeof(Int16)
+          size : CurrentNumberOfPlayers
+          targets :            
+            - name : teamGroup
+              cast : Int32
+              type : StageUnitInfo.TEAM_GROUP            
+            - name : Id
+              type : Guid
+              length : 16
+              options : [byte_param_constructor, to_byte_array]
