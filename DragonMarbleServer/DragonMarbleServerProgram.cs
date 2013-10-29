@@ -40,6 +40,8 @@ namespace DragonMarble
             while (true)
             {
                 string readLine = Console.ReadLine();
+                
+                //dice cheat
                 int i;
                 if (int.TryParse(readLine, out i))
                 {

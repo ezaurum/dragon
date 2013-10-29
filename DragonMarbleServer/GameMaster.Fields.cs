@@ -10,7 +10,9 @@ namespace DragonMarble
     {
         public enum GameState
         {
-            BeforeInit = 0,
+            JustMade = 0,
+            WaitingRoom,
+            BeforeInit,
             Init,
             StartGame,
             OrderPlayers,
@@ -22,7 +24,7 @@ namespace DragonMarble
         //turn limit
         public const int TurnLimit = 30;
         private static readonly ILog Logger = LogManager.GetLogger(typeof (GameMaster));
-
+        public int PlayerNumberForPlay { get; private set; }
         public static GameBoard OriginalBoard { get; set; }
         private readonly Dictionary<short, Guid> _orderCard = new Dictionary<short, Guid>();
         private readonly EventWaitHandle _receiveMessageWaitHandler = new ManualResetEvent(false);
@@ -30,15 +32,10 @@ namespace DragonMarble
         private bool _gameContinue;
         private GameState _state;
 
-        public GameMaster(List<StageTileInfo> tiles)
-            : this()
+        public GameMaster(int playerNumberForPlayer)
         {
-            Board = new GameBoard(tiles);
-        }
-
-        public GameMaster()
-        {
-            _state = GameState.BeforeInit;
+            PlayerNumberForPlay = playerNumberForPlayer;
+            _state = GameState.JustMade;
             Id = Guid.NewGuid();
             Units = new List<StageUnitInfo>();
         }
@@ -50,7 +47,10 @@ namespace DragonMarble
 
         public bool IsGameStartable
         {
-            get { return (Units.Count > 1); }
+            get
+            {
+                return Units.Count == PlayerNumberForPlay;
+            }
         }
 
         private StageUnitInfo CurrentPlayer

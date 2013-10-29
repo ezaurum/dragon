@@ -57,8 +57,8 @@ namespace DragonMarble
                 Gold = 2000000
             };
 
-            GameMaster gm = new GameMaster();
-            
+            GameMaster gm = new GameMaster(2);
+
             gm.Join(token.Unit);
 
             StageUnitInfo dummyAI = new AIStageUnitInfo()
