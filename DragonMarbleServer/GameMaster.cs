@@ -12,7 +12,6 @@ namespace DragonMarble
         public void StartGame()
         {
             InitGame();
-            SendOrderCardSelectMessage();
             EndOrder();
             Logger.Debug("Starg gmae and");
         }
@@ -32,38 +31,42 @@ namespace DragonMarble
             });
 
             _state = GameState.Init;
-        }
 
-        private void SendOrderCardSelectMessage()
-        {
-            if (GameState.Init != _state)
-                throw new InvalidOperationException("State is not initialized.");
-
-            _state = GameState.OrderPlayers;
             GameContinue = true;
 
             //order
             //At first, select order
+            _receiveMessageWaitHandler.Reset();
 
-            Notify(new OrderCardSelectGameMessage
+            OrderCardSelectGameMessage orderCardSelectGameMessage = new OrderCardSelectGameMessage
             {
                 Actor = Id,
-                NumberOfPlayers = (short) Units.Count,
-                OrderCardSelectState = new List<bool> {false, false},
+                NumberOfPlayers = (short)Units.Count,
+                OrderCardSelectState = new List<bool>(),
                 SelectedCardNumber = -1
-            });
+            };
+
+            for (int i = 0; i < Units.Count; i++)
+            {
+                orderCardSelectGameMessage.OrderCardSelectState.Add(false);
+            }
+            _state = GameState.OrderPlayers;
+            Notify(orderCardSelectGameMessage);
         }
 
         private void EndOrder()
         {
+            _receiveMessageWaitHandler.WaitOne();
+            ///pick random card
+            short firstCardNumber = (short) RandomUtil.Next(0,Units.Count);
+            Guid firstPlayerId = _orderCard[firstCardNumber];
+            
             Notify(new OrderCardResultGameMessage
             {
-                FirstPlayerId = Units[0].Id,
-                FirstCardNumber = 1
+                FirstPlayerId = firstPlayerId,
+                FirstCardNumber = firstCardNumber
             });
 
-            Units[0].Order = 0;
-            Units[1].Order = 1;
             OrderedByTurnPlayers = Units.OrderBy(player => player.Order).ToList();
 
             Logger.Debug("End order");
@@ -114,7 +117,6 @@ namespace DragonMarble
                 //wait for action result copy when message is action result copy
                 if (GameMessageType.ActionResultCopy == action.MessageType)
                 {
-                    _receiveMessageWaitHandler.Reset();
                     Logger.DebugFormat("wait for action result copy Turn:{0}", Turn + 1);
                     _receiveMessageWaitHandler.WaitOne();
                 }

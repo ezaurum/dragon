@@ -13,6 +13,6 @@ namespace DragonMarble
 
         //real time checker
         void ActionResultCopySended();
-        void OrderSelectSended();
+        void OrderSelectSended(OrderCardSelectGameMessage message);
     }
 }

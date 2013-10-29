@@ -44,7 +44,7 @@ namespace DragonMarble
                 switch (value.MessageType)
                 {
                     case GameMessageType.OrderCardSelect:
-                        Unit.ReceivedMessage = value;
+                        Unit.SelectOrderCard(value);
                         Logger.DebugFormat("received {0}, real time.", value.MessageType);
                         break;
                     case GameMessageType.ActionResultCopy:

@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using DragonMarble.Message;
 
 namespace DragonMarble
 {
@@ -14,17 +16,57 @@ namespace DragonMarble
             }
         }
 
-        public void OrderSelectSended()
+        public void OrderSelectSended(OrderCardSelectGameMessage message)
         {
+            short selectedCardNumber = message.SelectedCardNumber;
+            lock (_orderCard)
+            {
+                if (_orderCard.ContainsKey(selectedCardNumber))
+                {
+                    message.SelectedCardNumber = -1;
+                }
+                else
+                {
+                    _orderCard.Add(selectedCardNumber, message.Actor);
+                    message.OrderCardSelectState[selectedCardNumber] = true;
+                }
+            }
+
+            Notify(message);
+
             if (_orderCard.Count == _availablePlayers.Count - 1)
             {
+                short notSelectedCard = 0;
+                Guid notSelectedUnit = Guid.Empty;
 
+                for (short i = 0; i < _availablePlayers.Count; i++)
+                {
+                    if (_orderCard.ContainsKey(i)) continue;
+
+                    notSelectedCard = i;
+                    break;
+                }
+
+                foreach (StageUnitInfo stageUnitInfo in _availablePlayers)
+                {
+                    if(_orderCard.ContainsValue(stageUnitInfo.Id)) continue;
+                    notSelectedUnit = stageUnitInfo.Id;
+                    break;
+                }
+                
+                if ( notSelectedUnit == Guid.Empty )
+                    throw new InvalidOperationException("empty guid!");
+
+                _orderCard.Add(notSelectedCard, notSelectedUnit);
+                message.Actor = notSelectedUnit;
+                message.SelectedCardNumber = notSelectedCard;
+                Notify(message);
             }
+
             if (_orderCard.Count == _availablePlayers.Count)
             {
                 _receiveMessageWaitHandler.Set();
             }
         }
-
     }
 }

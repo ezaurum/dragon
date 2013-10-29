@@ -87,8 +87,6 @@ namespace DragonMarble
             get { return property; }
         }
 
-        public int LastSelected { get; set; }
-
         public int Position
         {
             get { return tileIndex; }
@@ -243,6 +241,11 @@ namespace DragonMarble
             {
                 unitBuff = new StageBuffInfo(buffType, buffTurn, power);
             }
+        }
+
+        public void SelectOrderCard(IDragonMarbleGameMessage value)
+        {
+            StageManager.OrderSelectSended((OrderCardSelectGameMessage) value);
         }
     }
 }

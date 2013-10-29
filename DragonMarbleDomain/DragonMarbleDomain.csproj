@@ -42,12 +42,16 @@
     <Compile Include="StageUnitInfo.Action.cs" />
     <Compile Include="StageUnitInfo.cs" />
     <Compile Include="StageUnitInfo.Enum.cs" />
+    <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Commons\Commons.csproj">
       <Project>{6A94673F-AE42-4A0D-BADC-83933C0976C1}</Project>
       <Name>Commons</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
