@@ -10,6 +10,7 @@ namespace DragonMarble
         List<StageUnitInfo> Units { get; set; }
         void Notify(IDragonMarbleGameMessage gameActions);
         void Join(StageUnitInfo player);
+        void Ban(StageUnitInfo stageUnitInfo);
 
         //real time checker
         void ActionResultCopySended();

@@ -34,5 +34,13 @@ namespace DragonMarble
                 Server = Id
             };
         }
+
+        public void Ban(StageUnitInfo stageUnitInfo)
+        {
+            Logger.DebugFormat("banned. :{0}",stageUnitInfo.Id);
+            stageUnitInfo.ControlMode= StageUnitInfo.ControlModeType.AI_0;
+            Raja raja = (Raja) stageUnitInfo.MessageProcessor;
+            raja.Dispose();
+        }
     }
 }

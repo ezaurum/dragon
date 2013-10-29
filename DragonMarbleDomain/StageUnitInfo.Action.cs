@@ -49,124 +49,151 @@ namespace DragonMarble
 
         public IEnumerable<IGameMessage> Actions()
 		{
-
 			for (ActionRemined = 1; ActionRemined > 0; ActionRemined--) {
 				IDragonMarbleGameMessage receivedMessage = ReceivedMessage;
 
 				switch (specialState) {
 				case SPECIAL_STATE.NONE:
-					var rollMoveDiceGameMessage = (RollMoveDiceGameMessage)receivedMessage;
-					yield return Dice.RollAndGetResultGameAction(this
-                            , rollMoveDiceGameMessage.Pressed
-                            , rollMoveDiceGameMessage.Odd
-                            , rollMoveDiceGameMessage.Even);
-
-					if (Dice.isDouble) {
-						if (Dice.rollCount > 2) {
-							Prison();
-							break;
-						}
-						ActionRemined += 1;
-					}
-					Go (Dice.resultSum);
-					foreach(var destinationGameAction in DestinationGameAction () ) {
-						if (null != destinationGameAction)
-							yield return destinationGameAction;
-					}
-					break;
+					foreach (var gameMessage in NormalPositionActions(receivedMessage)) 
+                        yield return gameMessage;
+				        break;
 					
 				case SPECIAL_STATE.PRISON:
-					PrisonActionGameMessage prisonActionMsg = (PrisonActionGameMessage) receivedMessage;
-					Dice.Roll();
-					//yield return Dice.RollAndGetResultGameAction(this, 0.5f, false, false);
-					bool escape = false;
-					switch ( prisonActionMsg.ActionIndex ){
-					case (char)PRISON_ACTION.ROLL:
-						if ( Dice.isDouble ){
-							escape = true;
-						}else{
-							UpdatePrisonState();
-						}
-						break;
-					case (char)PRISON_ACTION.PAY:
-						if ( AddGold( - GameBoard.PRISON_PRICE ) ){
-							if (Dice.isDouble) {
-								ActionRemined += 1;
-							}
-							escape = true;
-						}else{
-							SelfBan();
-						}
-						break;
-					case (char)PRISON_ACTION.CARD:
-						if ( chanceCoupon == CHANCE_COUPON.ESCAPE_ISLAND ){
-							chanceCoupon = CHANCE_COUPON.NONE;
-							escape = true;
-						}else{
-							SelfBan();
-						}
-						break;
-					}
-				        yield return new PrisonActionResultGameMessage
-				        {
-				            Actor = Id,
-				            EscapeResult = escape,
-				            EscapeType = prisonActionMsg.ActionIndex
-				        };
-				        yield return new RollMoveDiceResultGameMessage
-				        {
-				            Actor = Id,
-				            Dices = new List<char> {(char) Dice.result[0], (char) Dice.result[1]}
-				        };
-					
-					if ( escape ){
-						specialState = SPECIAL_STATE.NONE;
-						specialStateValue = 0;
-						Go (Dice.resultSum);
-						foreach(var destinationGameAction in DestinationGameAction () ) {
-							if (null != destinationGameAction)
-								yield return destinationGameAction;
-						}	
-					}
-					break;
+					foreach (var gameMessage1 in InPrisonActions(receivedMessage)) yield return gameMessage1;
+				        break;
 					
 				case SPECIAL_STATE.TRAVEL:
-                    {
-                        IDragonMarbleGameMessage travelActionMsg = receivedMessage;
-                        if (travelActionMsg.MessageType == GameMessageType.TravelAction)
-                        {
-                            TravelActionGameMessage msg = (TravelActionGameMessage)travelActionMsg;
-                            yield return msg;
-                            if (tileIndex == msg.TileIndex || msg.TileIndex < 0 || msg.TileIndex > 32)
-                            {
-                                SelfBan();
-                            }
-                            else
-                            {
-                                tileIndex = msg.TileIndex;
-                            }
-                        }
-                        else if (travelActionMsg.MessageType == GameMessageType.RollMoveDice)
-                        {
-                            RollMoveDiceGameMessage msg = (RollMoveDiceGameMessage)travelActionMsg;
-                            yield return Dice.RollAndGetResultGameAction(this, msg.Pressed, msg.Odd, msg.Even);
-                            Go(Dice.resultSum);
-                        }
-                        specialState = SPECIAL_STATE.NONE;
-                        specialStateValue = 0;
-                        foreach (var destinationGameAction in DestinationGameAction())
-                        {
-                            if (null != destinationGameAction)
-                                yield return destinationGameAction;
-                        }
-
+                    foreach (var gameMessage2 in InTravelActions(receivedMessage)) yield return gameMessage2;
                         break;
-                    }
-					
+				    
 				}
 			}
 			DeactivateTurn ();
 		}
+
+        private IEnumerable<IGameMessage> InTravelActions(IDragonMarbleGameMessage receivedMessage)
+        {
+            IDragonMarbleGameMessage travelActionMsg = receivedMessage;
+            if (travelActionMsg.MessageType == GameMessageType.TravelAction)
+            {
+                TravelActionGameMessage msg = (TravelActionGameMessage) travelActionMsg;
+                yield return msg;
+                if (tileIndex == msg.TileIndex || msg.TileIndex < 0 || msg.TileIndex > 32)
+                {
+                    SelfBan();
+                }
+                else
+                {
+                    tileIndex = msg.TileIndex;
+                }
+            }
+            else if (travelActionMsg.MessageType == GameMessageType.RollMoveDice)
+            {
+                RollMoveDiceGameMessage msg = (RollMoveDiceGameMessage) travelActionMsg;
+                yield return Dice.RollAndGetResultGameAction(this, msg.Pressed, msg.Odd, msg.Even);
+                Go(Dice.resultSum);
+            }
+            specialState = SPECIAL_STATE.NONE;
+            specialStateValue = 0;
+            foreach (var destinationGameAction in DestinationGameAction())
+            {
+                if (null != destinationGameAction)
+                    yield return destinationGameAction;
+            }
+        }
+
+        private IEnumerable<IGameMessage> InPrisonActions(IDragonMarbleGameMessage receivedMessage)
+        {
+            PrisonActionGameMessage prisonActionMsg = (PrisonActionGameMessage) receivedMessage;
+            Dice.Roll();
+            //yield return Dice.RollAndGetResultGameAction(this, 0.5f, false, false);
+            bool escape = false;
+            switch (prisonActionMsg.ActionIndex)
+            {
+                case (char) PRISON_ACTION.ROLL:
+                    if (Dice.isDouble)
+                    {
+                        escape = true;
+                    }
+                    else
+                    {
+                        UpdatePrisonState();
+                    }
+                    break;
+                case (char) PRISON_ACTION.PAY:
+                    if (AddGold(- GameBoard.PRISON_PRICE))
+                    {
+                        if (Dice.isDouble)
+                        {
+                            ActionRemined += 1;
+                        }
+                        escape = true;
+                    }
+                    else
+                    {
+                        SelfBan();
+                    }
+                    break;
+                case (char) PRISON_ACTION.CARD:
+                    if (chanceCoupon == CHANCE_COUPON.ESCAPE_ISLAND)
+                    {
+                        chanceCoupon = CHANCE_COUPON.NONE;
+                        escape = true;
+                    }
+                    else
+                    {
+                        SelfBan();
+                    }
+                    break;
+            }
+            yield return new PrisonActionResultGameMessage
+            {
+                Actor = Id,
+                EscapeResult = escape,
+                EscapeType = prisonActionMsg.ActionIndex
+            };
+            yield return new RollMoveDiceResultGameMessage
+            {
+                Actor = Id,
+                Dices = new List<char> {(char) Dice.result[0], (char) Dice.result[1]}
+            };
+
+            if (escape)
+            {
+                specialState = SPECIAL_STATE.NONE;
+                specialStateValue = 0;
+                Go(Dice.resultSum);
+                foreach (var destinationGameAction in DestinationGameAction())
+                {
+                    if (null != destinationGameAction)
+                        yield return destinationGameAction;
+                }
+            }
+        }
+
+        private IEnumerable<IGameMessage> NormalPositionActions(IDragonMarbleGameMessage receivedMessage)
+        {
+            var rollMoveDiceGameMessage = (RollMoveDiceGameMessage) receivedMessage;
+            yield return Dice.RollAndGetResultGameAction(this
+                , rollMoveDiceGameMessage.Pressed
+                , rollMoveDiceGameMessage.Odd
+                , rollMoveDiceGameMessage.Even);
+
+            if (Dice.isDouble)
+            {
+                if (Dice.rollCount > 2)
+                {
+                    Prison();
+                    yield break;
+                }
+                ActionRemined += 1;
+            }
+            Go(Dice.resultSum);
+            foreach (var destinationGameAction in DestinationGameAction())
+            {
+                yield return destinationGameAction;
+            }
+        }
 
         private IEnumerable<IGameMessage> DestinationGameAction()
 		{
@@ -179,12 +206,10 @@ namespace DragonMarble
             case StageTileInfo.TYPE.PRISON:
                     ActionRemined = 0;
                     Prison();
-                    yield return null;
                     break;
             case StageTileInfo.TYPE.TRAVEL:
                     ActionRemined = 0;
                     Travel();
-                    yield return null;
                     break;
             case StageTileInfo.TYPE.START:
                     bool isAbleToBuild = false;
@@ -207,9 +232,6 @@ namespace DragonMarble
                             }
                         }
                     }
-				break;
-			default:
-				yield return null;
 				break;
 			}
 		}
@@ -374,8 +396,9 @@ namespace DragonMarble
 			return true;
 		}
 		
-		private void SelfBan(){
-			
+		private void SelfBan()
+		{
+		    StageManager.Ban(this);
 		}
 	}
 }
