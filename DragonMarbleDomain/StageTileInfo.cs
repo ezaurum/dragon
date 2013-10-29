@@ -115,8 +115,22 @@ namespace DragonMarble
         public int olympic;
         public bool isMonopoly;
         public string name;
-
-        public StageUnitInfo owner;
+		
+		private StageUnitInfo _owner;
+		public StageUnitInfo owner {
+			get {
+				return _owner;
+			}
+			set {
+				if ( _owner != null ){
+					_owner.lands.Remove( index );
+				}
+				_owner = value;
+				if ( _owner != null ){
+					_owner.lands.Add( index, this );
+				}
+			}
+		}
         public StageBuffInfo tileBuff;
         public TYPE type;
         public int typeValue;
@@ -188,10 +202,17 @@ namespace DragonMarble
         }
         public int GetMinBuyPrice(StageUnitInfo unit)
         {
-            for ( int i = 0; i < buildings.Count; i++ ){
-                if ( i <= unit.round && buildings[i].isBuilt == false ){
-                    return buildings[i].buyPrice;
-                }
+			if ( isAbleToBuildLandmark ){
+				return buildings[4].buyPrice;
+			}
+            for ( int i = 0; i < 4; i++ ){
+				if ( i >= buildings.Count ) return 0;
+				if ( buildings[i].isBuilt == false ){
+					if ( i <= unit.round ){
+						return buildings[i].buyPrice;
+					}
+					return 0;
+				}
             }
             return 0;
         }
@@ -268,7 +289,13 @@ namespace DragonMarble
                 tileBuff = new StageBuffInfo(buffType, power, buffTurn);
             }
         }
-
+		public bool IsEnemyTeam(StageUnitInfo unit){
+			if ( owner == null || owner.teamGroup == unit.teamGroup ){
+				return false;
+			}
+			return true;
+		}
+		
         public bool IsSameOwner(StageUnitInfo unit)
         {
             if (owner == null || !owner.Equals(unit))
@@ -307,7 +334,6 @@ namespace DragonMarble
                 if (owner == null)
                 {
                     owner = unit;
-                    unit.lands.Add(index, this);
                 }
                 return true;
             }
@@ -328,7 +354,7 @@ namespace DragonMarble
         }
         public bool IsAbleToBuy(StageUnitInfo unit){
             if ( type == TYPE.SIGHT || type == TYPE.CITY ){
-                if ( owner == null || owner.Equals( unit ) ){
+                if ( owner == null || owner.teamGroup == unit.teamGroup ){
                     int minBuyPrice = GetMinBuyPrice( unit );
                     if ( minBuyPrice > 0 && minBuyPrice <= unit.gold ){
                         return true;
@@ -348,23 +374,22 @@ namespace DragonMarble
 		
         public bool TakeOver(StageUnitInfo unit)
         {
+			if ( owner.teamGroup == unit.teamGroup ) return false;
             int p = takeOverPrice;
             if (unit.AddGold(-p))
             {
                 owner.AddGold(p);
-                owner.lands.Remove(index);
-                unit.lands.Add(index, this);
                 owner = unit;
                 return true;
             }
             return false;
         }
-
+		
         public void SetOwner(StageUnitInfo unit)
         {
             owner = unit;
         }
-
+		 
         public void ChangeOwner(StageTileInfo tile)
         {
             StageUnitInfo exOwner = owner;
@@ -375,7 +400,6 @@ namespace DragonMarble
         public void Sell()
         {
             owner.AddGold(sellPrice);
-            owner.lands.Remove(index);
             owner = null;
             foreach (Building b in buildings) b.isBuilt = false;
         }

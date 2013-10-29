@@ -200,7 +200,7 @@ namespace DragonMarble
             return false;
         }
 		
-		public int GetPayFee(StageTileInfo tile){
+		public int GetPayFee(StageTileInfo tile, int discount){
 			int fee = tile.fee;
             if (unitBuff != null)
             {
@@ -213,12 +213,13 @@ namespace DragonMarble
                     fee -= (fee*unitBuff.power/100);
                 }
             }
+			fee -= ( fee * discount / 100 );
 			return fee;
 		}
-        public bool Pay(StageTileInfo tile)
+        public bool Pay(StageTileInfo tile, int discount)
         {
-			int fee = GetPayFee(tile);
-            if (AddGold(-fee))
+			int fee = GetPayFee(tile, discount);
+			if (AddGold(-fee))
             {
                 tile.owner.AddGold(fee);
                 return true;

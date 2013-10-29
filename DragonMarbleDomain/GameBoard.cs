@@ -12,6 +12,7 @@ namespace DragonMarble
 		public const int PRISON_PRICE = 300000;
 		public const int DONATE_MONEY = 200000;
 		public const int TAX_PERCENT = 5;
+		public const int MAX_OLYMPIC_CNT = 4;
 		
 		public int TILE_INDEX_PRISON;
 		public int TILE_INDEX_TRAVEL;

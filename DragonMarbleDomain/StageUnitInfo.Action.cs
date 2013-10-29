@@ -213,72 +213,136 @@ namespace DragonMarble
 				break;
 			}
 		}
+		
+		private IEnumerable<IGameMessage> BuyLandRequest(StageTileInfo stageTile){
+			yield return new BuyLandRequestGameMessage
+            {
+                Actor = Id,
+                ResponseLimit = 50000
+            };
+            IDragonMarbleGameMessage receivedMessage = ReceivedMessage;
+            if (BuyLand(receivedMessage))
+            {
+                yield return receivedMessage;
+            }
+            else
+            {
+                SelfBan();
+            }
+		}
+		
+		private IEnumerable<IGameMessage> PayResultCitySight(StageTileInfo stageTile, int fee)
+		{
+			yield return new PayFeeGameMessage
+            {
+                Actor = Id,
+				Fee = fee
+            };
+			if (stageTile.IsAbleToTakeover(this))
+            {
+                yield return new TakeoverRequestGameMessage
+                {
+                    Actor = Id
+                };
+                IDragonMarbleGameMessage receivedMessage = ReceivedMessage;
+                if (Takeover(receivedMessage))
+                {
+                    yield return receivedMessage;
 
+                    if (stageTile.IsAbleToBuy(this))
+                    {
+                        foreach (var gameAction in BuyLandRequest(stageTile)) yield return gameAction;
+                    }
+                }
+                else
+                {
+                    SelfBan();
+                }
+            }
+		}
+		
         private IEnumerable<IGameMessage> MoveResultCitySight(StageTileInfo stageTile)
 	    {
 	        if (stageTile.IsAbleToBuy(this))
 	        {
-	            yield return new BuyLandRequestGameMessage
-	            {
-	                Actor = Id,
-	                ResponseLimit = 50000
-	            };
-	            IDragonMarbleGameMessage receivedMessage = ReceivedMessage;
-	            if (BuyLand(receivedMessage))
-	            {
-	                yield return receivedMessage;
-	            }
-	            else
-	            {
-	                SelfBan();
-	            }
+				foreach (var gameAction in BuyLandRequest(stageTile)) yield return gameAction;
 	        }
 	        else
 	        {
 	            if (stageTile.owner != null && !stageTile.IsSameOwner(this))
 	            {
-	                if (Pay(stageTile))
-	                {
-	                    yield return new PayFeeGameMessage
-	                    {
-	                        Actor = Id
-	                    };
-	                }
-	                if (stageTile.IsAbleToTakeover(this))
-	                {
-	                    yield return new TakeoverRequestGameMessage
-	                    {
-	                        Actor = Id
-	                    };
+					int discount = 0;
+					if ( chanceCoupon == CHANCE_COUPON.DISCOUNT_50 || chanceCoupon == CHANCE_COUPON.ANGEL ){
+						yield return new UseCouponRequestGameMessage
+						{
+							Actor = Id
+						};
+						UseCouponGameMessage receivedMessage = (UseCouponGameMessage) ReceivedMessage;
+						if ( receivedMessage.Use ){
+							if ( chanceCoupon == CHANCE_COUPON.ANGEL ){
+								discount = 100;
+							}else if ( chanceCoupon == CHANCE_COUPON.DISCOUNT_50 ){
+								discount = 50;
+							}
+							chanceCoupon = CHANCE_COUPON.NONE;
+						}
+					}
+					int fee = GetPayFee(stageTile, discount);
+					
+					if (Pay (stageTile, discount)){
+						foreach (var gameAction in PayResultCitySight(stageTile, fee)) yield return gameAction;
+	                }else{
+						if ( usableLoanCount > 0 ){
+							int needMoney = fee - gold;
+							yield return new NeedMoneyRequestGameMessage
+							{
+								Actor = Id,
+								NeedMoney = needMoney
+							};
+							IDragonMarbleGameMessage receivedMessage = (LoanMoneyGameMessage) ReceivedMessage;
+							if ( receivedMessage.MessageType == GameMessageType.LoanMoney ){
+								LoanMoneyGameMessage loanMsg = (LoanMoneyGameMessage) receivedMessage;
+								yield return loanMsg;
+								
+								if ( loanMsg.LoanMoney > 0 ){
+									if ( Loan( needMoney ) ){
+										if ( Pay(stageTile, discount) ){
+											foreach (var gameAction in BuyLandRequest(stageTile)) yield return gameAction;
+										}else{
+											SelfBan();
+										}
+									}else{
+										SelfBan();
+									}
+								}else{
+									yield return new GameResultGameMessage
+									{
+										LoseUnit = Id
+									};
+								}
+								
+							}else if ( receivedMessage.MessageType == GameMessageType.SellLands ){
+								SellLandsGameMessage sellMsg = (SellLandsGameMessage) receivedMessage;
+								yield return sellMsg;
+								foreach ( char c in sellMsg.LandList ){
+									lands[(int) c].Sell();
+								}
+								if ( Pay(stageTile, discount) ){
+									foreach (var gameAction in PayResultCitySight(stageTile, fee)) yield return gameAction;
+								}else{
+									SelfBan();
+								}
+							}
 
-	                    IDragonMarbleGameMessage receivedMessage = ReceivedMessage;
-	                    if (Takeover(receivedMessage))
-	                    {
-	                        yield return receivedMessage;
+						}else{
+							yield return new GameResultGameMessage
+							{
+								LoseUnit = Id
+							};
+						}
 
-	                        if (stageTile.IsAbleToBuy(this))
-	                        {
-	                            yield return new BuyLandRequestGameMessage
-	                            {
-	                                Actor = Id,
-	                                ResponseLimit = 50000
-	                            };
-	                            receivedMessage = ReceivedMessage;
-	                            if (BuyLand(receivedMessage))
-	                            {
-	                                yield return receivedMessage;
-	                            }
-	                            else
-	                            {
-	                                SelfBan();
-	                            }
-	                        }
-	                    }
-	                    else
-	                    {
-	                        SelfBan();
-	                    }
-	                }
+					}
+	               
 	            }
 	        }
 	        yield return null;

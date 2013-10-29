@@ -24,7 +24,8 @@
             A = 0,
             B,
             C,
-            D
+            D,
+			NONE
         }
 
         public enum UNIT_COLOR
