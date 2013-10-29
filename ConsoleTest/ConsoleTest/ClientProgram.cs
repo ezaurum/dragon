@@ -26,24 +26,24 @@ namespace ConsoleTest
             {
                 string readLine = Console.ReadLine();
                 
-                if (readLine.Contains("Q"))
+                if (readLine.Contains("Q") || readLine.Contains("q"))
                 {
                     return;
                 }
 
-                if (readLine.Contains("R"))
+                if (readLine.Contains("R") || readLine.Contains("r"))
                 {
 
                     nm.Reconnect();
                 }
 
-                if (readLine.Contains("D") )
+                if (readLine.Contains("D") || readLine.Contains("d"))
                 {
 
                     nm.SendMessage(rollMessage);
                 }
 
-                if (readLine.Contains("A"))
+                if (readLine.Contains("A") || readLine.Contains("a"))
                 {
                     nm.SendMessage(new ActionResultCopyGameMessage());
                 }
