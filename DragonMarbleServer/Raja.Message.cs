@@ -98,7 +98,7 @@ namespace DragonMarble
 
         private void ResetTimer()
         {
-            _timeout = -1;
+            _timeout = Timeout.Infinite;
             _timerMessage = null;
         }
 
@@ -118,12 +118,14 @@ namespace DragonMarble
             {
                 case GameMessageType.BuyLandRequest:
                     BuyLandRequestGameMessage mBuyLandRequest = (BuyLandRequestGameMessage)value;
+                    if ( mBuyLandRequest.Actor != Unit.Id ) return;
                     _timerMessage = value;
                     _timeout = mBuyLandRequest.ResponseLimit;
                     break;
 
                 case GameMessageType.ActivateTurn:
                     ActivateTurnGameMessage mActivateTurn = (ActivateTurnGameMessage)value;
+                    if (mActivateTurn.TurnOwner != Unit.Id) return;
                     _timerMessage = value;
                     _timeout = mActivateTurn.ResponseLimit;
                     break;
