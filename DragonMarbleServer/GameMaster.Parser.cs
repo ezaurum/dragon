@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 
@@ -13,20 +14,20 @@ namespace DragonMarble
             {
                 IEnumerable<XElement> xElements = c.Elements("Price");
 
-                var buyPrices = new int[4];
-                var sellPrices = new int[4];
-                var fees = new int[4];
+                int[] buyPrices = new int[4];
+                int[] sellPrices = new int[4];
+                int[] fees = new int[4];
 
                 int i = 0;
                 foreach (XElement xElement in xElements)
                 {
-                    buyPrices[i] = int.Parse(xElement.Attribute("BuyPrice").Value.ToString());
-                    fees[i] = int.Parse(xElement.Attribute("Fee").Value.ToString());
-                    sellPrices[i] = int.Parse(xElement.Attribute("SellPrice").Value.ToString());
+                    buyPrices[i] = Int32.Parse(xElement.Attribute("BuyPrice").Value.ToString());
+                    fees[i] = Int32.Parse(xElement.Attribute("Fee").Value.ToString());
+                    sellPrices[i] = Int32.Parse(xElement.Attribute("SellPrice").Value.ToString());
                 }
 
                 return new StageTileInfo(
-                    int.Parse(c.Attribute("Index").Value.ToString()),
+                    Int32.Parse(c.Attribute("Index").Value.ToString()),
                     c.Attribute("Name").Value.ToString(),
                     c.Attribute("Type").Value.ToString(),
                     c.Attribute("TypeValue").Value.ToString(), buyPrices, sellPrices, fees);
