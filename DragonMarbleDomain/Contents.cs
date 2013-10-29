@@ -5,6 +5,7 @@ using DragonMarble.Message;
 
 namespace DragonMarble
 {
+    [Serializable]
     public class StageBuffInfo
     {
         public enum TARGET
@@ -52,6 +53,7 @@ namespace DragonMarble
         }
     }
 
+    [Serializable]
     public class StageDiceInfo
     {
 
@@ -172,7 +174,7 @@ namespace DragonMarble
         }
     }
 
-
+    [Serializable]
     public class StageGambleInfo
     {
         public const int MAX_WIN_COUNT = 3;
@@ -190,7 +192,8 @@ namespace DragonMarble
         {
             NULL, WIN, LOSE
         }
-
+        
+        [Serializable]
         public class CardData
         {
             public TYPE type;

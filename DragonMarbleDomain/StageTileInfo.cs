@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 namespace DragonMarble
 {
+    [Serializable]
     public class StageTileInfo
     {
         public enum TYPE
@@ -426,7 +427,8 @@ namespace DragonMarble
                 }
             }
         }
-
+        
+        [Serializable]
         public class Building
         {
             public int buyPrice;

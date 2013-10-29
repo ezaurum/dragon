@@ -5,6 +5,7 @@ using DragonMarble.Message;
 
 namespace DragonMarble
 {
+    [Serializable]
     public partial class StageUnitInfo
     {
         public StageUnitInfo(UNIT_COLOR unitColor, TEAM_GROUP teamGroup, int initialCapital = 2000000)
