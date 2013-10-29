@@ -154,7 +154,7 @@ public class ActivateTurnGameMessage : IDragonMarbleGameMessage
 {
 	public GameMessageType MessageType {get{return GameMessageType.ActivateTurn;}}
 	public Guid TurnOwner { get; set;}
-	public Int64 ResponseLimit;
+	public Int32 ResponseLimit;
 
 	public byte[] ToByteArray()
 	{
@@ -171,7 +171,7 @@ public class ActivateTurnGameMessage : IDragonMarbleGameMessage
 		index += 16;
 		BitConverter.GetBytes(ResponseLimit)
 		.CopyTo(bytes,index);
-		index += sizeof(Int64);
+		index += sizeof(Int32);
 	return bytes;
 }
 
@@ -182,15 +182,15 @@ public void FromByteArray(byte[] bytes)
 		Buffer.BlockCopy(bytes, index, tempTurnOwner, 0,16);
 		TurnOwner = new Guid(tempTurnOwner);
 		index += 16;
-		ResponseLimit = BitConverter.ToInt64(bytes, index);
-		index += sizeof(Int64);
+		ResponseLimit = BitConverter.ToInt32(bytes, index);
+		index += sizeof(Int32);
 }
 
 	public Int16 Length
 	{
 		get
 		{
-			return (Int16)(2+sizeof(GameMessageType)+16+sizeof(Int64));
+			return (Int16)(2+sizeof(GameMessageType)+16+sizeof(Int32));
 		}
 	}
 }
@@ -251,7 +251,7 @@ public void FromByteArray(byte[] bytes)
 public class BuyLandRequestGameMessage : IDragonMarbleGameMessage	
 {
 	public GameMessageType MessageType {get{return GameMessageType.BuyLandRequest;}}
-	public Int64 ResponseLimit;
+	public Int32 ResponseLimit;
 	public Guid Actor { get; set;}
 
 	public byte[] ToByteArray()
@@ -266,7 +266,7 @@ public class BuyLandRequestGameMessage : IDragonMarbleGameMessage
 		index += sizeof(GameMessageType);
 		BitConverter.GetBytes(ResponseLimit)
 		.CopyTo(bytes,index);
-		index += sizeof(Int64);
+		index += sizeof(Int32);
 		Actor.ToByteArray()
 		.CopyTo(bytes,index);
 		index += 16;
@@ -276,8 +276,8 @@ public class BuyLandRequestGameMessage : IDragonMarbleGameMessage
 public void FromByteArray(byte[] bytes)
 {
 		int index = 6;
-		ResponseLimit = BitConverter.ToInt64(bytes, index);
-		index += sizeof(Int64);
+		ResponseLimit = BitConverter.ToInt32(bytes, index);
+		index += sizeof(Int32);
 		byte[] tempActor = new byte[16];
 		Buffer.BlockCopy(bytes, index, tempActor, 0,16);
 		Actor = new Guid(tempActor);
@@ -288,7 +288,7 @@ public void FromByteArray(byte[] bytes)
 	{
 		get
 		{
-			return (Int16)(2+sizeof(GameMessageType)+sizeof(Int64)+16);
+			return (Int16)(2+sizeof(GameMessageType)+sizeof(Int32)+16);
 		}
 	}
 }

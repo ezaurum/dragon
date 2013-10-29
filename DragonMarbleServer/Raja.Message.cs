@@ -5,6 +5,7 @@ using Dragon;
 using Dragon.Message;
 using DragonMarble.Message;
 
+
 namespace DragonMarble
 {
     public partial class Raja : IMessageProcessor<IDragonMarbleGameMessage>
@@ -13,6 +14,9 @@ namespace DragonMarble
 
         private readonly Queue<IDragonMarbleGameMessage> _receivedMessages
             = new Queue<IDragonMarbleGameMessage>();
+
+        private IDragonMarbleGameMessage _timerMessage;
+        private int _timeout = Timeout.Infinite ;
 
         public IEnumerable<IDragonMarbleGameMessage> ReceivedMessages
         {
@@ -34,13 +38,41 @@ namespace DragonMarble
                     _receiveMessageWaitHandler.Reset();
                     Logger.Debug("no message in queue. wait for message");
                 }
-                Logger.DebugFormat("Start waiting. {0}", _receivedMessages.Count);
-                _receiveMessageWaitHandler.WaitOne();
+                Logger.DebugFormat("Start waiting. {0}, {1}", _receivedMessages.Count, _timeout);
+
+                _receiveMessageWaitHandler.WaitOne(_timeout);
+                
+                lock (_timerMessage)
+                {
+                    if (null != _timerMessage)
+                    {
+                        Unit.ControlMode = StageUnitInfo.ControlModeType.AI_0;
+
+                        Logger.DebugFormat("ai");
+
+                        switch (_timerMessage.MessageType)
+                        {
+                            case GameMessageType.ActivateTurn:
+                                ReceivedMessage = new RollMoveDiceGameMessage
+                                {
+                                    Actor = Unit.Id,
+                                    Pressed = RandomUtil.Next(0f, 1f)
+                                };
+                                Logger.DebugFormat("ai set");
+                                break;
+                            case GameMessageType.RollMoveDiceResult:
+                                break;
+                        }     
+                        Logger.DebugFormat("ai set");
+                    }
+                }
+
                 Logger.Debug("Deque.");
                 return _receivedMessages.Dequeue();
             }
             set
             {
+                ResetTimer();
                 switch (value.MessageType)
                 {
                     case GameMessageType.OrderCardSelect:
@@ -51,7 +83,6 @@ namespace DragonMarble
                         Logger.DebugFormat("received {0}, real time.", value.MessageType);
                         Unit.IsActionResultCopySended = true;
                         break;
-
                     default:
                         _receivedMessages.Enqueue(value);
                         _receiveMessageWaitHandler.Set();
@@ -65,15 +96,39 @@ namespace DragonMarble
             }
         }
 
+        private void ResetTimer()
+        {
+            _timeout = -1;
+            _timerMessage = null;
+        }
+
         public IDragonMarbleGameMessage SendingMessage
         {
             set
             {
                 SendMessage(value);
+                SetTimer(value);
             }
             get { throw new NotImplementedException(); }
         }
 
+        private void SetTimer(IDragonMarbleGameMessage value)
+        {
+            switch (value.MessageType)
+            {
+                case GameMessageType.BuyLandRequest:
+                    BuyLandRequestGameMessage mBuyLandRequest = (BuyLandRequestGameMessage)value;
+                    _timerMessage = value;
+                    _timeout = mBuyLandRequest.ResponseLimit;
+                    break;
+
+                case GameMessageType.ActivateTurn:
+                    ActivateTurnGameMessage mActivateTurn = (ActivateTurnGameMessage)value;
+                    _timerMessage = value;
+                    _timeout = mActivateTurn.ResponseLimit;
+                    break;
+            }
+        }
 
         public void ResetMessages()
         {

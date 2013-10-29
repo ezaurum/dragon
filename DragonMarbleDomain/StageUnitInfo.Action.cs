@@ -30,7 +30,7 @@ namespace DragonMarble
 			IDragonMarbleGameMessage message = new ActivateTurnGameMessage
             {
                 TurnOwner = Id,
-                ResponseLimit = 50000
+                ResponseLimit = 5000
             };
 
 			return message;
@@ -218,7 +218,7 @@ namespace DragonMarble
 			yield return new BuyLandRequestGameMessage
             {
                 Actor = Id,
-                ResponseLimit = 50000
+                ResponseLimit = 5000
             };
             IDragonMarbleGameMessage receivedMessage = ReceivedMessage;
             if (BuyLand(receivedMessage))
