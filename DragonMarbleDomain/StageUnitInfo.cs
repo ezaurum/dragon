@@ -59,6 +59,8 @@ namespace DragonMarble
         public ControlModeType ControlMode { get; set; }
         public int CharacterId { get; set; }
         public int DiceId { get; set; }
+        public bool IsReady { get; set; }
+        public bool IsRoomOwner { get; set; }
 
         public virtual IDragonMarbleGameMessage ReceivedMessage
         {
