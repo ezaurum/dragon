@@ -30,12 +30,13 @@ namespace DragonMarble
 
         public void Dispose()
         {
-            Socket = null;
-            ReadArgs.UserToken = null;
-            ReadArgs = null;
-            WriteArgs.UserToken = null;
-            WriteArgs = null;
-            IsDisposed = true;
+           _receiveMessageWaitHandler.Close();
+           Socket = null;
+           ReadArgs.UserToken = null;
+           ReadArgs = null;
+           WriteArgs.UserToken = null;
+           WriteArgs = null;
+           IsDisposed = true;
         }
     }
 }
