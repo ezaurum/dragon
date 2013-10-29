@@ -72,9 +72,9 @@ namespace DragonMarble
             };
             gm.Join(dummyAI);
 
-            if (IsGameStartable)
+            if (gm.IsGameStartable)
             {
-                Task.Factory.StartNew(StartGame);
+                Task.Factory.StartNew(gm.StartGame);
             }
         }
     }

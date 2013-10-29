@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
-using System.Net.Sockets;
-using System.Threading.Tasks;
 using Dragon.Server;
 using GameUtils;
 using log4net;
@@ -17,19 +15,15 @@ namespace DragonMarble
         private const int QueueNumber = 1000;
         private const int BufferSize = 1024;
         private const int MaxConnection = 3000;
-        private static readonly ILog Logger = LogManager.GetLogger(typeof(DragonMarbleServerProgram));
-        private static GameMaster gm;
+        private static readonly ILog Logger = LogManager.GetLogger(typeof (DragonMarbleServerProgram));
+
         private static void Main(string[] args)
         {
             XmlConfigurator.Configure(new FileInfo("log4net.xml"));
             Logger.Debug("Start app.");
 
-            gm = new GameMaster();
+            InitGameData();
 
-            List<StageTileInfo> tiles = XmlUtils.LoadXml(@"data_stage.xml", GameMaster.ParseTiles);
-
-            gm.Board = new GameBoard(tiles);
-            
             RajaProvider rajaProvider = new RajaProvider();
 
             var server = new NetworkManager(
@@ -40,13 +34,12 @@ namespace DragonMarble
             };
 
             server.OnAfterAccept += GameMaster.AddPlayer;
-            
+
             server.Start();
-            string readLine = "";
 
             while (true)
             {
-                readLine = Console.ReadLine();
+                string readLine = Console.ReadLine();
                 int i;
                 if (int.TryParse(readLine, out i))
                 {
@@ -55,7 +48,12 @@ namespace DragonMarble
 
                 if (readLine.Contains("Q") || readLine.Contains("q")) return;
             }
-            
+        }
+
+        private static void InitGameData()
+        {
+            List<StageTileInfo> tiles = XmlUtils.LoadXml(@"data_stage.xml", GameMaster.ParseTiles);
+            GameMaster.OriginalBoard = new GameBoard(tiles);
         }
     }
 }

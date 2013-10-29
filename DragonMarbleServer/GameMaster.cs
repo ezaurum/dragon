@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading.Tasks;
 using Dragon.Message;
 using DragonMarble.Message;
@@ -19,6 +21,7 @@ namespace DragonMarble
         private void InitGame()
         {
             _availablePlayers = Units;
+            Board = OriginalBoard.Clone();
 
             Board.Init();
 
@@ -149,6 +152,21 @@ namespace DragonMarble
                 yield return CurrentPlayer;
 
                 _receiveMessageWaitHandler.Reset();
+            }
+        }
+    }
+
+    public static class GameBoardUtil
+    {
+        public static GameBoard Clone(this GameBoard gameBoard)
+        {
+            using (var ms = new MemoryStream())
+            {
+                var formatter = new BinaryFormatter();
+                formatter.Serialize(ms, gameBoard);
+                ms.Position = 0;
+
+                return (GameBoard)formatter.Deserialize(ms);
             }
         }
     }
