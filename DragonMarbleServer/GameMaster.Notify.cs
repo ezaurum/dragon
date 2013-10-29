@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Sockets;
+using System.Threading.Tasks;
 using DragonMarble.Message;
 
 namespace DragonMarble
@@ -41,6 +43,39 @@ namespace DragonMarble
             stageUnitInfo.ControlMode= StageUnitInfo.ControlModeType.AI_0;
             Raja raja = (Raja) stageUnitInfo.MessageProcessor;
             raja.Dispose();
+        }
+
+        public static void AddPlayer(object sender, SocketAsyncEventArgs e)
+        {
+            Raja token = (Raja)e.UserToken;
+            token.Unit = new StageUnitInfo
+            {
+                Id = Guid.NewGuid(),
+                Order = 0,
+                UnitColor = StageUnitInfo.UNIT_COLOR.BLUE,
+                CharacterId = 1,
+                Gold = 2000000
+            };
+
+            GameMaster gm = new GameMaster();
+            
+            gm.Join(token.Unit);
+
+            StageUnitInfo dummyAI = new AIStageUnitInfo()
+            {
+                Id = Guid.NewGuid(),
+                Order = 1,
+                UnitColor = StageUnitInfo.UNIT_COLOR.GREEN,
+                CharacterId = 1,
+                Gold = 2000000,
+                ControlMode = StageUnitInfo.ControlModeType.AI_0
+            };
+            gm.Join(dummyAI);
+
+            if (IsGameStartable)
+            {
+                Task.Factory.StartNew(StartGame);
+            }
         }
     }
 }

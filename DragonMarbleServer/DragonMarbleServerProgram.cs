@@ -39,7 +39,7 @@ namespace DragonMarble
                 RajaProvider = rajaProvider
             };
 
-            server.OnAfterAccept += AddPlayer;
+            server.OnAfterAccept += GameMaster.AddPlayer;
             
             server.Start();
             string readLine = "";
@@ -47,7 +47,7 @@ namespace DragonMarble
             while (true)
             {
                 readLine = Console.ReadLine();
-                int i = 0;
+                int i;
                 if (int.TryParse(readLine, out i))
                 {
                     if (i > 1 && i < 13) StageDiceInfo.diceCheat = i;
@@ -57,38 +57,5 @@ namespace DragonMarble
             }
             
         }
-
-
-        public static void AddPlayer(object sender, SocketAsyncEventArgs e)
-        {
-            Raja token = (Raja)e.UserToken;
-            token.Unit = new StageUnitInfo
-            {
-                Id = Guid.NewGuid(),
-                Order = 0,
-                UnitColor = StageUnitInfo.UNIT_COLOR.BLUE,
-                CharacterId = 1,
-                Gold = 2000000
-            };
-
-            gm.Join(token.Unit);
-
-            StageUnitInfo dummyAI = new AIStageUnitInfo()
-            {
-                Id = Guid.NewGuid(),
-                Order = 1,
-                UnitColor = StageUnitInfo.UNIT_COLOR.GREEN,
-                CharacterId = 1,
-                Gold = 2000000,
-                ControlMode = StageUnitInfo.ControlModeType.AI_0
-            };
-            gm.Join(dummyAI);
-
-            if (gm.IsGameStartable)
-            {
-                Task.Factory.StartNew(gm.StartGame);
-            }
-        }
-
     }
 }
