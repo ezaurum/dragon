@@ -31,6 +31,7 @@ public enum GameMessageType
 	RollMoveDiceResult,
 	RoomOwner,
 	SellLands,
+	StartGame,
 	Takeover,
 	TakeoverRequest,
 	TravelAction,
@@ -125,6 +126,9 @@ public static class GameMessageFactory
 		break;
 		case GameMessageType.SellLands:
 		message = new SellLandsGameMessage();
+		break;
+		case GameMessageType.StartGame:
+		message = new StartGameGameMessage();
 		break;
 		case GameMessageType.Takeover:
 		message = new TakeoverGameMessage();
@@ -1385,6 +1389,38 @@ public void FromByteArray(byte[] bytes)
 		get
 		{
 			return (Int16)(2+sizeof(GameMessageType)+sizeof(Char)+LandCount*(sizeof(Char))+16);
+		}
+	}
+}
+
+// start game	
+public class StartGameGameMessage : IDragonMarbleGameMessage	
+{
+	public GameMessageType MessageType {get{return GameMessageType.StartGame;}}
+
+	public byte[] ToByteArray()
+	{
+		byte[] bytes = new byte[Length];
+		int index = 0;
+		BitConverter.GetBytes(Length)
+		.CopyTo(bytes,index);
+		index += sizeof(Int16);
+		BitConverter.GetBytes((Int32)MessageType)
+		.CopyTo(bytes,index);
+		index += sizeof(GameMessageType);
+	return bytes;
+}
+
+public void FromByteArray(byte[] bytes)
+{
+		int index = 6;
+}
+
+	public Int16 Length
+	{
+		get
+		{
+			return (Int16)(2+sizeof(GameMessageType));
 		}
 	}
 }

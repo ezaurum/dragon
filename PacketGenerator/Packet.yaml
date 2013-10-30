@@ -349,3 +349,6 @@ NewPlayerJoin :
       name : PlayerId
       length : 16
       options : [byte_param_constructor, to_byte_array, property]
+
+StartGame :
+  comment : start game      
