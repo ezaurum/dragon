@@ -13,7 +13,7 @@ namespace ConsoleTest
                 return true;
             }
 
-            if (readLine.Contains("R") || readLine.Contains("r"))
+            if (readLine.Contains("RR") || readLine.Contains("rr"))
             {
                 nm.Reconnect();
             }
