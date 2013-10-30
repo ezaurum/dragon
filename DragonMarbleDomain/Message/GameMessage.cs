@@ -520,7 +520,7 @@ public class InitializeGameGameMessage : IDragonMarbleGameMessage
 	{
 		BitConverter.GetBytes(Units[i].gold)
 		.CopyTo(bytes,index);
-		index += sizeof(Int32);
+		index += sizeof(Int64);
 		BitConverter.GetBytes(Units[i].Order)
 		.CopyTo(bytes,index);
 		index += sizeof(Int32);
@@ -558,8 +558,8 @@ public void FromByteArray(byte[] bytes)
 		for(int i = 0; i < NumberOfPlayers; i++)
 		{
 		StageUnitInfo tempUnits = new StageUnitInfo();
-		tempUnits.gold = BitConverter.ToInt32(bytes, index);
-		index += sizeof(Int32);
+		tempUnits.gold = BitConverter.ToInt64(bytes, index);
+		index += sizeof(Int64);
 		tempUnits.Order = BitConverter.ToInt32(bytes, index);
 		index += sizeof(Int32);
 		tempUnits.unitColor = (StageUnitInfo.UNIT_COLOR)BitConverter.ToInt32(bytes, index);
@@ -580,7 +580,7 @@ public void FromByteArray(byte[] bytes)
 	{
 		get
 		{
-			return (Int16)(2+sizeof(GameMessageType)+4*(sizeof(Int16))+sizeof(Int16)+NumberOfPlayers*(sizeof(Int32)+sizeof(Int32)+sizeof(StageUnitInfo.UNIT_COLOR)+sizeof(StageUnitInfo.TEAM_GROUP)+sizeof(StageUnitInfo.ControlModeType)+16));
+			return (Int16)(2+sizeof(GameMessageType)+4*(sizeof(Int16))+sizeof(Int16)+NumberOfPlayers*(sizeof(Int64)+sizeof(Int32)+sizeof(StageUnitInfo.UNIT_COLOR)+sizeof(StageUnitInfo.TEAM_GROUP)+sizeof(StageUnitInfo.ControlModeType)+16));
 		}
 	}
 }
@@ -669,6 +669,9 @@ public class InitializeWaitingRoomGameMessage : IDragonMarbleGameMessage
 		Units[i].Id.ToByteArray()
 		.CopyTo(bytes,index);
 		index += 16;
+		BitConverter.GetBytes(Units[i].IsReady)
+		.CopyTo(bytes,index);
+		index += sizeof(Boolean);
 	}
 	return bytes;
 }
@@ -692,6 +695,8 @@ public void FromByteArray(byte[] bytes)
 		Buffer.BlockCopy(bytes, index, temptempUnits_Id, 0,16);
 		tempUnits.Id = new Guid(temptempUnits_Id);
 		index += 16;
+		tempUnits.IsReady = BitConverter.ToBoolean(bytes, index);
+		index += sizeof(Boolean);
 		Units.Add(tempUnits);
 		}
 }
@@ -700,7 +705,7 @@ public void FromByteArray(byte[] bytes)
 	{
 		get
 		{
-			return (Int16)(2+sizeof(GameMessageType)+sizeof(Int16)+sizeof(Int16)+sizeof(Int16)+CurrentNumberOfPlayers*(sizeof(StageUnitInfo.TEAM_GROUP)+16));
+			return (Int16)(2+sizeof(GameMessageType)+sizeof(Int16)+sizeof(Int16)+sizeof(Int16)+CurrentNumberOfPlayers*(sizeof(StageUnitInfo.TEAM_GROUP)+16+sizeof(Boolean)));
 		}
 	}
 }
@@ -709,7 +714,7 @@ public void FromByteArray(byte[] bytes)
 public class LoanMoneyGameMessage : IDragonMarbleGameMessage	
 {
 	public GameMessageType MessageType {get{return GameMessageType.LoanMoney;}}
-	public Int32 LoanMoney;
+	public Int64 LoanMoney;
 	public Guid Actor { get; set;}
 
 	public byte[] ToByteArray()
@@ -724,7 +729,7 @@ public class LoanMoneyGameMessage : IDragonMarbleGameMessage
 		index += sizeof(GameMessageType);
 		BitConverter.GetBytes(LoanMoney)
 		.CopyTo(bytes,index);
-		index += sizeof(Int32);
+		index += sizeof(Int64);
 		Actor.ToByteArray()
 		.CopyTo(bytes,index);
 		index += 16;
@@ -734,8 +739,8 @@ public class LoanMoneyGameMessage : IDragonMarbleGameMessage
 public void FromByteArray(byte[] bytes)
 {
 		int index = 6;
-		LoanMoney = BitConverter.ToInt32(bytes, index);
-		index += sizeof(Int32);
+		LoanMoney = BitConverter.ToInt64(bytes, index);
+		index += sizeof(Int64);
 		byte[] tempActor = new byte[16];
 		Buffer.BlockCopy(bytes, index, tempActor, 0,16);
 		Actor = new Guid(tempActor);
@@ -746,7 +751,7 @@ public void FromByteArray(byte[] bytes)
 	{
 		get
 		{
-			return (Int16)(2+sizeof(GameMessageType)+sizeof(Int32)+16);
+			return (Int16)(2+sizeof(GameMessageType)+sizeof(Int64)+16);
 		}
 	}
 }
@@ -755,7 +760,7 @@ public void FromByteArray(byte[] bytes)
 public class NeedMoneyRequestGameMessage : IDragonMarbleGameMessage	
 {
 	public GameMessageType MessageType {get{return GameMessageType.NeedMoneyRequest;}}
-	public Int32 NeedMoney;
+	public Int64 NeedMoney;
 	public Guid Actor { get; set;}
 
 	public byte[] ToByteArray()
@@ -770,7 +775,7 @@ public class NeedMoneyRequestGameMessage : IDragonMarbleGameMessage
 		index += sizeof(GameMessageType);
 		BitConverter.GetBytes(NeedMoney)
 		.CopyTo(bytes,index);
-		index += sizeof(Int32);
+		index += sizeof(Int64);
 		Actor.ToByteArray()
 		.CopyTo(bytes,index);
 		index += 16;
@@ -780,8 +785,8 @@ public class NeedMoneyRequestGameMessage : IDragonMarbleGameMessage
 public void FromByteArray(byte[] bytes)
 {
 		int index = 6;
-		NeedMoney = BitConverter.ToInt32(bytes, index);
-		index += sizeof(Int32);
+		NeedMoney = BitConverter.ToInt64(bytes, index);
+		index += sizeof(Int64);
 		byte[] tempActor = new byte[16];
 		Buffer.BlockCopy(bytes, index, tempActor, 0,16);
 		Actor = new Guid(tempActor);
@@ -792,7 +797,7 @@ public void FromByteArray(byte[] bytes)
 	{
 		get
 		{
-			return (Int16)(2+sizeof(GameMessageType)+sizeof(Int32)+16);
+			return (Int16)(2+sizeof(GameMessageType)+sizeof(Int64)+16);
 		}
 	}
 }
@@ -1293,7 +1298,6 @@ public class RoomOwnerGameMessage : IDragonMarbleGameMessage
 {
 	public GameMessageType MessageType {get{return GameMessageType.RoomOwner;}}
 	public Guid RoomOwner { get; set;}
-	public Boolean Startable;
 
 	public byte[] ToByteArray()
 	{
@@ -1308,9 +1312,6 @@ public class RoomOwnerGameMessage : IDragonMarbleGameMessage
 		RoomOwner.ToByteArray()
 		.CopyTo(bytes,index);
 		index += 16;
-		BitConverter.GetBytes(Startable)
-		.CopyTo(bytes,index);
-		index += sizeof(Boolean);
 	return bytes;
 }
 
@@ -1321,15 +1322,13 @@ public void FromByteArray(byte[] bytes)
 		Buffer.BlockCopy(bytes, index, tempRoomOwner, 0,16);
 		RoomOwner = new Guid(tempRoomOwner);
 		index += 16;
-		Startable = BitConverter.ToBoolean(bytes, index);
-		index += sizeof(Boolean);
 }
 
 	public Int16 Length
 	{
 		get
 		{
-			return (Int16)(2+sizeof(GameMessageType)+16+sizeof(Boolean));
+			return (Int16)(2+sizeof(GameMessageType)+16);
 		}
 	}
 }

@@ -32,7 +32,7 @@ InitializeGame :
           size : NumberOfPlayers
           targets :
             - name : gold
-              type : Int32
+              type : Int64
             - name : Order
               type : Int32
             - name : unitColor
@@ -235,7 +235,7 @@ NeedMoneyRequest :
   comment : request loan money
   fields :
     - name : NeedMoney
-      type : Int32
+      type : Int64
     - name : Actor
       type : Guid
       length : 16
@@ -245,7 +245,7 @@ LoanMoney :
   comment : loan money from bank
   fields :
     - name : LoanMoney
-      type : Int32
+      type : Int64
     - name : Actor
       type : Guid
       length : 16
@@ -293,8 +293,6 @@ RoomOwner :
       type : Guid
       length : 16
       options : [byte_param_constructor, to_byte_array, property]
-    - name : Startable
-      type : Boolean
 
 EveryoneIsReady :
   comment : Everyone is ready for game start
@@ -341,6 +339,8 @@ InitializeWaitingRoom :
               type : Guid
               length : 16
               options : [byte_param_constructor, to_byte_array]
+            - name : IsReady
+              type : Boolean
 
 NewPlayerJoin :
   comment : 게임 대기방 추가 정보

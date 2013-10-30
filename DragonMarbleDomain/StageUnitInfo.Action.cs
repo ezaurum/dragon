@@ -315,7 +315,7 @@ namespace DragonMarble
 						foreach (var gameAction in PayResultCitySight(stageTile, fee)) yield return gameAction;
 	                }else{
 						if ( usableLoanCount > 0 ){
-							int needMoney = fee - gold;
+							long needMoney = fee - gold;
 							yield return new NeedMoneyRequestGameMessage
 							{
 								Actor = Id,

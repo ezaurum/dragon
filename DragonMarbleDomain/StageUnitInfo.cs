@@ -8,6 +8,21 @@ namespace DragonMarble
     [Serializable]
     public partial class StageUnitInfo
     {
+        private bool _isReady;
+        public CHANCE_COUPON chanceCoupon;
+        public long gold;
+        public bool isBankrupt;
+        public Dictionary<int, StageTileInfo> lands;
+        public int ranking;
+        public int round;
+        public SPECIAL_STATE specialState;
+        public int specialStateValue;
+        public TEAM_GROUP teamGroup;
+        public int tileIndex;
+        public StageBuffInfo unitBuff;
+        public UNIT_COLOR unitColor;
+        public int usableLoanCount;
+
         public StageUnitInfo(UNIT_COLOR unitColor, TEAM_GROUP teamGroup, int initialCapital = 2000000)
             : this(unitColor, initialCapital)
         {
@@ -31,26 +46,13 @@ namespace DragonMarble
             unitBuff = null;
             chanceCoupon = CHANCE_COUPON.NONE;
             usableLoanCount = 1;
-			isBankrupt = false;
+            isBankrupt = false;
             DiceId = 1;
             Dice = new StageDiceInfo();
             specialState = SPECIAL_STATE.NONE;
         }
 
         public Guid Id { get; set; }
-        public CHANCE_COUPON chanceCoupon;
-        public int gold;
-        public Dictionary<int, StageTileInfo> lands;
-        public int ranking;
-        public int round;
-        public TEAM_GROUP teamGroup;
-        public int tileIndex;
-        public StageBuffInfo unitBuff;
-        public UNIT_COLOR unitColor;
-		public SPECIAL_STATE specialState;
-		public int specialStateValue;
-        public int usableLoanCount;
-		public bool isBankrupt;
         public virtual IMessageProcessor<IDragonMarbleGameMessage> MessageProcessor { get; set; }
         public virtual IStageManager StageManager { get; set; }
         public StageDiceInfo Dice { get; set; }
@@ -60,7 +62,21 @@ namespace DragonMarble
         public ControlModeType ControlMode { get; set; }
         public int CharacterId { get; set; }
         public int DiceId { get; set; }
-        public bool IsReady { get; set; }
+
+        public bool IsReady
+        {
+            get { return IsRoomOwner || _isReady; }
+            set
+            {
+                _isReady = value;
+                StageManager.ReadyNotify(new ReadyStateGameMessage
+                {
+                    Actor = Id,
+                    Ready = value
+                });
+            }
+        }
+
         public bool IsRoomOwner { get; set; }
 
         public virtual IDragonMarbleGameMessage ReceivedMessage
@@ -70,12 +86,10 @@ namespace DragonMarble
             {
                 if (!OwnTurn)
                 {
-
                     foreach (var messages in GetMessageResult(value))
                     {
                         StageManager.Notify(messages);
                     }
-                    
                 }
             }
         }
@@ -85,7 +99,7 @@ namespace DragonMarble
             set { MessageProcessor.SendingMessage = value; }
         }
 
-        public int Assets
+        public long Assets
         {
             get { return property; }
         }
@@ -96,7 +110,7 @@ namespace DragonMarble
             set { tileIndex = value; }
         }
 
-        public int Gold
+        public long Gold
         {
             get { return gold; }
             set { gold = value; }
@@ -108,11 +122,11 @@ namespace DragonMarble
             set { unitColor = value; }
         }
 
-        public int property
+        public long property
         {
             get
             {
-                int p = gold;
+                long p = gold;
                 foreach (StageTileInfo t in lands.Values)
                 {
                     p += t.sellPrice;
@@ -140,14 +154,14 @@ namespace DragonMarble
             MessageProcessor.ResetMessages();
         }
 
-        public bool AddGold(int a)
+        public bool AddGold(long a)
         {
             if (gold + a < 0) return false;
             gold += a;
             return true;
         }
 
-        public int DonateMoney(int g)
+        public long DonateMoney(long g)
         {
             if (g > gold) g = gold;
             AddGold(-g);
@@ -171,26 +185,33 @@ namespace DragonMarble
             tileIndex += step;
             if (tileIndex >= 32) tileIndex -= 32;
         }
-		public void Prison(){
-			specialState = SPECIAL_STATE.PRISON;
-			specialStateValue = 0;
-		}
-		public void Travel(){
-			specialState = SPECIAL_STATE.TRAVEL;
-			specialStateValue = 0;
-		}
-		
-		public void UpdatePrisonState(){
-			if ( specialState == SPECIAL_STATE.PRISON ){
-				specialStateValue++;
-				if ( specialStateValue >= 3 ){
-					specialState = SPECIAL_STATE.NONE;
-					specialStateValue = 0;
-				}
-			}
-		}
-		
-        public bool Loan(int loanGold)
+
+        public void Prison()
+        {
+            specialState = SPECIAL_STATE.PRISON;
+            specialStateValue = 0;
+        }
+
+        public void Travel()
+        {
+            specialState = SPECIAL_STATE.TRAVEL;
+            specialStateValue = 0;
+        }
+
+        public void UpdatePrisonState()
+        {
+            if (specialState == SPECIAL_STATE.PRISON)
+            {
+                specialStateValue++;
+                if (specialStateValue >= 3)
+                {
+                    specialState = SPECIAL_STATE.NONE;
+                    specialStateValue = 0;
+                }
+            }
+        }
+
+        public bool Loan(long loanGold)
         {
             if (usableLoanCount > 0)
             {
@@ -200,9 +221,10 @@ namespace DragonMarble
             }
             return false;
         }
-		
-		public int GetPayFee(StageTileInfo tile, int discount){
-			int fee = tile.fee;
+
+        public int GetPayFee(StageTileInfo tile, int discount)
+        {
+            int fee = tile.fee;
             if (unitBuff != null)
             {
                 if (unitBuff.type == StageBuffInfo.TYPE.OVERCHARGE)
@@ -214,13 +236,14 @@ namespace DragonMarble
                     fee -= (fee*unitBuff.power/100);
                 }
             }
-			fee -= ( fee * discount / 100 );
-			return fee;
-		}
+            fee -= (fee*discount/100);
+            return fee;
+        }
+
         public bool Pay(StageTileInfo tile, int discount)
         {
-			int fee = GetPayFee(tile, discount);
-			if (AddGold(-fee))
+            int fee = GetPayFee(tile, discount);
+            if (AddGold(-fee))
             {
                 tile.owner.AddGold(fee);
                 return true;

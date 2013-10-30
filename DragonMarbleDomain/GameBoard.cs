@@ -26,7 +26,7 @@ namespace DragonMarble
             FeeBoostedTiles = new List<short>();
         }
 
-        public int GrossAssets { get; set; }
+        public long GrossAssets { get; set; }
         public List<StageTileInfo> Tiles { get; set; }
         public Dictionary<StageTileInfo.ColorGroupType, List<StageTileInfo>> ColorGroups { get; set; }
         public Dictionary<StageTileInfo.LineGroupType, List<StageTileInfo>> LineGroups { get; set; }
