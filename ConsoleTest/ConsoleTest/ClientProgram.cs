@@ -3,14 +3,17 @@ using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Threading;
 using Dragon.Client;
+using DragonMarble;
 using DragonMarble.Message;
 
 namespace ConsoleTest
 {
     class ClientProgram
     {
+        private static StageUnitInfo _unitInfo;
         static void Main(string[] args)
         {
+            OrderCardSelectState = new List<bool>();
             RollMoveDiceGameMessage rollMessage = new RollMoveDiceGameMessage()
             {
                 Pressed = new Random().Next(0,int.MaxValue)
@@ -50,10 +53,11 @@ namespace ConsoleTest
 
                 if (readLine.Contains("1"))
                 {
+                    OrderCardSelectState[1] = true;
                     OrderCardSelectGameMessage orderCardSelectGameMessage = new OrderCardSelectGameMessage
                     {
                         SelectedCardNumber = 1,
-                        OrderCardSelectState = new List<Boolean> {false,true},
+                        OrderCardSelectState = OrderCardSelectState,
                         NumberOfPlayers = 2
                     };
                     nm.SendMessage(orderCardSelectGameMessage);
@@ -68,16 +72,19 @@ namespace ConsoleTest
 
                 if (readLine.Contains("0"))
                 {
+                    OrderCardSelectState[0] = true;
                     OrderCardSelectGameMessage orderCardSelectGameMessage = new OrderCardSelectGameMessage
                     {
                         SelectedCardNumber = 0,
-                        OrderCardSelectState = new List<Boolean> { true, false },
+                        OrderCardSelectState = OrderCardSelectState,
                         NumberOfPlayers = 2
                     };
                     nm.SendMessage(orderCardSelectGameMessage);
                 }
             }
         }
+
+        private static List<bool> OrderCardSelectState {get ; set; }
 
         private static void ProcessClientReceivedMessage(object o, SocketAsyncEventArgs eventArgs)
         {   
@@ -95,29 +102,64 @@ namespace ConsoleTest
             Console.WriteLine("receive , type: {0}, length :{1}", dragonMarbleGameMessage.MessageType, m.Length);
             token.Message = dragonMarbleGameMessage;
 
+            Console.WriteLine("=======================================================================");
             switch (dragonMarbleGameMessage.MessageType)
             { 
                 case GameMessageType.OrderCardSelect:
-                    Console.WriteLine("{0},{1}",
-                        ((OrderCardSelectGameMessage)dragonMarbleGameMessage).OrderCardSelectState[0],
-                    ((OrderCardSelectGameMessage)dragonMarbleGameMessage).OrderCardSelectState[1])
-                    ;
+                    
+                    OrderCardSelect((OrderCardSelectGameMessage) dragonMarbleGameMessage);
                     break;
                 case GameMessageType.InitializeGame:
-                    Console.WriteLine("number of players : {0}", ((InitializeGameGameMessage) dragonMarbleGameMessage).NumberOfPlayers);
-                    Console.WriteLine("number of players : {0}", ((InitializeGameGameMessage)dragonMarbleGameMessage).Units[0].gold);
-                    Console.WriteLine("number of players : {0}", ((InitializeGameGameMessage)dragonMarbleGameMessage).Units[0].Id);
-                    Console.WriteLine("number of players : {0}", ((InitializeGameGameMessage)dragonMarbleGameMessage).Units[1].Id);
-                    Console.WriteLine("number of players : {0}", ((InitializeGameGameMessage)dragonMarbleGameMessage).Units[1].gold);
+                    InitGame((InitializeGameGameMessage)dragonMarbleGameMessage);
                     break;
-                    case GameMessageType.ActivateTurn:
-                    Console.WriteLine(((ActivateTurnGameMessage)dragonMarbleGameMessage).TurnOwner);
+                case GameMessageType.ActivateTurn:
+                    ActivateTurn((ActivateTurnGameMessage) dragonMarbleGameMessage);
                     break;
-            }
+                case GameMessageType.InitializePlayer:
+                    InitializePlayerGameMessage ipgm = (InitializePlayerGameMessage)dragonMarbleGameMessage;
+                    _unitInfo = new StageUnitInfo
+                    {
+                        Id = ipgm.PlayerId,
+                        ControlMode = StageUnitInfo.ControlModeType.Player
+                    };
+                    Console.WriteLine("SYSTEM: player initialized : {0}", _unitInfo.Id);
+                    break;
 
+            }
+            Console.WriteLine("=======================================================================");
             Console.WriteLine("current thread : {0}",Thread.CurrentThread.ManagedThreadId);
             
             
+        }
+
+        private static void OrderCardSelect(OrderCardSelectGameMessage m)
+        {
+            OrderCardSelectState = m.OrderCardSelectState;
+
+            Console.Write("SYSTEM : cards [");
+            foreach (bool b in m.OrderCardSelectState)
+            {
+                Console.Write(",{0}",b);
+            }
+            Console.WriteLine("]");
+        }
+
+        private static void ActivateTurn(ActivateTurnGameMessage dragonMarbleGameMessage)
+        {
+            Console.WriteLine(dragonMarbleGameMessage.TurnOwner);
+            if (dragonMarbleGameMessage.TurnOwner == _unitInfo.Id)
+            {
+                Console.WriteLine("SYSTEM: My turn!");
+            }
+        }
+
+        private static void InitGame(InitializeGameGameMessage initializeGameGameMessage)
+        {
+            Console.WriteLine("SYSTEM: {0} players", initializeGameGameMessage.NumberOfPlayers);
+            foreach (StageUnitInfo info in initializeGameGameMessage.Units)
+            {
+                Console.WriteLine("SYSTEM : {0}, {1},{2}", info.Id, info.UnitColor, info.Gold);
+            }
         }
     }
 }
