@@ -29,11 +29,26 @@ namespace ConsoleTest
                     InitWaitingRoom((InitializeWaitingRoomGameMessage)dragonMarbleGameMessage);
                     break;
                 case GameMessageType.EveryoneIsReady:
+
                     break;
                 case GameMessageType.RoomOwner:
                     if (_unitInfo.Id == ((RoomOwnerGameMessage) dragonMarbleGameMessage).RoomOwner)
                     {
                         _unitInfo.IsRoomOwner = true;
+                    }
+                    break;
+                case GameMessageType.ReadyState:
+                    ReadyStateGameMessage readyStateGameMessage 
+                        = ((ReadyStateGameMessage) dragonMarbleGameMessage);
+                    _units[readyStateGameMessage.Actor].IsReady =
+                        readyStateGameMessage.Ready;
+                    if (readyStateGameMessage.Ready)
+                    {
+                        Console.WriteLine("{0} is ready.",readyStateGameMessage.Actor);
+                    }
+                    else
+                    {
+                        Console.WriteLine("{0} is not ready.", readyStateGameMessage.Actor);
                     }
                     break;
             }
