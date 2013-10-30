@@ -21,7 +21,7 @@ namespace DragonMarble
             Notify(message);
             if (IsStartable)
             {
-                Notify(new EveryoneIsReadyGameMessage()
+                Notify(new EveryoneIsReadyGameMessage
                 {
                     ResponseLimit = 100000
                 });

@@ -47,20 +47,10 @@ namespace DragonMarble
                 Gold = 2000000
             };
 
+            //TODO game master pool need
             GameMaster gm = new GameMaster(2);
 
             gm.Join(token.Unit);
-
-            StageUnitInfo dummyAI = new AIStageUnitInfo()
-            {
-                Id = Guid.NewGuid(),
-                Order = 1,
-                UnitColor = StageUnitInfo.UNIT_COLOR.GREEN,
-                CharacterId = 1,
-                Gold = 2000000,
-                ControlMode = StageUnitInfo.ControlModeType.AI_0
-            };
-         // gm.Join(dummyAI);
         }
     }
 }
