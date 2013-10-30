@@ -48,6 +48,20 @@ namespace DragonMarble
                     if (i > 1 && i < 13) StageDiceInfo.diceCheat = i;
                 }
 
+                if (readLine.Contains("A") || readLine.Contains("a"))
+                {
+                    StageUnitInfo s = new AIStageUnitInfo
+                    {
+                        Id = Guid.NewGuid(),
+                        UnitColor = StageUnitInfo.UNIT_COLOR.GREEN,
+                        Gold = 2000000,
+                        ControlMode = StageUnitInfo.ControlModeType.AI_0,
+                        CharacterId = 1,
+                    };
+
+                    //TODO join dummy player
+                }
+
                 if (readLine.Contains("Q") || readLine.Contains("q")) return;
             }
         }
