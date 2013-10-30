@@ -87,6 +87,12 @@ namespace DragonMarble
                             });
                         }
                         break;
+                    case GameMessageType.StartGame:
+                        if (Unit.IsRoomOwner)
+                        {
+                            ((GameMaster)Unit.StageManager).StartGame(Unit.Id);
+                        }
+                        break;
                     case GameMessageType.OrderCardSelect:
                         Unit.SelectOrderCard(value);
                         Logger.DebugFormat("received {0}, real time.", value.MessageType);
