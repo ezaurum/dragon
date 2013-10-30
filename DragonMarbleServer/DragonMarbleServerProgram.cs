@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Net.Sockets;
 using Dragon.Server;
 using GameUtils;
 using log4net;
@@ -32,8 +33,8 @@ namespace DragonMarble
             {
                 RajaProvider = rajaProvider
             };
-
-            server.OnAfterAccept += GameMaster.AddPlayer;
+            GameMasterPool pool =new GameMasterPool();
+            server.OnAfterAccept += pool.AddPlayer;
 
             server.Start();
 
@@ -59,7 +60,7 @@ namespace DragonMarble
                         CharacterId = 1,
                     };
 
-                    //TODO join dummy player
+                    pool.Join(s);
                 }
 
                 if (readLine.Contains("Q") || readLine.Contains("q")) return;
@@ -70,6 +71,42 @@ namespace DragonMarble
         {
             List<StageTileInfo> tiles = XmlUtils.LoadXml(@"data_stage.xml", GameMaster.ParseTiles);
             GameMaster.OriginalBoard = new GameBoard(tiles);
+        }
+    }
+
+    internal class GameMasterPool
+    {
+        GameMaster gm = new GameMaster(2);
+
+        public GameMaster GetGameMaster()
+        {
+            return gm;
+        }
+
+        /// <summary>
+        /// after Connect event
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void AddPlayer(object sender, SocketAsyncEventArgs e)
+        {
+            Raja token = (Raja)e.UserToken;
+            token.Unit = new StageUnitInfo
+            {
+                Id = Guid.NewGuid(),
+                Order = 0,
+                UnitColor = StageUnitInfo.UNIT_COLOR.BLUE,
+                CharacterId = 1,
+                Gold = 2000000
+            };
+            
+            Join(token.Unit);
+            
+        }
+
+        public void Join(StageUnitInfo unit)
+        {
+            GetGameMaster().Join(unit);
         }
     }
 }

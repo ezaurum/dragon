@@ -29,28 +29,5 @@ namespace DragonMarble
             Raja raja = (Raja) stageUnitInfo.MessageProcessor;
             raja.Dispose();
         }
-
-        /// <summary>
-        /// after Connect event
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        public static void AddPlayer(object sender, SocketAsyncEventArgs e)
-        {
-            Raja token = (Raja)e.UserToken;
-            token.Unit = new StageUnitInfo
-            {
-                Id = Guid.NewGuid(),
-                Order = 0,
-                UnitColor = StageUnitInfo.UNIT_COLOR.BLUE,
-                CharacterId = 1,
-                Gold = 2000000
-            };
-
-            //TODO game master pool need
-            GameMaster gm = new GameMaster(2);
-
-            gm.Join(token.Unit);
-        }
     }
 }

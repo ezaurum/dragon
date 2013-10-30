@@ -59,14 +59,14 @@ namespace DragonMarble
             {
                 RoomOwner = Units[0].Id
             });
-/*
+
             Notify(new InitializeWaitingRoomGameMessage
             {
                 Units = Units,
                 BoardType = 0,
                 CurrentNumberOfPlayers = (short)Units.Count,
                 NumberOfPlayers = PlayerNumberForPlay
-            });*/
+            });
         }
 
         /// <summary>
