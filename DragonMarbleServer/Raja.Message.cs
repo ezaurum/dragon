@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using Dragon;
 using Dragon.Message;
 using DragonMarble.Message;
@@ -42,8 +43,7 @@ namespace DragonMarble
 
                 _receiveMessageWaitHandler.WaitOne(_timeout);
                 
-                lock (_timerMessage)
-                {
+                
                     if (null != _timerMessage)
                     {
                         Unit.ControlMode = StageUnitInfo.ControlModeType.AI_0;
@@ -65,7 +65,7 @@ namespace DragonMarble
                         }     
                         Logger.DebugFormat("ai set");
                     }
-                }
+                
 
                 Logger.Debug("Deque.");
                 return _receivedMessages.Dequeue();
@@ -179,6 +179,7 @@ namespace DragonMarble
 
         private void SendMessage(IDragonMarbleGameMessage m)
         {
+            Task.WaitAll(Task.Delay(1));
             WriteArgs.SetBuffer(m.ToByteArray(), 0, m.Length);
             NetworkManager.SendBytes(Socket, WriteArgs);
         }
