@@ -69,11 +69,6 @@ namespace DragonMarble
             set
             {
                 _isReady = value;
-                StageManager.ReadyNotify(new ReadyStateGameMessage
-                {
-                    Actor = Id,
-                    Ready = value
-                });
             }
         }
 

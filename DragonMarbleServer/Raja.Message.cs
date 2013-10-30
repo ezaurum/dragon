@@ -80,6 +80,11 @@ namespace DragonMarble
                         if (Unit.Id == readyStateGameMessage.Actor)
                         {
                             Unit.IsReady = readyStateGameMessage.Ready;
+                            Unit.StageManager.ReadyNotify(new ReadyStateGameMessage
+                            {
+                                Actor = Unit.Id,
+                                Ready = readyStateGameMessage.Ready
+                            });
                         }
                         break;
                     case GameMessageType.OrderCardSelect:
