@@ -60,6 +60,7 @@ namespace DragonMarble
                 _orderCard.Add(notSelectedCard, notSelectedUnit);
                 message.Actor = notSelectedUnit;
                 message.SelectedCardNumber = notSelectedCard;
+                message.OrderCardSelectState[notSelectedCard] = true;
                 Notify(message);
             }
 
