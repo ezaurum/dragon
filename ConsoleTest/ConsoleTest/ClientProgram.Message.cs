@@ -38,19 +38,24 @@ namespace ConsoleTest
                     }
                     break;
                 case GameMessageType.ReadyState:
-                    ReadyStateGameMessage readyStateGameMessage 
-                        = ((ReadyStateGameMessage) dragonMarbleGameMessage);
-                    _units[readyStateGameMessage.Actor].IsReady =
-                        readyStateGameMessage.Ready;
-                    if (readyStateGameMessage.Ready)
-                    {
-                        Console.WriteLine("{0} is ready.",readyStateGameMessage.Actor);
-                    }
-                    else
-                    {
-                        Console.WriteLine("{0} is not ready.", readyStateGameMessage.Actor);
-                    }
+                    SetReadyState((ReadyStateGameMessage) dragonMarbleGameMessage);
                     break;
+            }
+        }
+
+        private static void SetReadyState(ReadyStateGameMessage readyStateGameMessage)
+        {
+            StageUnitInfo stageUnitInfo = _units[readyStateGameMessage.Actor];
+            stageUnitInfo.IsReady
+                = readyStateGameMessage.Ready;
+
+            if (stageUnitInfo.IsReady)
+            {
+                Console.WriteLine("{0} is ready.", stageUnitInfo.Id);
+            }
+            else
+            {
+                Console.WriteLine("{0} is not ready.", stageUnitInfo.Id);
             }
         }
 

@@ -41,9 +41,11 @@ namespace ConsoleTest
 
             if (readLine.Contains("r") || readLine.Contains("R"))
             {
+                Console.WriteLine(_unitInfo.IsReady);
                 nm.SendMessage(new ReadyStateGameMessage
                 {
-                    Actor = _unitInfo.Id
+                    Actor = _unitInfo.Id,
+                    Ready = !_unitInfo.IsReady
                 });
             }
 

@@ -76,14 +76,14 @@ namespace DragonMarble
                 switch (value.MessageType)
                 {
                     case GameMessageType.ReadyState :
-                        ReadyStateGameMessage readyStateGameMessage = value as ReadyStateGameMessage;
+                        ReadyStateGameMessage readyStateGameMessage = (ReadyStateGameMessage)value;
                         if (Unit.Id == readyStateGameMessage.Actor)
                         {
                             Unit.IsReady = readyStateGameMessage.Ready;
                             Unit.StageManager.ReadyNotify(new ReadyStateGameMessage
                             {
                                 Actor = Unit.Id,
-                                Ready = readyStateGameMessage.Ready
+                                Ready = Unit.IsReady
                             });
                         }
                         break;
