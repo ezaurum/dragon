@@ -175,7 +175,7 @@ PayFee :
   comment : pay fee
   fields :
     - name : Fee
-      type : Int32
+      type : Int64
     - name : Actor
       type : Guid
       length : 16
