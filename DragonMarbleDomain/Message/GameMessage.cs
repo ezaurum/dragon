@@ -19,6 +19,7 @@ public enum GameMessageType
 	InitializeWaitingRoom,
 	LoanMoney,
 	NeedMoneyRequest,
+	NewPlayerJoin,
 	NothingToDo,
 	OrderCardResult,
 	OrderCardSelect,
@@ -88,6 +89,9 @@ public static class GameMessageFactory
 		break;
 		case GameMessageType.NeedMoneyRequest:
 		message = new NeedMoneyRequestGameMessage();
+		break;
+		case GameMessageType.NewPlayerJoin:
+		message = new NewPlayerJoinGameMessage();
 		break;
 		case GameMessageType.NothingToDo:
 		message = new NothingToDoGameMessage();
@@ -785,6 +789,46 @@ public void FromByteArray(byte[] bytes)
 		get
 		{
 			return (Int16)(2+sizeof(GameMessageType)+sizeof(Int32)+16);
+		}
+	}
+}
+
+// 게임 대기방 추가 정보	
+public class NewPlayerJoinGameMessage : IDragonMarbleGameMessage	
+{
+	public GameMessageType MessageType {get{return GameMessageType.NewPlayerJoin;}}
+	public Guid PlayerId { get; set;}
+
+	public byte[] ToByteArray()
+	{
+		byte[] bytes = new byte[Length];
+		int index = 0;
+		BitConverter.GetBytes(Length)
+		.CopyTo(bytes,index);
+		index += sizeof(Int16);
+		BitConverter.GetBytes((Int32)MessageType)
+		.CopyTo(bytes,index);
+		index += sizeof(GameMessageType);
+		PlayerId.ToByteArray()
+		.CopyTo(bytes,index);
+		index += 16;
+	return bytes;
+}
+
+public void FromByteArray(byte[] bytes)
+{
+		int index = 6;
+		byte[] tempPlayerId = new byte[16];
+		Buffer.BlockCopy(bytes, index, tempPlayerId, 0,16);
+		PlayerId = new Guid(tempPlayerId);
+		index += 16;
+}
+
+	public Int16 Length
+	{
+		get
+		{
+			return (Int16)(2+sizeof(GameMessageType)+16);
 		}
 	}
 }

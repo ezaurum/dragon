@@ -341,3 +341,11 @@ InitializeWaitingRoom :
               type : Guid
               length : 16
               options : [byte_param_constructor, to_byte_array]
+
+NewPlayerJoin :
+  comment : 게임 대기방 추가 정보
+  fields :
+    - type : Guid
+      name : PlayerId
+      length : 16
+      options : [byte_param_constructor, to_byte_array, property]
