@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Xml.Linq;
 
 namespace DragonMarble
@@ -33,6 +35,21 @@ namespace DragonMarble
                     c.Attribute("TypeValue").Value.ToString(), buyPrices, sellPrices, fees);
             });
             return query.ToList();
+        }
+    }
+
+    public static class GameBoardUtil
+    {
+        public static GameBoard Clone(this GameBoard gameBoard)
+        {
+            using (var ms = new MemoryStream())
+            {
+                var formatter = new BinaryFormatter();
+                formatter.Serialize(ms, gameBoard);
+                ms.Position = 0;
+
+                return (GameBoard)formatter.Deserialize(ms);
+            }
         }
     }
 }

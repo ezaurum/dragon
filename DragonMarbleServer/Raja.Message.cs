@@ -75,6 +75,13 @@ namespace DragonMarble
                 ResetTimer();
                 switch (value.MessageType)
                 {
+                    case GameMessageType.ReadyState :
+                        ReadyStateGameMessage readyStateGameMessage = value as ReadyStateGameMessage;
+                        if (Unit.Id == readyStateGameMessage.Actor)
+                        {
+                            Unit.IsReady = readyStateGameMessage.Ready;
+                        }
+                        break;
                     case GameMessageType.OrderCardSelect:
                         Unit.SelectOrderCard(value);
                         Logger.DebugFormat("received {0}, real time.", value.MessageType);
@@ -161,10 +168,8 @@ namespace DragonMarble
 
         private void SendMessage(IDragonMarbleGameMessage m)
         {
-            Logger.DebugFormat("1SendMessage:{0}, {1}bytes", m.MessageType, m.Length);
             WriteArgs.SetBuffer(m.ToByteArray(), 0, m.Length);
             NetworkManager.SendBytes(Socket, WriteArgs);
-            Logger.DebugFormat("2SendMessage:{0}, {1}bytes", m.MessageType, m.Length);
         }
     }
 

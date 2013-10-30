@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
-using System.Threading.Tasks;
 using DragonMarble.Message;
 
 namespace DragonMarble
@@ -20,23 +19,9 @@ namespace DragonMarble
         }
 
         /// <summary>
-        /// Join player to game.
+        /// ban from game
         /// </summary>
-        /// <param name="player"></param>
-        public void Join(StageUnitInfo player)
-        {
-            Units.Add(player);
-            player.StageManager = this;
-            player.Stage = Board;
-
-            //set initailize player message
-            player.SendingMessage = new InitializePlayerGameMessage
-            {
-                PlayerId = player.Id,
-                Server = Id
-            };
-        }
-
+        /// <param name="stageUnitInfo"></param>
         public void Ban(StageUnitInfo stageUnitInfo)
         {
             Logger.DebugFormat("banned. :{0}",stageUnitInfo.Id);
@@ -45,6 +30,11 @@ namespace DragonMarble
             raja.Dispose();
         }
 
+        /// <summary>
+        /// after Connect event
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public static void AddPlayer(object sender, SocketAsyncEventArgs e)
         {
             Raja token = (Raja)e.UserToken;
@@ -70,12 +60,7 @@ namespace DragonMarble
                 Gold = 2000000,
                 ControlMode = StageUnitInfo.ControlModeType.AI_0
             };
-            gm.Join(dummyAI);
-
-            if (gm.IsGameStartable)
-            {
-                Task.Factory.StartNew(gm.StartGame);
-            }
+         // gm.Join(dummyAI);
         }
     }
 }

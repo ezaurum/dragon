@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading.Tasks;
-using Dragon.Message;
 using DragonMarble.Message;
 
 namespace DragonMarble
@@ -75,99 +72,7 @@ namespace DragonMarble
             Logger.Debug("End order");
 
             //playe game is need another thread.
-            Task.Factory.StartNew(PlayGame);
-        }
-
-        private void PlayGame()
-        {
-            Logger.Debug("Play Game");
-            ProcessAction();
-            EndGame();
-        }
-
-        public void EndGame()
-        {
-            _state = GameState.EndGame;
-            Logger.Debug("end game.");
-        }
-
-        private void ProcessAction()
-        {
-            Logger.Debug("Process action");
-
-            foreach (IDragonMarbleGameMessage action in PlayerActions())
-            {
-                Board.GrossAssets = 0;
-                Units.ForEach(p => Board.GrossAssets += p.Assets);
-                if (Logger.IsDebugEnabled)
-                {
-                    Logger.DebugFormat("Gross Assets is : {0}", Board.GrossAssets);
-                }
-
-                CurrentAction = action;
-                _state = GameState.ProcessPlayerAction;
-                if (GameMessageType.ActionResultCopy == action.MessageType)
-                {
-                    _receiveMessageWaitHandler.Reset();
-                    _availablePlayers.ForEach(p => p.IsActionResultCopySended = false);
-                }
-
-                if (GameMessageType.ActionResultCopy != action.MessageType)
-                {
-                    Notify(action);
-                }
-
-                //wait for action result copy when message is action result copy
-                if (GameMessageType.ActionResultCopy == action.MessageType)
-                {
-                    Logger.DebugFormat("wait for action result copy Turn:{0}", Turn + 1);
-                    _receiveMessageWaitHandler.WaitOne();
-                }
-            }
-        }
-
-        private IEnumerable<IGameMessage> PlayerActions()
-        {
-            Logger.Debug("Player actions");
-            foreach (IGameMessage action
-                in PlayersOrderByTurn().SelectMany(player => player.Actions()))
-            {
-                _state = GameState.WaitPlayerAction;
-
-                Logger.DebugFormat("_state:{0}", _state);
-
-                //turn owner's action
-                yield return action;
-            }
-        }
-
-        private IEnumerable<StageUnitInfo> PlayersOrderByTurn()
-        {
-            for (Turn = 0; Turn < TurnLimit; Turn++)
-            {
-                Logger.DebugFormat("start Turn:{0}", Turn + 1);
-
-                Notify(CurrentPlayer.ActivateTurn());
-
-                yield return CurrentPlayer;
-
-                _receiveMessageWaitHandler.Reset();
-            }
-        }
-    }
-
-    public static class GameBoardUtil
-    {
-        public static GameBoard Clone(this GameBoard gameBoard)
-        {
-            using (var ms = new MemoryStream())
-            {
-                var formatter = new BinaryFormatter();
-                formatter.Serialize(ms, gameBoard);
-                ms.Position = 0;
-
-                return (GameBoard)formatter.Deserialize(ms);
-            }
+            Task.Factory.StartNew(ProcessAction);
         }
     }
 }

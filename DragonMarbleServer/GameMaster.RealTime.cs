@@ -16,6 +16,18 @@ namespace DragonMarble
             }
         }
 
+        public void ReadyNotify(ReadyStateGameMessage message)
+        {   
+            Notify(message);
+            if (IsStartable)
+            {
+                Notify(new EveryoneIsReadyGameMessage()
+                {
+                    ResponseLimit = 100000
+                });
+            }
+        }
+
         public void OrderSelectSended(OrderCardSelectGameMessage message)
         {
             short selectedCardNumber = message.SelectedCardNumber;

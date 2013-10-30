@@ -24,40 +24,35 @@ namespace DragonMarble
         //turn limit
         public const int TurnLimit = 30;
         private static readonly ILog Logger = LogManager.GetLogger(typeof (GameMaster));
-        public int PlayerNumberForPlay { get; private set; }
-        public static GameBoard OriginalBoard { get; set; }
+
         private readonly Dictionary<short, Guid> _orderCard = new Dictionary<short, Guid>();
         private readonly EventWaitHandle _receiveMessageWaitHandler = new ManualResetEvent(false);
         private List<StageUnitInfo> _availablePlayers;
         private bool _gameContinue;
         private GameState _state;
 
-        public GameMaster(int playerNumberForPlayer)
+        public GameMaster(short playerNumberForPlayer)
         {
             PlayerNumberForPlay = playerNumberForPlayer;
             _state = GameState.JustMade;
             Id = Guid.NewGuid();
             Units = new List<StageUnitInfo>();
         }
+        
+        public static GameBoard OriginalBoard { get; set; }
+        public short PlayerNumberForPlay { get; private set; }
 
         public GameBoard Board { get; set; }
         public int Turn { get; set; }
-        public List<StageUnitInfo> OrderedByTurnPlayers { get; set; }
+
         public IGameMessage CurrentAction { get; set; }
 
-        public bool IsGameStartable
-        {
-            get
-            {
-                return Units.Count == PlayerNumberForPlay;
-            }
-        }
+        public List<StageUnitInfo> OrderedByTurnPlayers { get; set; }
 
         private StageUnitInfo CurrentPlayer
         {
             get { return OrderedByTurnPlayers[Turn%Units.Count]; }
         }
-
 
         public bool GameContinue
         {
@@ -78,7 +73,5 @@ namespace DragonMarble
             }
             set { _gameContinue = value; }
         }
-
-        
     }
 }
