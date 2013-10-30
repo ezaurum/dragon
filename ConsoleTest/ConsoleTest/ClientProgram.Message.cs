@@ -6,6 +6,38 @@ namespace ConsoleTest
 {
     public partial class ClientProgram
     {
+        private static void SwitchMessage(IDragonMarbleGameMessage dragonMarbleGameMessage)
+        {
+            switch (dragonMarbleGameMessage.MessageType)
+            {
+                case GameMessageType.OrderCardSelect:
+                    OrderCardSelect((OrderCardSelectGameMessage)dragonMarbleGameMessage);
+                    break;
+                case GameMessageType.InitializeGame:
+                    InitGame((InitializeGameGameMessage)dragonMarbleGameMessage);
+                    break;
+                case GameMessageType.ActivateTurn:
+                    ActivateTurn((ActivateTurnGameMessage)dragonMarbleGameMessage);
+                    break;
+                case GameMessageType.InitializePlayer:
+                    InitPlayer(dragonMarbleGameMessage);
+                    break;
+                case GameMessageType.NewPlayerJoin:
+                    Join((NewPlayerJoinGameMessage)dragonMarbleGameMessage);
+                    break;
+                case GameMessageType.InitializeWaitingRoom:
+                    InitWaitingRoom((InitializeWaitingRoomGameMessage)dragonMarbleGameMessage);
+                    break;
+                case GameMessageType.EveryoneIsReady:
+                    break;
+                case GameMessageType.RoomOwner:
+                    if (_unitInfo.Id == ((RoomOwnerGameMessage) dragonMarbleGameMessage).RoomOwner)
+                    {
+                        _unitInfo.IsRoomOwner = true;
+                    }
+                    break;
+            }
+        }
 
         private static void InitWaitingRoom(InitializeWaitingRoomGameMessage dragonMarbleGameMessage)
         {

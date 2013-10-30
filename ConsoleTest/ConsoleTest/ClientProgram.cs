@@ -52,29 +52,7 @@ namespace ConsoleTest
             token.Message = dragonMarbleGameMessage;
 
             Console.WriteLine("=======================================================================");
-            switch (dragonMarbleGameMessage.MessageType)
-            {
-                case GameMessageType.OrderCardSelect:
-                    OrderCardSelect((OrderCardSelectGameMessage) dragonMarbleGameMessage);
-                    break;
-                case GameMessageType.InitializeGame:
-                    InitGame((InitializeGameGameMessage) dragonMarbleGameMessage);
-                    break;
-                case GameMessageType.ActivateTurn:
-                    ActivateTurn((ActivateTurnGameMessage) dragonMarbleGameMessage);
-                    break;
-                case GameMessageType.InitializePlayer:
-                    InitPlayer(dragonMarbleGameMessage);
-                    break;
-                case GameMessageType.NewPlayerJoin:
-                    Join((NewPlayerJoinGameMessage) dragonMarbleGameMessage);
-                    break;
-                case GameMessageType.InitializeWaitingRoom:
-                    InitWaitingRoom((InitializeWaitingRoomGameMessage) dragonMarbleGameMessage);
-                    break;
-                case GameMessageType.EveryoneIsReady:
-                    break;
-            }
+            SwitchMessage(dragonMarbleGameMessage);
             Console.WriteLine("=======================================================================");
             Console.WriteLine("current thread : {0}", Thread.CurrentThread.ManagedThreadId);
         }
