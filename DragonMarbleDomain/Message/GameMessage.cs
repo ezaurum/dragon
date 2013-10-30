@@ -997,7 +997,7 @@ public void FromByteArray(byte[] bytes)
 public class PayFeeGameMessage : IDragonMarbleGameMessage	
 {
 	public GameMessageType MessageType {get{return GameMessageType.PayFee;}}
-	public Int32 Fee;
+	public Int64 Fee;
 	public Guid Actor { get; set;}
 
 	public byte[] ToByteArray()
@@ -1012,7 +1012,7 @@ public class PayFeeGameMessage : IDragonMarbleGameMessage
 		index += sizeof(GameMessageType);
 		BitConverter.GetBytes(Fee)
 		.CopyTo(bytes,index);
-		index += sizeof(Int32);
+		index += sizeof(Int64);
 		Actor.ToByteArray()
 		.CopyTo(bytes,index);
 		index += 16;
@@ -1022,8 +1022,8 @@ public class PayFeeGameMessage : IDragonMarbleGameMessage
 public void FromByteArray(byte[] bytes)
 {
 		int index = 6;
-		Fee = BitConverter.ToInt32(bytes, index);
-		index += sizeof(Int32);
+		Fee = BitConverter.ToInt64(bytes, index);
+		index += sizeof(Int64);
 		byte[] tempActor = new byte[16];
 		Buffer.BlockCopy(bytes, index, tempActor, 0,16);
 		Actor = new Guid(tempActor);
@@ -1034,7 +1034,7 @@ public void FromByteArray(byte[] bytes)
 	{
 		get
 		{
-			return (Int16)(2+sizeof(GameMessageType)+sizeof(Int32)+16);
+			return (Int16)(2+sizeof(GameMessageType)+sizeof(Int64)+16);
 		}
 	}
 }
