@@ -199,6 +199,14 @@ Takeover :
       length : 16
       options : [byte_param_constructor, to_byte_array, property]
 
+Bankrupt :
+  comment : Bankrupt
+  fields :
+    - name : Actor
+      type : Guid
+      length : 16
+      options : [byte_param_constructor, to_byte_array, property]
+
 PrisonAction :
   comment : action in Prison
   fields :
