@@ -22,6 +22,11 @@ namespace DragonMarble
             } 
         }
 
+        public Raja()
+        {
+            AbleToSend = true;
+        }
+
         public INetworkManager NetworkManager { get; set; }
         public Socket Socket { get; set; }
         public SocketAsyncEventArgs ReadArgs { get; set; }

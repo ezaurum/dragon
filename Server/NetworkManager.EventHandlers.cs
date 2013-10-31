@@ -86,6 +86,9 @@ namespace Dragon.Server
         private void DefaultAfterSend(object sender, SocketAsyncEventArgs e)
         {
             Logger.DebugFormat("Sended.");
+            IRaja userToken = (IRaja) e.UserToken;
+            userToken.AbleToSend = true;
+
         }
 
         private void DefaultAfterReceive(object sender, SocketAsyncEventArgs e)

@@ -13,6 +13,8 @@ namespace Dragon.Client
         public SocketAsyncEventArgs WriteArgs { get; set; }
         public INetworkManager NetworkManager { get; set; }
         public bool IsDisposed { get; set; }
+        public bool AbleToSend { get; set; }
+
         public void ReceiveBytes(byte[] buffer, int offset, int bytesTransferred)
         {
 

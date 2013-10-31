@@ -34,6 +34,7 @@ namespace Dragon
         SocketAsyncEventArgs WriteArgs { get; set; }
         INetworkManager NetworkManager { get; set; }
         bool IsDisposed { get; set; }
+        bool AbleToSend { get; set; }
         void ReceiveBytes(byte[] buffer, int offset, int bytesTransferred);
     }
 

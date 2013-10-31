@@ -12,12 +12,12 @@ namespace DragonMarble
     public partial class Raja : IMessageProcessor<IDragonMarbleGameMessage>
     {
         private readonly EventWaitHandle _receiveMessageWaitHandler = new ManualResetEvent(false);
-
-        private readonly Queue<IDragonMarbleGameMessage> _receivedMessages
-            = new Queue<IDragonMarbleGameMessage>();
+        
+        private readonly CircularQueue<IDragonMarbleGameMessage> _receivedMessages = new CircularQueue<IDragonMarbleGameMessage>();
 
         private IDragonMarbleGameMessage _timerMessage;
         private int _timeout = Timeout.Infinite ;
+        private int _resendInterval = 0;
 
         public IEnumerable<IDragonMarbleGameMessage> ReceivedMessages
         {
@@ -155,6 +155,8 @@ namespace DragonMarble
             throw new NotImplementedException();
         }
 
+        public bool AbleToSend { get; set; }
+
         public void ReceiveBytes(byte[] buffer, int offset, int bytesTransferred)
         {
             short messageLength = BitConverter.ToInt16(buffer, offset);
@@ -179,9 +181,17 @@ namespace DragonMarble
 
         private void SendMessage(IDragonMarbleGameMessage m)
         {
-            Task.WaitAll(Task.Delay(1));
-            WriteArgs.SetBuffer(m.ToByteArray(), 0, m.Length);
-            NetworkManager.SendBytes(Socket, WriteArgs);
+            while ( AbleToSend && _resendInterval < 10000)
+            {
+                _resendInterval = _resendInterval << 1;
+                
+                Task.WaitAll(Task.Delay(_resendInterval));
+
+                AbleToSend = false;
+                WriteArgs.SetBuffer(m.ToByteArray(), 0, m.Length);
+                NetworkManager.SendBytes(Socket, WriteArgs);
+            }
+            
         }
     }
 
