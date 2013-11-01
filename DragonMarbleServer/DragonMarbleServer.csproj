@@ -36,6 +36,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>lib\log4net.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.VisualStudio.Profiler">
+      <HintPath>..\..\..\..\..\Program Files (x86)\Microsoft Visual Studio 11.0\Team Tools\Performance Tools\Microsoft.VisualStudio.Profiler.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />

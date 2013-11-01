@@ -7,6 +7,7 @@ using Dragon.Server;
 using GameUtils;
 using log4net;
 using log4net.Config;
+using Microsoft.VisualStudio.Profiler;
 
 namespace DragonMarble
 {
@@ -20,6 +21,10 @@ namespace DragonMarble
 
         private static void Main(string[] args)
         {
+            DataCollection.StopProfile(
+                ProfileLevel.Global,
+                DataCollection.CurrentId);
+            
             XmlConfigurator.Configure(new FileInfo("log4net.xml"));
             Logger.Debug("Start app.");
 
@@ -38,7 +43,9 @@ namespace DragonMarble
 
             server.Start();
 
-            while (true)
+            Running = true;
+
+            while (Running)
             {
                 string readLine = Console.ReadLine();
                 
@@ -63,9 +70,15 @@ namespace DragonMarble
                     pool.Join(s);
                 }
 
-                if (readLine.Contains("Q") || readLine.Contains("q")) return;
+                if (readLine.Contains("Q") || readLine.Contains("q")) Running = false;
             }
+
+            DataCollection.StopProfile(
+                ProfileLevel.Global,
+                DataCollection.CurrentId);
         }
+
+        public static bool Running { get; set; }
 
         private static void InitGameData()
         {
