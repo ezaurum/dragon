@@ -171,6 +171,16 @@ UseCoupon :
       length : 16
       options : [byte_param_constructor, to_byte_array, property]
 
+OpenChanceCard :
+  comment : open a chance card
+  fields :
+    - name : CardId
+      type : Char
+    - name : Actor
+      type : Guid
+      length : 16
+      options : [byte_param_constructor, to_byte_array, property]
+
 PayFee :
   comment : pay fee
   fields :

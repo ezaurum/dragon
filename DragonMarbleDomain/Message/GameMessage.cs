@@ -22,6 +22,7 @@ public enum GameMessageType
 	NeedMoneyRequest,
 	NewPlayerJoin,
 	NothingToDo,
+	OpenChanceCard,
 	OrderCardResult,
 	OrderCardSelect,
 	PayFee,
@@ -100,6 +101,9 @@ public static class GameMessageFactory
 		break;
 		case GameMessageType.NothingToDo:
 		message = new NothingToDoGameMessage();
+		break;
+		case GameMessageType.OpenChanceCard:
+		message = new OpenChanceCardGameMessage();
 		break;
 		case GameMessageType.OrderCardResult:
 		message = new OrderCardResultGameMessage();
@@ -920,6 +924,52 @@ public void FromByteArray(byte[] bytes)
 		get
 		{
 			return (Int16)(2+sizeof(GameMessageType)+16);
+		}
+	}
+}
+
+// open a chance card	
+public class OpenChanceCardGameMessage : IDragonMarbleGameMessage	
+{
+	public GameMessageType MessageType {get{return GameMessageType.OpenChanceCard;}}
+	public Char CardId;
+	public Guid Actor { get; set;}
+
+	public byte[] ToByteArray()
+	{
+		byte[] bytes = new byte[Length];
+		int index = 0;
+		BitConverter.GetBytes(Length)
+		.CopyTo(bytes,index);
+		index += sizeof(Int16);
+		BitConverter.GetBytes((Int32)MessageType)
+		.CopyTo(bytes,index);
+		index += sizeof(GameMessageType);
+		BitConverter.GetBytes(CardId)
+		.CopyTo(bytes,index);
+		index += sizeof(Char);
+		Actor.ToByteArray()
+		.CopyTo(bytes,index);
+		index += 16;
+	return bytes;
+}
+
+public void FromByteArray(byte[] bytes)
+{
+		int index = 6;
+		CardId = BitConverter.ToChar(bytes, index);
+		index += sizeof(Char);
+		byte[] tempActor = new byte[16];
+		Buffer.BlockCopy(bytes, index, tempActor, 0,16);
+		Actor = new Guid(tempActor);
+		index += 16;
+}
+
+	public Int16 Length
+	{
+		get
+		{
+			return (Int16)(2+sizeof(GameMessageType)+sizeof(Char)+16);
 		}
 	}
 }
