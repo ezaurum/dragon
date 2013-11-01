@@ -181,6 +181,20 @@ OpenChanceCard :
       length : 16
       options : [byte_param_constructor, to_byte_array, property]
 
+OrderChanceCard :
+  comment : order for chance card
+  fields :
+    - name : Use
+      type : Boolean
+    - name : Value1
+      type : Char
+    - name : Value2
+      type : Char
+    - name : Actor
+      type : Guid
+      length : 16
+      options : [byte_param_constructor, to_byte_array, property]
+
 PayFee :
   comment : pay fee
   fields :
