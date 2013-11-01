@@ -276,10 +276,9 @@ SellLands :
 GameResult :
   comment : game result
   fields :
-    - name : LoseUnit
-      type : Guid
-      length : 16
-      options : [byte_param_constructor, to_byte_array, property]
+    - name : WinTeam
+      cast : Int32
+      type : StageUnitInfo.TEAM_GROUP
 
 ActionResultCopy :
   comment : Client received Player's action result signal

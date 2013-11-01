@@ -491,7 +491,7 @@ public void FromByteArray(byte[] bytes)
 public class GameResultGameMessage : IDragonMarbleGameMessage	
 {
 	public GameMessageType MessageType {get{return GameMessageType.GameResult;}}
-	public Guid LoseUnit { get; set;}
+	public StageUnitInfo.TEAM_GROUP WinTeam;
 
 	public byte[] ToByteArray()
 	{
@@ -503,26 +503,24 @@ public class GameResultGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes((Int32)MessageType)
 		.CopyTo(bytes,index);
 		index += sizeof(GameMessageType);
-		LoseUnit.ToByteArray()
+		BitConverter.GetBytes((Int32)WinTeam)
 		.CopyTo(bytes,index);
-		index += 16;
+		index += sizeof(StageUnitInfo.TEAM_GROUP);
 	return bytes;
 }
 
 public void FromByteArray(byte[] bytes)
 {
 		int index = 6;
-		byte[] tempLoseUnit = new byte[16];
-		Buffer.BlockCopy(bytes, index, tempLoseUnit, 0,16);
-		LoseUnit = new Guid(tempLoseUnit);
-		index += 16;
+		WinTeam = (StageUnitInfo.TEAM_GROUP)BitConverter.ToInt32(bytes, index);
+		index += sizeof(StageUnitInfo.TEAM_GROUP);
 }
 
 	public Int16 Length
 	{
 		get
 		{
-			return (Int16)(2+sizeof(GameMessageType)+16);
+			return (Int16)(2+sizeof(GameMessageType)+sizeof(StageUnitInfo.TEAM_GROUP));
 		}
 	}
 }
