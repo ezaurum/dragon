@@ -178,7 +178,11 @@ namespace DragonMarble
         public void Go(int step)
         {
             tileIndex += step;
-            if (tileIndex >= 32) tileIndex -= 32;
+            if (tileIndex >= 32){
+				tileIndex -= 32;
+				round++;
+				AddGold( GameBoard.SALARY );
+			}
         }
 
         public void Prison()
@@ -217,9 +221,9 @@ namespace DragonMarble
             return false;
         }
 
-        public int GetPayFee(StageTileInfo tile, int discount)
+        public long GetPayFee(StageTileInfo tile)
         {
-            int fee = tile.fee;
+            long fee = tile.fee;
             if (unitBuff != null)
             {
                 if (unitBuff.type == StageBuffInfo.TYPE.OVERCHARGE)
@@ -231,13 +235,13 @@ namespace DragonMarble
                     fee -= (fee*unitBuff.power/100);
                 }
             }
-            fee -= (fee*discount/100);
+            //fee -= (fee*discount/100);
             return fee;
         }
 
-        public bool Pay(StageTileInfo tile, int discount)
+        public bool Pay(StageTileInfo tile)
         {
-            int fee = GetPayFee(tile, discount);
+            long fee = GetPayFee(tile);
             if (AddGold(-fee))
             {
                 tile.owner.AddGold(fee);

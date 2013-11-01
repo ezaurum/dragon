@@ -32,7 +32,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="AIStageUnitInfo.cs" />
+    <Compile Include="Card\CharacterCardInfo.cs" />
+    <Compile Include="Card\CharacterCardStat.cs" />
     <Compile Include="Contents.cs" />
+    <Compile Include="GameAccountInfo.cs" />
     <Compile Include="GameBoard.cs" />
     <Compile Include="IStageManager.cs" />
     <Compile Include="Message\GameMessage.cs" />

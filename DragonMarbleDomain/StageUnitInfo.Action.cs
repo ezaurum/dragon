@@ -253,7 +253,7 @@ namespace DragonMarble
             }
 		}
 		
-		private IEnumerable<IGameMessage> PayResultCitySight(StageTileInfo stageTile, int fee)
+		private IEnumerable<IGameMessage> PayResultCitySight(StageTileInfo stageTile, long fee)
 		{
 			yield return new PayFeeGameMessage
             {
@@ -293,7 +293,6 @@ namespace DragonMarble
 	        {
 	            if (stageTile.owner != null && !stageTile.IsSameOwner(this))
 	            {
-					int discount = 0;
 					if ( chanceCoupon == CHANCE_COUPON.DISCOUNT_50 || chanceCoupon == CHANCE_COUPON.ANGEL ){
 						yield return new UseCouponRequestGameMessage
 						{
@@ -302,16 +301,16 @@ namespace DragonMarble
 						UseCouponGameMessage receivedMessage = (UseCouponGameMessage) ReceivedMessage;
 						if ( receivedMessage.Use ){
 							if ( chanceCoupon == CHANCE_COUPON.ANGEL ){
-								discount = 100;
+								AddBuff(StageBuffInfo.TYPE.DISCOUNT, 1, 100);
 							}else if ( chanceCoupon == CHANCE_COUPON.DISCOUNT_50 ){
-								discount = 50;
+								AddBuff(StageBuffInfo.TYPE.DISCOUNT, 1, 50);
 							}
 							chanceCoupon = CHANCE_COUPON.NONE;
 						}
 					}
-					int fee = GetPayFee(stageTile, discount);
+					long fee = GetPayFee(stageTile);
 					
-					if (Pay (stageTile, discount)){
+					if (Pay (stageTile)){
 						foreach (var gameAction in PayResultCitySight(stageTile, fee)) yield return gameAction;
 	                }else{
 						if ( usableLoanCount > 0 ){
@@ -328,7 +327,7 @@ namespace DragonMarble
 								
 								if ( loanMsg.LoanMoney > 0 ){
 									if ( Loan( needMoney ) ){
-										if ( Pay(stageTile, discount) ){
+										if ( Pay(stageTile) ){
 											foreach (var gameAction in BuyLandRequest(stageTile)) yield return gameAction;
 										}else{
 											SelfBan();
@@ -339,7 +338,7 @@ namespace DragonMarble
 								}else{
 									yield return new GameResultGameMessage
 									{
-										LoseUnit = Id
+										WinTeam = teamGroup
 									};
 								}
 								
@@ -349,7 +348,7 @@ namespace DragonMarble
 								foreach ( char c in sellMsg.LandList ){
 									lands[(int) c].Sell();
 								}
-								if ( Pay(stageTile, discount) ){
+								if ( Pay(stageTile) ){
 									foreach (var gameAction in PayResultCitySight(stageTile, fee)) yield return gameAction;
 								}else{
 									SelfBan();
@@ -359,7 +358,7 @@ namespace DragonMarble
 						}else{
 							yield return new GameResultGameMessage
 							{
-								LoseUnit = Id
+								WinTeam = teamGroup
 							};
 						}
 

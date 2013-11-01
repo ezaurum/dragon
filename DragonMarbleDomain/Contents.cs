@@ -5,7 +5,6 @@ using DragonMarble.Message;
 
 namespace DragonMarble
 {
-    [Serializable]
     public class StageBuffInfo
     {
         public enum TARGET
@@ -39,7 +38,7 @@ namespace DragonMarble
         {
             get
             {
-                if (turn >= 0)
+                if (turn > 0)
                 {
                     return true;
                 }
@@ -53,7 +52,6 @@ namespace DragonMarble
         }
     }
 
-    [Serializable]
     public class StageDiceInfo
     {
 
@@ -75,7 +73,7 @@ namespace DragonMarble
 
         public StageDiceInfo()
         {
-            rand = RandomFactory.NewRandom();
+            rand = RandomFactory.NewRandom;
             result = new[] { 0, 0 };
             rollCount = 0;
             isDouble = false;
@@ -174,7 +172,7 @@ namespace DragonMarble
         }
     }
 
-    [Serializable]
+
     public class StageGambleInfo
     {
         public const int MAX_WIN_COUNT = 3;
@@ -192,8 +190,7 @@ namespace DragonMarble
         {
             NULL, WIN, LOSE
         }
-        
-        [Serializable]
+
         public class CardData
         {
             public TYPE type;
@@ -216,7 +213,7 @@ namespace DragonMarble
 
         public StageGambleInfo()
         {
-            rand = RandomFactory.NewRandom();
+            rand = RandomFactory.NewRandom;
             winCount = 0;
             battingPrice = 0;
             rewardPrice = 0;
