@@ -36,6 +36,48 @@ namespace DragonMarble
             });
             return query.ToList();
         }
+
+        public static List<StageChanceCardInfo> ParseCards(XDocument doc)
+        {
+            // Query the data and write out a subset of contacts
+            IEnumerable<StageChanceCardInfo> query = doc.Elements("Category").Elements("Chance").Select(c =>
+            {
+                int classId = Int32.Parse(c.Attribute("ClassID").Value);
+                
+                XElement element = c.Element("Effect");
+                StageChanceCardInfo.TYPE cardType = (StageChanceCardInfo.TYPE) Enum.Parse(typeof(StageChanceCardInfo.TYPE), element.Attribute("Type").Value);
+
+                StageChanceCardInfo stageChanceCardInfo = new StageChanceCardInfo
+                {
+                    classId = classId,
+                    type = cardType
+                };
+           
+                switch (cardType)
+                {
+                    case StageChanceCardInfo.TYPE.BUFF:
+                        stageChanceCardInfo.buffType = (StageBuffInfo.TYPE)Enum.Parse(typeof(StageBuffInfo.TYPE), element.Attribute("BuffType").Value);
+                        stageChanceCardInfo.buffTarget = (StageBuffInfo.TARGET)Enum.Parse(typeof(StageBuffInfo.TARGET), element.Attribute("Target").Value);
+                        stageChanceCardInfo.buffPower = Convert.ToInt32(element.Attribute("BuffPower").Value);
+                        stageChanceCardInfo.buffTurn = Convert.ToInt32(element.Attribute("BuffTurn").Value);
+                        break;
+                    case StageChanceCardInfo.TYPE.GOTO:
+                        stageChanceCardInfo.tileIndex  = Int32.Parse(element.Attribute("TileIndex").Value);
+                        break;
+                    case StageChanceCardInfo.TYPE.COUPON:
+                        stageChanceCardInfo.couponType = (StageUnitInfo.CHANCE_COUPON)Enum.Parse(typeof(StageUnitInfo.CHANCE_COUPON), element.Attribute("CouponType").Value);
+                        break;
+                    case StageChanceCardInfo.TYPE.ORDER:
+                        stageChanceCardInfo.orderType = (StageChanceCardInfo.ORDER_TYPE)Enum.Parse(typeof(StageChanceCardInfo.ORDER_TYPE), element.Attribute("OrderType").Value);
+                        break;
+                    default:
+                        throw new InvalidOperationException(string.Format("there is no sutiable matching for type : {0}", cardType));
+                }
+                
+                return stageChanceCardInfo;
+            });
+            return query.ToList();
+        }
     }
 
     public static class GameBoardUtil

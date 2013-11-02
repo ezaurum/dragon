@@ -62,11 +62,14 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="data_chance.xml" />
+    <Content Include="data_dice.xml" />
     <Content Include="data_stage.xml">
       <SubType>Designer</SubType>
     </Content>
+    <Content Include="data_unit.xml" />
     <Content Include="lib\log4net.dll" />
     <Content Include="lib\log4net.xml" />
+    <Content Include="text_language.xml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Commons\Commons.csproj">

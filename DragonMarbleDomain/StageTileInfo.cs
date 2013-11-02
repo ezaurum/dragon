@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace DragonMarble
 {
-    [Serializable]
+	[Serializable]
     public class StageTileInfo
     {
         public enum TYPE
@@ -175,11 +175,11 @@ namespace DragonMarble
             }
         }
 
-        public int fee
+        public long fee
         {
             get
             {
-                int p = 0;
+                long p = 0;
                 foreach (Building b in buildings)
                 {
                     if (b.isBuilt)
@@ -195,7 +195,7 @@ namespace DragonMarble
                 {
                     if (tileBuff.type == StageBuffInfo.TYPE.DISCOUNT)
                     {
-                        p += (p * tileBuff.power / 100);
+                        p -= (p * tileBuff.power / 100);
                     }
                 }
                 return p;
@@ -416,7 +416,7 @@ namespace DragonMarble
             }
         }
 
-        public void UpdateTurn()
+        public bool UpdateTurn()
         {
             if (tileBuff != null)
             {
@@ -425,10 +425,12 @@ namespace DragonMarble
                 {
                     tileBuff = null;
                 }
+				return true;
             }
+			return false;
         }
-        
-        [Serializable]
+		
+		[Serializable]
         public class Building
         {
             public int buyPrice;

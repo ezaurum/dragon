@@ -184,6 +184,12 @@ namespace DragonMarble
 				AddGold( GameBoard.SALARY );
 			}
         }
+		public void GoTo(int goTileIndex){
+			int goStep = goTileIndex - tileIndex;
+			if ( goStep < 0 ) goStep += 32;
+			Go(goStep);
+		}
+		
 
         public void Prison()
         {

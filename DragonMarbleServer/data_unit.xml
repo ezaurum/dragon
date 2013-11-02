@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Category>
+	<Unit ClassID="1" Name="진더미1" FileName="warrior_dummyblue"/>
+	<Unit ClassID="2" Name="진더미2" FileName="warrior_dummygreen"/>
+	<Unit ClassID="4444" Name="더미1" FileName="DummyHero"/>
+	<Unit ClassID="5555" Name="더미2" FileName="DummyHero2"/>
+</Category>

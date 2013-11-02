@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Category>
+	<Dice ClassID="1" Name="그냥 주사위" FileName="Dice1"/>
+	<Dice ClassID="2" Name="강철 주사위" FileName="Dice2"/>
+</Category>
