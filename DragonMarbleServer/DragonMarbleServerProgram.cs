@@ -83,7 +83,9 @@ namespace DragonMarble
         private static void InitGameData()
         {
             List<StageTileInfo> tiles = XmlUtils.LoadXml(@"data_stage.xml", GameMaster.ParseTiles);
+            GameMaster.ChanceCardList = XmlUtils.LoadXml(@"data_chance.xml", GameMaster.ParseCards);
             GameMaster.OriginalBoard = new GameBoard(tiles);
+            
         }
     }
 

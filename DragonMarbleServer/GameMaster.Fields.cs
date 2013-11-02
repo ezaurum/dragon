@@ -41,6 +41,7 @@ namespace DragonMarble
         
         public static GameBoard OriginalBoard { get; set; }
         public short PlayerNumberForPlay { get; private set; }
+        public static List<StageChanceCardInfo> ChanceCardList = new List<StageChanceCardInfo>();
 
         public GameBoard Board { get; set; }
         public int Turn { get; set; }
