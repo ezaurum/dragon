@@ -181,15 +181,53 @@ OpenChanceCard :
       length : 16
       options : [byte_param_constructor, to_byte_array, property]
 
-OrderChanceCard :
-  comment : order for chance card
+ChanceCardGoTo :
+  comment : chqnce card move
   fields :
-    - name : Use
-      type : Boolean
+    - name : CardId
+      type : Char
+    - name : Actor
+      type : Guid
+      length : 16
+      options : [byte_param_constructor, to_byte_array, property]
+
+ChanceCardOrder :
+  comment : chance card order
+  fields :
+    - name : CardId
+      type : Char
     - name : Value1
       type : Char
     - name : Value2
       type : Char
+    - name : Actor
+      type : Guid
+      length : 16
+      options : [byte_param_constructor, to_byte_array, property]
+    - name : Target
+      type : Guid
+      length : 16
+      options : [byte_param_constructor, to_byte_array, property]
+
+ChanceCardBuff :
+  comment : chance card buff
+  fields :
+    - name : CardId
+      type : Char
+    - name : SelectTile
+      type : Char
+    - name : Actor
+      type : Guid
+      length : 16
+      options : [byte_param_constructor, to_byte_array, property]
+
+ChanceCardCoupon :
+  comment : save the chance card
+  fields :
+    - name : CardId
+      type : Char
+    - name : Save
+      type : Boolean
     - name : Actor
       type : Guid
       length : 16
