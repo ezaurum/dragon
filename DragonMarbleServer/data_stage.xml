@@ -1,160 +1,157 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <Category>
-  <Stage Index="0" Name="출발" Type="START" FileName="tile_0" TypeValue="70" />
-  <Stage Index="1" Name="몰락한 섬" Type="CITY" FileName="tile_1" TypeValue="1">
-
-    <Price BuyPrice="20000" SellPrice="10000" Fee="4000" />
-    <Price BuyPrice="10000" SellPrice="5000" Fee="8000" />
-    <Price BuyPrice="30000" SellPrice="15000" Fee="28000" />
-    <Price BuyPrice="50000" SellPrice="25000" Fee="84000" />
-    <Price BuyPrice="50000" SellPrice="25000" Fee="334000" />
-  </Stage>
-  <Stage Index="2" Name="갬블" Type="GAMBLE" FileName="tile_2" TypeValue="25" />
-  <Stage Index="3" Name="무너진 섬" Type="CITY" FileName="tile_3" TypeValue="1">
-    <Price BuyPrice="26000" SellPrice="13000" Fee="5000" />
-    <Price BuyPrice="10000" SellPrice="5000" Fee="10000" />
-    <Price BuyPrice="30000" SellPrice="15000" Fee="32000" />
-    <Price BuyPrice="50000" SellPrice="25000" Fee="92000" />
-    <Price BuyPrice="50000" SellPrice="25000" Fee="342000" />
-  </Stage>
-  <Stage Index="4" Name="원더풀 테마파크" Type="SIGHT" FileName="tile_4" TypeValue="0">
-    <Price BuyPrice="100000" SellPrice="50000" Fee="160000" />
-  </Stage>
-  <Stage Index="5" Name="잔상 섬" Type="CITY" FileName="tile_5" TypeValue="2">
-    <Price BuyPrice="48000" SellPrice="24000" Fee="12000" />
-    <Price BuyPrice="20000" SellPrice="10000" Fee="24000" />
-    <Price BuyPrice="60000" SellPrice="30000" Fee="70000" />
-    <Price BuyPrice="100000" SellPrice="50000" Fee="190000" />
-    <Price BuyPrice="100000" SellPrice="50000" Fee="640000" />
-  </Stage>
-  <Stage Index="6" Name="그림자 섬" Type="CITY" FileName="tile_6" TypeValue="2">
-    <Price BuyPrice="48000" SellPrice="24000" Fee="12000" />
-    <Price BuyPrice="20000" SellPrice="10000" Fee="24000" />
-    <Price BuyPrice="60000" SellPrice="30000" Fee="70000" />
-    <Price BuyPrice="100000" SellPrice="50000" Fee="190000" />
-    <Price BuyPrice="100000" SellPrice="50000" Fee="640000" />
-  </Stage>
-  <Stage Index="7" Name="거울섬" Type="CITY" FileName="tile_7" TypeValue="2">
-    <Price BuyPrice="54000" SellPrice="27000" Fee="14000" />
-    <Price BuyPrice="20000" SellPrice="10000" Fee="28000" />
-    <Price BuyPrice="60000" SellPrice="30000" Fee="76000" />
-    <Price BuyPrice="100000" SellPrice="50000" Fee="200000" />
-    <Price BuyPrice="100000" SellPrice="50000" Fee="650000" />
-  </Stage>
-  <Stage Index="8" Name="버뮤다 삼각지대" Type="PRISON" FileName="tile_8" TypeValue="10" />
-  <Stage Index="9" Name="씨 드래곤 네스트" Type="SIGHT" FileName="tile_9" TypeValue="0">
-    <Price BuyPrice="100000" SellPrice="50000" Fee="160000" />
-  </Stage>
-  <Stage Index="10" Name="포자 섬" Type="CITY" FileName="tile_10" TypeValue="3">
-    <Price BuyPrice="72000" SellPrice="36000" Fee="23000" />
-    <Price BuyPrice="30000" SellPrice="15000" Fee="46000" />
-    <Price BuyPrice="90000" SellPrice="45000" Fee="130000" />
-    <Price BuyPrice="150000" SellPrice="75000" Fee="350000" />
-    <Price BuyPrice="150000" SellPrice="75000" Fee="950000" />
-  </Stage>
-  <Stage Index="11" Name="기만자 섬" Type="CITY" FileName="tile_11" TypeValue="3">
-    <Price BuyPrice="10" SellPrice="10" Fee="5" />
-    <Price BuyPrice="72000" SellPrice="36000" Fee="23000" />
-    <Price BuyPrice="30000" SellPrice="15000" Fee="46000" />
-    <Price BuyPrice="90000" SellPrice="45000" Fee="130000" />
-    <Price BuyPrice="150000" SellPrice="75000" Fee="350000" />
-    <Price BuyPrice="150000" SellPrice="75000" Fee="950000" />
-  </Stage>
-  <Stage Index="12" Name="찬스카드" Type="CHANCE" FileName="tile_12" TypeValue="0" />
-  <Stage Index="13" Name="무기고 섬" Type="CITY" FileName="tile_13" TypeValue="4">
-    <Price BuyPrice="94000" SellPrice="47000" Fee="33000" />
-    <Price BuyPrice="40000" SellPrice="20000" Fee="66000" />
-    <Price BuyPrice="120000" SellPrice="60000" Fee="180000" />
-    <Price BuyPrice="200000" SellPrice="100000" Fee="450000" />
-    <Price BuyPrice="200000" SellPrice="100000" Fee="1150000" />
-  </Stage>
-  <Stage Index="14" Name="조각 섬" Type="CITY" FileName="tile_14" TypeValue="4">
-    <Price BuyPrice="100000" SellPrice="50000" Fee="36000" />
-    <Price BuyPrice="40000" SellPrice="20000" Fee="72000" />
-    <Price BuyPrice="120000" SellPrice="60000" Fee="190000" />
-    <Price BuyPrice="200000" SellPrice="100000" Fee="470000" />
-    <Price BuyPrice="200000" SellPrice="100000" Fee="1170000" />
-  </Stage>
-  <Stage Index="15" Name="폭포 섬" Type="CITY" FileName="tile_15" TypeValue="4">
-    <Price BuyPrice="118000" SellPrice="59000" Fee="51000" />
-    <Price BuyPrice="50000" SellPrice="25000" Fee="102000" />
-    <Price BuyPrice="150000" SellPrice="75000" Fee="280000" />
-    <Price BuyPrice="250000" SellPrice="125000" Fee="650000" />
-    <Price BuyPrice="250000" SellPrice="125000" Fee="1400000" />
-  </Stage>
-  <Stage Index="16" Name="축제의 보물창고" Type="OLYMPIC" FileName="tile_16" TypeValue="10" />
-  <Stage Index="17" Name="광시곡 섬" Type="CITY" FileName="tile_17" TypeValue="5">
-    <Price BuyPrice="124000" SellPrice="62000" Fee="54000" />
-    <Price BuyPrice="50000" SellPrice="25000" Fee="108000" />
-    <Price BuyPrice="150000" SellPrice="75000" Fee="280000" />
-    <Price BuyPrice="250000" SellPrice="125000" Fee="670000" />
-    <Price BuyPrice="250000" SellPrice="125000" Fee="1420000" />
-  </Stage>
-  <Stage Index="18" Name="그린 드래곤네스트" Type="SIGHT" FileName="tile_18" TypeValue="0">
-    <Price BuyPrice="100000" SellPrice="50000" Fee="160000" />
-  </Stage>
-  <Stage Index="19" Name="광산 섬" Type="CITY" FileName="tile_19" TypeValue="5">
-    <Price BuyPrice="140000" SellPrice="70000" Fee="65000" />
-    <Price BuyPrice="60000" SellPrice="30000" Fee="130000" />
-    <Price BuyPrice="180000" SellPrice="90000" Fee="330000" />
-    <Price BuyPrice="300000" SellPrice="150000" Fee="790000" />
-    <Price BuyPrice="300000" SellPrice="150000" Fee="1540000" />
-  </Stage>
-  <Stage Index="20" Name="찬스카드" Type="CHANCE" FileName="tile_20" TypeValue="0" />
-  <Stage Index="21" Name="사라진 섬" Type="CITY" FileName="tile_21" TypeValue="6">
-    <Price BuyPrice="146000" SellPrice="73000" Fee="70000" />
-    <Price BuyPrice="60000" SellPrice="30000" Fee="140000" />
-    <Price BuyPrice="180000" SellPrice="90000" Fee="360000" />
-    <Price BuyPrice="300000" SellPrice="150000" Fee="830000" />
-    <Price BuyPrice="300000" SellPrice="150000" Fee="1580000" />
-  </Stage>
-  <Stage Index="22" Name="폭격 섬" Type="CITY" FileName="tile_22" TypeValue="6">
-    <Price BuyPrice="146000" SellPrice="73000" Fee="70000" />
-    <Price BuyPrice="60000" SellPrice="30000" Fee="140000" />
-    <Price BuyPrice="180000" SellPrice="90000" Fee="360000" />
-    <Price BuyPrice="300000" SellPrice="150000" Fee="830000" />
-    <Price BuyPrice="300000" SellPrice="150000" Fee="1580000" />
-  </Stage>
-  <Stage Index="23" Name="영웅 섬" Type="CITY" FileName="tile_23" TypeValue="6">
-    <Price BuyPrice="160000" SellPrice="80000" Fee="90000" />
-    <Price BuyPrice="70000" SellPrice="35000" Fee="180000" />
-    <Price BuyPrice="210000" SellPrice="105000" Fee="460000" />
-    <Price BuyPrice="350000" SellPrice="175000" Fee="1060000" />
-    <Price BuyPrice="350000" SellPrice="175000" Fee="1760000" />
-  </Stage>
-  <Stage Index="24" Name="세계여행" Type="TRAVEL" FileName="tile_24" TypeValue="0" />
-  <Stage Index="25" Name="사막 드래곤네스트" Type="SIGHT" FileName="tile_25" TypeValue="0">
-    <Price BuyPrice="100000" SellPrice="50000" Fee="160000" />
-  </Stage>
-  <Stage Index="26" Name="수호자 섬" Type="CITY" FileName="tile_26" TypeValue="7">
-    <Price BuyPrice="170000" SellPrice="85000" Fee="95000" />
-    <Price BuyPrice="70000" SellPrice="35000" Fee="190000" />
-    <Price BuyPrice="210000" SellPrice="105000" Fee="480000" />
-    <Price BuyPrice="350000" SellPrice="175000" Fee="1100000" />
-    <Price BuyPrice="350000" SellPrice="175000" Fee="1800000" />
-  </Stage>
-  <Stage Index="27" Name="악몽 섬" Type="CITY" FileName="tile_27" TypeValue="7">
-    <Price BuyPrice="192000" SellPrice="96000" Fee="110000" />
-    <Price BuyPrice="80000" SellPrice="40000" Fee="220000" />
-    <Price BuyPrice="240000" SellPrice="120000" Fee="540000" />
-    <Price BuyPrice="400000" SellPrice="200000" Fee="1220000" />
-    <Price BuyPrice="400000" SellPrice="200000" Fee="1820000" />
-  </Stage>
-  <Stage Index="28" Name="찬스카드" Type="CHANCE" FileName="tile_28" TypeValue="0" />
-  <Stage Index="29" Name="회오리 섬" Type="CITY" FileName="tile_29" TypeValue="8">
-    <Price BuyPrice="196000" SellPrice="98000" Fee="115000" />
-    <Price BuyPrice="80000" SellPrice="40000" Fee="230000" />
-    <Price BuyPrice="240000" SellPrice="120000" Fee="560000" />
-    <Price BuyPrice="400000" SellPrice="200000" Fee="1250000" />
-    <Price BuyPrice="400000" SellPrice="200000" Fee="1850000" />
-  </Stage>
-  <Stage Index="30" Name="해적선의 조선소" Type="TAX" FileName="tile_30" TypeValue="32" />
-  <Stage Index="31" Name="해적의 섬" Type="CITY" FileName="tile_31" TypeValue="8">
-    <Price BuyPrice="200000" SellPrice="100000" Fee="120000" />
-    <Price BuyPrice="80000" SellPrice="40000" Fee="240000" />
-    <Price BuyPrice="240000" SellPrice="120000" Fee="580000" />
-    <Price BuyPrice="400000" SellPrice="200000" Fee="1280000" />
-    <Price BuyPrice="400000" SellPrice="200000" Fee="1880000" />
-  </Stage>
+	<Stage Index="0" Name="출발" Type="START" FileName="tile_0" TitleName="titlecolor_normal" IconName="titlesymbol_dummy" TypeValue="70"/>
+	<Stage Index="1" Name="몰락한 섬" Type="CITY" FileName="tile_1" TitleName="titlecolor_a" IconName="titlesymbol_dummy" TypeValue="1">
+		<Price BuyPrice="20000" SellPrice="10000" Fee="4000"/>
+		<Price BuyPrice="10000" SellPrice="5000" Fee="8000"/>
+		<Price BuyPrice="30000" SellPrice="15000" Fee="28000"/>
+		<Price BuyPrice="50000" SellPrice="25000" Fee="84000"/>
+		<Price BuyPrice="50000" SellPrice="25000" Fee="334000"/>
+	</Stage>
+	<Stage Index="2" Name="갬블" Type="GAMBLE" FileName="tile_2" TitleName="titlecolor_normal" IconName="titlesymbol_dummy" TypeValue="25"/>
+	<Stage Index="3" Name="무너진 섬" Type="CITY" FileName="tile_3" TitleName="titlecolor_a" IconName="titlesymbol_dummy" TypeValue="1">
+		<Price BuyPrice="26000" SellPrice="13000" Fee="5000"/>
+		<Price BuyPrice="10000" SellPrice="5000" Fee="10000"/>
+		<Price BuyPrice="30000" SellPrice="15000" Fee="32000"/>
+		<Price BuyPrice="50000" SellPrice="25000" Fee="92000"/>
+		<Price BuyPrice="50000" SellPrice="25000" Fee="342000"/>
+	</Stage>
+	<Stage Index="4" Name="원더풀 테마파크" Type="SIGHT" FileName="tile_4" TitleName="titlecolor_sight" IconName="titlesymbol_dummy" TypeValue="0">
+		<Price BuyPrice="100000" SellPrice="50000" Fee="160000"/>
+	</Stage>
+	<Stage Index="5" Name="잔상 섬" Type="CITY" FileName="tile_5" TitleName="titlecolor_b" IconName="titlesymbol_dummy" TypeValue="2">
+		<Price BuyPrice="48000" SellPrice="24000" Fee="12000"/>
+		<Price BuyPrice="20000" SellPrice="10000" Fee="24000"/>
+		<Price BuyPrice="60000" SellPrice="30000" Fee="70000"/>
+		<Price BuyPrice="100000" SellPrice="50000" Fee="190000"/>
+		<Price BuyPrice="100000" SellPrice="50000" Fee="640000"/>
+	</Stage>
+	<Stage Index="6" Name="그림자 섬" Type="CITY" FileName="tile_6" TitleName="titlecolor_b" IconName="titlesymbol_dummy" TypeValue="2">
+		<Price BuyPrice="48000" SellPrice="24000" Fee="12000"/>
+		<Price BuyPrice="20000" SellPrice="10000" Fee="24000"/>
+		<Price BuyPrice="60000" SellPrice="30000" Fee="70000"/>
+		<Price BuyPrice="100000" SellPrice="50000" Fee="190000"/>
+		<Price BuyPrice="100000" SellPrice="50000" Fee="640000"/>
+	</Stage>
+	<Stage Index="7" Name="거울섬" Type="CITY" FileName="tile_7" TitleName="titlecolor_b" IconName="titlesymbol_dummy" TypeValue="2">
+		<Price BuyPrice="54000" SellPrice="27000" Fee="14000"/>
+		<Price BuyPrice="20000" SellPrice="10000" Fee="28000"/>
+		<Price BuyPrice="60000" SellPrice="30000" Fee="76000"/>
+		<Price BuyPrice="100000" SellPrice="50000" Fee="200000"/>
+		<Price BuyPrice="100000" SellPrice="50000" Fee="650000"/>
+	</Stage>
+	<Stage Index="8" Name="혼돈의 틈" Type="PRISON" FileName="tile_8" TitleName="titlecolor_normal" IconName="titlesymbol_dummy" TypeValue="10"/>
+	<Stage Index="9" Name="씨 드래곤 네스트" Type="SIGHT" FileName="tile_9" TitleName="titlecolor_sight" IconName="titlesymbol_dummy" TypeValue="0">
+		<Price BuyPrice="100000" SellPrice="50000" Fee="160000"/>
+	</Stage>
+	<Stage Index="10" Name="포자 섬" Type="CITY" FileName="tile_10" TitleName="titlecolor_c" IconName="titlesymbol_dummy" TypeValue="3">
+		<Price BuyPrice="72000" SellPrice="36000" Fee="23000"/>
+		<Price BuyPrice="30000" SellPrice="15000" Fee="46000"/>
+		<Price BuyPrice="90000" SellPrice="45000" Fee="130000"/>
+		<Price BuyPrice="150000" SellPrice="75000" Fee="350000"/>
+		<Price BuyPrice="150000" SellPrice="75000" Fee="950000"/>
+	</Stage>
+	<Stage Index="11" Name="기만자 섬" Type="CITY" FileName="tile_11" TitleName="titlecolor_c" IconName="titlesymbol_dummy" TypeValue="3">
+		<Price BuyPrice="72000" SellPrice="36000" Fee="23000"/>
+		<Price BuyPrice="30000" SellPrice="15000" Fee="46000"/>
+		<Price BuyPrice="90000" SellPrice="45000" Fee="130000"/>
+		<Price BuyPrice="150000" SellPrice="75000" Fee="350000"/>
+		<Price BuyPrice="150000" SellPrice="75000" Fee="950000"/>
+	</Stage>
+	<Stage Index="12" Name="찬스카드" Type="CHANCE" FileName="tile_12" TitleName="titlecolor_normal" IconName="titlesymbol_dummy" TypeValue="0"/>
+	<Stage Index="13" Name="무기고 섬" Type="CITY" FileName="tile_13" TitleName="titlecolor_d" IconName="titlesymbol_dummy" TypeValue="4">
+		<Price BuyPrice="94000" SellPrice="47000" Fee="33000"/>
+		<Price BuyPrice="40000" SellPrice="20000" Fee="66000"/>
+		<Price BuyPrice="120000" SellPrice="60000" Fee="180000"/>
+		<Price BuyPrice="200000" SellPrice="100000" Fee="450000"/>
+		<Price BuyPrice="200000" SellPrice="100000" Fee="1150000"/>
+	</Stage>
+	<Stage Index="14" Name="조각 섬" Type="CITY" FileName="tile_14" TitleName="titlecolor_d" IconName="titlesymbol_dummy" TypeValue="4">
+		<Price BuyPrice="100000" SellPrice="50000" Fee="36000"/>
+		<Price BuyPrice="40000" SellPrice="20000" Fee="72000"/>
+		<Price BuyPrice="120000" SellPrice="60000" Fee="190000"/>
+		<Price BuyPrice="200000" SellPrice="100000" Fee="470000"/>
+		<Price BuyPrice="200000" SellPrice="100000" Fee="1170000"/>
+	</Stage>
+	<Stage Index="15" Name="폭포 섬" Type="CITY" FileName="tile_15" TitleName="titlecolor_d" IconName="titlesymbol_dummy" TypeValue="4">
+		<Price BuyPrice="118000" SellPrice="59000" Fee="51000"/>
+		<Price BuyPrice="50000" SellPrice="25000" Fee="102000"/>
+		<Price BuyPrice="150000" SellPrice="75000" Fee="280000"/>
+		<Price BuyPrice="250000" SellPrice="125000" Fee="650000"/>
+		<Price BuyPrice="250000" SellPrice="125000" Fee="1400000"/>
+	</Stage>
+	<Stage Index="16" Name="기사단" Type="OLYMPIC" FileName="tile_16" TitleName="titlecolor_normal" IconName="titlesymbol_dummy" TypeValue="10"/>
+	<Stage Index="17" Name="광시곡 섬" Type="CITY" FileName="tile_17" TitleName="titlecolor_e" IconName="titlesymbol_dummy" TypeValue="5">
+		<Price BuyPrice="124000" SellPrice="62000" Fee="54000"/>
+		<Price BuyPrice="50000" SellPrice="25000" Fee="108000"/>
+		<Price BuyPrice="150000" SellPrice="75000" Fee="280000"/>
+		<Price BuyPrice="250000" SellPrice="125000" Fee="670000"/>
+		<Price BuyPrice="250000" SellPrice="125000" Fee="1420000"/>
+	</Stage>
+	<Stage Index="18" Name="그린 드래곤네스트" Type="SIGHT" FileName="tile_18" TitleName="titlecolor_sight" IconName="titlesymbol_dummy" TypeValue="0">
+		<Price BuyPrice="100000" SellPrice="50000" Fee="160000"/>
+	</Stage>
+	<Stage Index="19" Name="광산 섬" Type="CITY" FileName="tile_19" TitleName="titlecolor_e" IconName="titlesymbol_dummy" TypeValue="5">
+		<Price BuyPrice="140000" SellPrice="70000" Fee="65000"/>
+		<Price BuyPrice="60000" SellPrice="30000" Fee="130000"/>
+		<Price BuyPrice="180000" SellPrice="90000" Fee="330000"/>
+		<Price BuyPrice="300000" SellPrice="150000" Fee="790000"/>
+		<Price BuyPrice="300000" SellPrice="150000" Fee="1540000"/>
+	</Stage>
+	<Stage Index="20" Name="찬스카드" Type="CHANCE" FileName="tile_20" TitleName="titlecolor_normal" IconName="titlesymbol_dummy" TypeValue="0"/>
+	<Stage Index="21" Name="사라진 섬" Type="CITY" FileName="tile_21" TitleName="titlecolor_f" IconName="titlesymbol_dummy" TypeValue="6">
+		<Price BuyPrice="146000" SellPrice="73000" Fee="70000"/>
+		<Price BuyPrice="60000" SellPrice="30000" Fee="140000"/>
+		<Price BuyPrice="180000" SellPrice="90000" Fee="360000"/>
+		<Price BuyPrice="300000" SellPrice="150000" Fee="830000"/>
+		<Price BuyPrice="300000" SellPrice="150000" Fee="1580000"/>
+	</Stage>
+	<Stage Index="22" Name="폭격 섬" Type="CITY" FileName="tile_22" TitleName="titlecolor_f" IconName="titlesymbol_dummy" TypeValue="6">
+		<Price BuyPrice="146000" SellPrice="73000" Fee="70000"/>
+		<Price BuyPrice="60000" SellPrice="30000" Fee="140000"/>
+		<Price BuyPrice="180000" SellPrice="90000" Fee="360000"/>
+		<Price BuyPrice="300000" SellPrice="150000" Fee="830000"/>
+		<Price BuyPrice="300000" SellPrice="150000" Fee="1580000"/>
+	</Stage>
+	<Stage Index="23" Name="영웅 섬" Type="CITY" FileName="tile_23" TitleName="titlecolor_f" IconName="titlesymbol_dummy" TypeValue="6">
+		<Price BuyPrice="160000" SellPrice="80000" Fee="90000"/>
+		<Price BuyPrice="70000" SellPrice="35000" Fee="180000"/>
+		<Price BuyPrice="210000" SellPrice="105000" Fee="460000"/>
+		<Price BuyPrice="350000" SellPrice="175000" Fee="1060000"/>
+		<Price BuyPrice="350000" SellPrice="175000" Fee="1760000"/>
+	</Stage>
+	<Stage Index="24" Name="세계여행" Type="TRAVEL" FileName="tile_24" TitleName="titlecolor_normal" IconName="titlesymbol_dummy" TypeValue="0"/>
+	<Stage Index="25" Name="사막 드래곤네스트" Type="SIGHT" FileName="tile_25" TitleName="titlecolor_sight" IconName="titlesymbol_dummy" TypeValue="0">
+		<Price BuyPrice="100000" SellPrice="50000" Fee="160000"/>
+	</Stage>
+	<Stage Index="26" Name="수호자 섬" Type="CITY" FileName="tile_26" TitleName="titlecolor_g" IconName="titlesymbol_dummy" TypeValue="7">
+		<Price BuyPrice="170000" SellPrice="85000" Fee="95000"/>
+		<Price BuyPrice="70000" SellPrice="35000" Fee="190000"/>
+		<Price BuyPrice="210000" SellPrice="105000" Fee="480000"/>
+		<Price BuyPrice="350000" SellPrice="175000" Fee="1100000"/>
+		<Price BuyPrice="350000" SellPrice="175000" Fee="1800000"/>
+	</Stage>
+	<Stage Index="27" Name="악몽 섬" Type="CITY" FileName="tile_27" TitleName="titlecolor_g" IconName="titlesymbol_dummy" TypeValue="7">
+		<Price BuyPrice="192000" SellPrice="96000" Fee="110000"/>
+		<Price BuyPrice="80000" SellPrice="40000" Fee="220000"/>
+		<Price BuyPrice="240000" SellPrice="120000" Fee="540000"/>
+		<Price BuyPrice="400000" SellPrice="200000" Fee="1220000"/>
+		<Price BuyPrice="400000" SellPrice="200000" Fee="1820000"/>
+	</Stage>
+	<Stage Index="28" Name="찬스카드" Type="CHANCE" FileName="tile_28" TitleName="titlecolor_normal" IconName="titlesymbol_dummy" TypeValue="0"/>
+	<Stage Index="29" Name="회오리 섬" Type="CITY" FileName="tile_29" TitleName="titlecolor_h" IconName="titlesymbol_dummy" TypeValue="8">
+		<Price BuyPrice="196000" SellPrice="98000" Fee="115000"/>
+		<Price BuyPrice="80000" SellPrice="40000" Fee="230000"/>
+		<Price BuyPrice="240000" SellPrice="120000" Fee="560000"/>
+		<Price BuyPrice="400000" SellPrice="200000" Fee="1250000"/>
+		<Price BuyPrice="400000" SellPrice="200000" Fee="1850000"/>
+	</Stage>
+	<Stage Index="30" Name="해적선의 조선소" Type="TAX" FileName="tile_30" TitleName="titlecolor_normal" IconName="titlesymbol_dummy" TypeValue="32"/>
+	<Stage Index="31" Name="해적의 섬" Type="CITY" FileName="tile_31" TitleName="titlecolor_h" IconName="titlesymbol_dummy" TypeValue="8">
+		<Price BuyPrice="200000" SellPrice="100000" Fee="120000"/>
+		<Price BuyPrice="80000" SellPrice="40000" Fee="240000"/>
+		<Price BuyPrice="240000" SellPrice="120000" Fee="580000"/>
+		<Price BuyPrice="400000" SellPrice="200000" Fee="1280000"/>
+		<Price BuyPrice="400000" SellPrice="200000" Fee="1880000"/>
+	</Stage>
 </Category>

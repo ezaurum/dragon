@@ -13,22 +13,22 @@
 		<Effect Type="GOTO" TileIndex="2"/>
 	</Chance>
 	<Chance ClassID="5" Name="바가지 요금" FileName="overcharge">
-		<Effect Type="BUFF" Target="OWNER" BuffType="OVERCHARGE" BuffPower="50" BuffTurn="1"/>
+		<Effect Type="BUFF" Target="OWNER" BuffType="OVERCHARGE" BuffPower="50" BuffTurn="1" EffectName=""/>
 	</Chance>
 	<Chance ClassID="6" Name="지진" FileName="earthquake">
-		<Effect Type="BUFF" Target="BUILDING_ENEMY" BuffType="DESTROY" BuffPower="0" BuffTurn="0"/>
+		<Effect Type="BUFF" Target="BUILDING_ENEMY" BuffType="DESTROY" BuffPower="0" BuffTurn="0" EffectName=""/>
 	</Chance>
-	<Chance ClassID="7" Name="도시 정전" FileName="blackout">
-		<Effect Type="BUFF" Target="CITY_ENEMY" BuffType="DISCOUNT" BuffPower="100" BuffTurn="3"/>
+	<Chance ClassID="7" Name="낙뢰" FileName="blackout">
+		<Effect Type="BUFF" Target="CITY_ENEMY" BuffType="DISCOUNT" BuffPower="100" BuffTurn="3" EffectName="blackout"/>
 	</Chance>
-	<Chance ClassID="8" Name="황사" FileName="dust">
-		<Effect Type="BUFF" Target="CITY_ENEMY" BuffType="DISCOUNT" BuffPower="50" BuffTurn="3"/>
+	<Chance ClassID="8" Name="화염" FileName="dust">
+		<Effect Type="BUFF" Target="CITY_ENEMY" BuffType="DISCOUNT" BuffPower="50" BuffTurn="5" EffectName="fire"/>
 	</Chance>
 	<Chance ClassID="9" Name="전염병" FileName="plague">
-		<Effect Type="BUFF" Target="CITYGROUP_ENEMY" BuffType="DISCOUNT" BuffPower="50" BuffTurn="3"/>
+		<Effect Type="BUFF" Target="CITYGROUP_ENEMY" BuffType="DISCOUNT" BuffPower="50" BuffTurn="3" EffectName=""/>
 	</Chance>
-	<Chance ClassID="10" Name="외계인 침공" FileName="ufo">
-		<Effect Type="BUFF" Target="BUILDINGGROUP_ENEMY" BuffType="DESTROY" BuffPower="0" BuffTurn="0"/>
+	<Chance ClassID="10" Name="운석낙하" FileName="ufo">
+		<Effect Type="BUFF" Target="BUILDINGGROUP_ENEMY" BuffType="DESTROY" BuffPower="0" BuffTurn="0" EffectName="meteo"/>
 	</Chance>
 	<Chance ClassID="11" Name="올림픽 관람" FileName="goolympic">
 		<Effect Type="ORDER" OrderType="GO_OLYMPIC_CITY"/>
@@ -36,7 +36,6 @@
 	<Chance ClassID="12" Name="올림픽 개최" FileName="holdolympic">
 		<Effect Type="ORDER" OrderType="OPEN_OLYMPIC"/>
 	</Chance>
-	
 	<Chance ClassID="13" Name="도시 기부" FileName="donation">
 		<Effect Type="ORDER" OrderType="DONATE_CITY"/>
 	</Chance>
@@ -49,17 +48,19 @@
 	<Chance ClassID="16" Name="강제 매각" FileName="forcesell">
 		<Effect Type="ORDER" OrderType="SELL"/>
 	</Chance>
-	<Chance ClassID="17" Name="할인 쿠폰" FileName="discount">
+	<Chance ClassID="17" Name="무인도" FileName="goisland">
+		<Effect Type="ORDER" OrderType="GO_ISLAND"/>
+	</Chance>
+	<Chance ClassID="18" Name="할인 쿠폰" FileName="discount">
 		<Effect Type="COUPON" CouponType="DISCOUNT_50"/>
 	</Chance>
-	<Chance ClassID="18" Name="무인도 탈출" FileName="escapeisland">
+	<Chance ClassID="19" Name="무인도 탈출" FileName="escapeisland">
 		<Effect Type="COUPON" CouponType="ESCAPE_ISLAND"/>
 	</Chance>
-	<Chance ClassID="19" Name="방패" FileName="shield">
+	<Chance ClassID="20" Name="방패" FileName="shield">
 		<Effect Type="COUPON" CouponType="SHIELD"/>
 	</Chance>
-	<Chance ClassID="20" Name="천사" FileName="angel">
+	<Chance ClassID="21" Name="천사" FileName="angel">
 		<Effect Type="COUPON" CouponType="ANGEL"/>
 	</Chance>
-	
 </Category>
