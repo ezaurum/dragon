@@ -178,17 +178,22 @@ namespace DragonMarble
         public const int MAX_WIN_COUNT = 3;
         public const int BASIC_SHOW_COUNT = 4;
         public const int COMPARER_NUMBER = 7;
+		
+		public static readonly int[] BATTING_PRICE = {
+			100000, 200000, 300000
+		};
+		
         public enum TYPE
         {
             spade, dia, heart, clover
         }
         public enum CHOICE
         {
-            NULL, HIGH, LOW
+            STOP, HIGH, LOW
         }
         public enum RESULT
         {
-            NULL, WIN, LOSE
+            NONE, WIN, LOSE
         }
 
         public class CardData
@@ -217,8 +222,8 @@ namespace DragonMarble
             winCount = 0;
             battingPrice = 0;
             rewardPrice = 0;
-            result = RESULT.NULL;
-            selectChoice = CHOICE.NULL;
+            result = RESULT.NONE;
+            selectChoice = CHOICE.STOP;
         }
 
         public void SetBattingPrice(int price)
@@ -229,7 +234,6 @@ namespace DragonMarble
                 rewardScale = 2;
             }
         }
-
 
         public void InitCards()
         {
@@ -243,14 +247,20 @@ namespace DragonMarble
             }
             useCards = new List<CardData>();
         }
-
-        public void UseBasicCards()
+		
+		public void UseBasicCards()
         {
             for (int i = 0; i < BASIC_SHOW_COUNT; i++)
             {
                 PickOneCard();
             }
         }
+		
+		public char MakeDataFromCard(CardData d){
+			int n = (int)d.type;
+			n = n + (d.num * 10);
+			return (char)n;
+		}
 
         CardData PickOneCard()
         {
@@ -277,6 +287,7 @@ namespace DragonMarble
             }
             else
             {
+				winCount = 0;
                 result = RESULT.LOSE;
                 rewardPrice = 0;
             }

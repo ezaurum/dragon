@@ -241,12 +241,142 @@ namespace DragonMarble
 			        break;
 				break;
 			case StageTileInfo.TYPE.TAX:
+				foreach (var gameAction in PayTaxResult()) yield return gameAction;
+			        break;
 				break;
 			case StageTileInfo.TYPE.GAMBLE:
+				foreach (var gameAction in GamblePlay()) yield return gameAction;
+			        break;
 				break;
 				
 				
 				
+			}
+		}
+		
+		private IEnumerable<IGameMessage> GamblePlay(){
+			if ( StageGambleInfo.BATTING_PRICE[0] > gold ){
+				yield break;
+			}
+			
+			StageGambleInfo gambleData = new StageGambleInfo();
+			gambleData.InitCards();
+			gambleData.UseBasicCards();
+			
+			List<char> cardList = new List<char>();
+			for ( int i = 0; i < gambleData.useCards.Count; i++ ){
+				cardList.Add( gambleData.MakeDataFromCard(gambleData.useCards[i]) );
+			}
+			yield return new GambleRequestGameMessage
+			{
+				Actor = Id,
+				CardList = cardList
+			};
+			
+			GambleBattingGameMessage battingMsg = (GambleBattingGameMessage) ReceivedMessage;
+			if ( !AddGold( - StageGambleInfo.BATTING_PRICE[battingMsg.BattingIndex] ) ){
+				SelfBan();
+			}
+			yield return battingMsg;
+			
+			foreach (var gameAction in GambleChoice(gambleData)) yield return gameAction;
+			
+		}
+		
+		private IEnumerable<IGameMessage> GambleChoice(StageGambleInfo gambleData){
+			GambleChoiceGameMessage choiceMsg = (GambleChoiceGameMessage) ReceivedMessage;
+			StageGambleInfo.CardData card = gambleData.SelectChoice( (StageGambleInfo.CHOICE) choiceMsg.Choice );
+			
+			switch( (StageGambleInfo.CHOICE) choiceMsg.Choice ){
+			case StageGambleInfo.CHOICE.STOP:
+				if ( gambleData.winCount > 0 ){
+					AddGold( gambleData.rewardPrice );
+					yield return new GambleResultGameMessage {
+						Actor = Id,
+						Choice = choiceMsg.Choice,
+						WinCount = (char) gambleData.winCount,
+						Card = gambleData.MakeDataFromCard(card)
+					};
+				}else{
+					SelfBan();
+				}
+				break;
+			case StageGambleInfo.CHOICE.HIGH:
+			case StageGambleInfo.CHOICE.LOW:
+				yield return new GambleResultGameMessage {
+					Actor = Id,
+					Choice = choiceMsg.Choice,
+					WinCount = (char) gambleData.winCount,
+					Card = gambleData.MakeDataFromCard(card)
+				};
+				if ( gambleData.winCount > 0 ){
+					if ( gambleData.winCount == 3 ){
+						AddGold( gambleData.rewardPrice );
+						yield break;
+					}else{
+						foreach (var gameAction in GambleChoice(gambleData)) yield return gameAction;
+					}
+				}else{
+					yield break;
+				}
+				break;
+				
+			}
+		}
+		
+		private IEnumerable<IGameMessage> PayTaxResult(){
+			long tax = GetTax();
+			if ( PayTax() ){
+				yield break;
+			}else{
+				if ( usableLoanCount > 0 ){
+					long needMoney = tax - gold;
+					yield return new NeedMoneyRequestGameMessage
+					{
+						Actor = Id,
+						NeedMoney = needMoney
+					};
+					IDragonMarbleGameMessage receivedMessage = (LoanMoneyGameMessage) ReceivedMessage;
+					if ( receivedMessage.MessageType == GameMessageType.LoanMoney ){
+						LoanMoneyGameMessage loanMsg = (LoanMoneyGameMessage) receivedMessage;
+						yield return loanMsg;
+						
+						if ( loanMsg.LoanMoney > 0 ){
+							if ( Loan( needMoney ) ){
+								if ( PayTax() ){
+									yield break;
+								}else{
+									SelfBan();
+								}
+							}else{
+								SelfBan();
+							}
+						}else{
+							yield return new GameResultGameMessage
+							{
+								WinTeam = teamGroup
+							};
+						}
+						
+					}else if ( receivedMessage.MessageType == GameMessageType.SellLands ){
+						SellLandsGameMessage sellMsg = (SellLandsGameMessage) receivedMessage;
+						yield return sellMsg;
+						foreach ( char c in sellMsg.LandList ){
+							lands[(int) c].Sell();
+						}
+						if ( PayTax() ){
+							yield break;
+						}else{
+							SelfBan();
+						}
+					}
+
+				}else{
+					yield return new GameResultGameMessage
+					{
+						WinTeam = teamGroup
+					};
+				}
 			}
 		}
 		
