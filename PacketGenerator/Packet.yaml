@@ -464,24 +464,21 @@ InitializeWaitingRoom :
               type : Boolean
 
 MakeNewGameRoom :
-    comment : 게임 대기방 새로 생성
-    fields :
-        - name : BoardType
-          cast : Int16
-          type : GameBoard.BoardType
-        - type : Int16
-          name : NumberOfPlayers
-        - type : Int16
-          name : CurrentNumberOfPlayers
+  comment : 게임 대기방 새로 생성
+  fields :
+    - name : BoardType
+      cast : Int16
+      type : GameBoard.BoardType
+    - name : PlayType
+      cast : Char
+      type : GamePlayType
 
 JoinToRandomGameRoom :
   comment : 무작위 게임 방 참가
   fields :
     - name : BoardType
       cast : Int16
-      type : GameBoard.BoardType
-    - name : NumberOfPlayers
-      type : Int16
+      type : GameBoard.BoardType    
     - name : PlayType
       cast : Char
       type : GamePlayType

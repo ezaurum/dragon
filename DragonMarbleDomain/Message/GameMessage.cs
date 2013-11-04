@@ -1232,7 +1232,6 @@ public class JoinToRandomGameRoomGameMessage : IDragonMarbleGameMessage
 {
 	public GameMessageType MessageType {get{return GameMessageType.JoinToRandomGameRoom;}}
 	public GameBoard.BoardType BoardType;
-	public Int16 NumberOfPlayers;
 	public GamePlayType PlayType;
 
 	public byte[] ToByteArray()
@@ -1248,9 +1247,6 @@ public class JoinToRandomGameRoomGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes((Int16)BoardType)
 		.CopyTo(bytes,index);
 		index += sizeof(GameBoard.BoardType);
-		BitConverter.GetBytes(NumberOfPlayers)
-		.CopyTo(bytes,index);
-		index += sizeof(Int16);
 		BitConverter.GetBytes((Char)PlayType)
 		.CopyTo(bytes,index);
 		index += sizeof(GamePlayType);
@@ -1262,8 +1258,6 @@ public void FromByteArray(byte[] bytes)
 		int index = 6;
 		BoardType = (GameBoard.BoardType)BitConverter.ToInt16(bytes, index);
 		index += sizeof(GameBoard.BoardType);
-		NumberOfPlayers = BitConverter.ToInt16(bytes, index);
-		index += sizeof(Int16);
 		PlayType = (GamePlayType)BitConverter.ToChar(bytes, index);
 		index += sizeof(GamePlayType);
 }
@@ -1272,7 +1266,7 @@ public void FromByteArray(byte[] bytes)
 	{
 		get
 		{
-			return (Int16)(2+sizeof(GameMessageType)+sizeof(GameBoard.BoardType)+sizeof(Int16)+sizeof(GamePlayType));
+			return (Int16)(2+sizeof(GameMessageType)+sizeof(GameBoard.BoardType)+sizeof(GamePlayType));
 		}
 	}
 }
@@ -1368,8 +1362,7 @@ public class MakeNewGameRoomGameMessage : IDragonMarbleGameMessage
 {
 	public GameMessageType MessageType {get{return GameMessageType.MakeNewGameRoom;}}
 	public GameBoard.BoardType BoardType;
-	public Int16 NumberOfPlayers;
-	public Int16 CurrentNumberOfPlayers;
+	public GamePlayType PlayType;
 
 	public byte[] ToByteArray()
 	{
@@ -1384,12 +1377,9 @@ public class MakeNewGameRoomGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes((Int16)BoardType)
 		.CopyTo(bytes,index);
 		index += sizeof(GameBoard.BoardType);
-		BitConverter.GetBytes(NumberOfPlayers)
+		BitConverter.GetBytes((Char)PlayType)
 		.CopyTo(bytes,index);
-		index += sizeof(Int16);
-		BitConverter.GetBytes(CurrentNumberOfPlayers)
-		.CopyTo(bytes,index);
-		index += sizeof(Int16);
+		index += sizeof(GamePlayType);
 	return bytes;
 }
 
@@ -1398,17 +1388,15 @@ public void FromByteArray(byte[] bytes)
 		int index = 6;
 		BoardType = (GameBoard.BoardType)BitConverter.ToInt16(bytes, index);
 		index += sizeof(GameBoard.BoardType);
-		NumberOfPlayers = BitConverter.ToInt16(bytes, index);
-		index += sizeof(Int16);
-		CurrentNumberOfPlayers = BitConverter.ToInt16(bytes, index);
-		index += sizeof(Int16);
+		PlayType = (GamePlayType)BitConverter.ToChar(bytes, index);
+		index += sizeof(GamePlayType);
 }
 
 	public Int16 Length
 	{
 		get
 		{
-			return (Int16)(2+sizeof(GameMessageType)+sizeof(GameBoard.BoardType)+sizeof(Int16)+sizeof(Int16));
+			return (Int16)(2+sizeof(GameMessageType)+sizeof(GameBoard.BoardType)+sizeof(GamePlayType));
 		}
 	}
 }
