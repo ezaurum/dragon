@@ -23,7 +23,7 @@ namespace DragonMarble
                 DateTime start = DateTime.Now;
 
                 Board.GrossAssets = 0;
-                Units.ForEach(p => Board.GrossAssets += p.Assets);
+                Units.Values.ToList().ForEach(p => Board.GrossAssets += p.Assets);
                 if (Logger.IsDebugEnabled)
                 {
                     Logger.DebugFormat("Gross Assets is : {0}", Board.GrossAssets);

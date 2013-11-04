@@ -30,6 +30,9 @@ namespace DragonMarble
             }
         }
 
+        /// <summary>
+        /// When received message is none, wait until message received.
+        /// </summary>
         public virtual IDragonMarbleGameMessage ReceivedMessage
         {
             get

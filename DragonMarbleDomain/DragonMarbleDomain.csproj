@@ -31,12 +31,15 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Account\GameAccountInfo.cs" />
     <Compile Include="AIStageUnitInfo.cs" />
     <Compile Include="Card\CharacterCardInfo.cs" />
     <Compile Include="Card\CharacterCardStat.cs" />
     <Compile Include="Contents.cs" />
-    <Compile Include="GameAccountInfo.cs" />
+    <Compile Include="Enums.cs" />
     <Compile Include="GameBoard.cs" />
+    <Compile Include="Game\GameRecords.cs" />
+    <Compile Include="Game\GameResult.cs" />
     <Compile Include="IStageManager.cs" />
     <Compile Include="Message\GameMessage.cs" />
     <Compile Include="Message\IDragonMarbleGameMessage.cs" />

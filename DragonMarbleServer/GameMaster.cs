@@ -12,12 +12,12 @@ namespace DragonMarble
         {
             InitGame();
             EndOrder();
-            Logger.Debug("Starg gmae and");
+            Logger.Debug("Start Game End");
         }
 
         private void InitGame()
         {
-            _availablePlayers = Units;
+            _availablePlayers = Units.Values.ToList();
             Board = OriginalBoard.Clone();
 
             Board.Init();
@@ -27,7 +27,7 @@ namespace DragonMarble
             {
                 FeeBoostedTiles = Board.FeeBoostedTiles,
                 NumberOfPlayers = (short) Units.Count,
-                Units = Units
+                Units = Units.Values.ToList()
             });
 
             _state = GameState.Init;
@@ -67,7 +67,7 @@ namespace DragonMarble
                 FirstCardNumber = firstCardNumber
             });
 
-            OrderedByTurnPlayers = Units.OrderBy(player => player.Order).ToList();
+            OrderedByTurnPlayers = Units.Values.OrderBy(player => player.Order).ToList();
 
             Logger.Debug("End order");
 

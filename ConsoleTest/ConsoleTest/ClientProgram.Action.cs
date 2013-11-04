@@ -18,6 +18,15 @@ namespace ConsoleTest
                 nm.Reconnect();
             }
 
+            if (readLine.Contains("ss") || readLine.Contains("SS"))
+            {
+                nm.SendMessage(new SessionGameMessage()
+                {
+                    SessionKey = Guid.NewGuid()
+                });
+                return false;
+            }
+
 
             //game
             if (readLine.Contains("D") || readLine.Contains("d"))

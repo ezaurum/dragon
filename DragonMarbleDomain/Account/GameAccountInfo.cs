@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using DragonMarble.Card;
+using DragonMarble.Game;
 
-namespace DragonMarble
+namespace DragonMarble.Account
 {
     public class GameAccountInfo
     {
@@ -16,61 +18,45 @@ namespace DragonMarble
         public DateTime LastLogin { get; set; }
         public DateTime Joined { get; set; }
         public DateTime LastPlay { get; set; }
-        
+
         public int RankingWithFriends { get; set; }
         public int RankingPercentWithEverybody { get; set; }
         public long RankingWithEverybody { get; set; }
         public long GameMoney { get; set; }
         public long CashMoney { get; set; }
-        public int GamePlayEnergy  { get; set; }
+        public int GamePlayEnergy { get; set; }
         public int PresentSended { get; set; }
         //public long HighScore
 
         public GameRecords ThisWeekGameRecords { get; set; }
         public GameRecords GameRecords { get; set; }
-        
+
+        //friends
+        public List<GameAccountInfo> Friends { get; set; }
+        //dices
+        public List<StageDiceInfo> Dieces { get; set; }
+        public StageDiceInfo CurrentDice { get; set; }
+
+        //CharacterCards
+        public List<CharacterCardInfo> CharacterCards { get; set; }
+        public CharacterCardInfo CurrentCharacterCard { get; set; }
+
+        //items
+        public List<FortuneItem> FortuneItems { get; set; }
+
     }
 
-    public class GameRecords
+    public class FortuneItem
     {
-        public long HighScoreOnAGame { get; set; }
-        public long HighScoreOnAWeek { get; set; }
-        public int Win { get; set; }
-        public int Lose { get; set; }
-        public int WinningRate { get; set; }
-        public int Games { get; set; }
-        public List<GameResult> Records { get; set; }
+        public Guid Id { get; set; }
+        public GameItemGrade Grade { get; set; }
+        public GameAccountInfo Owner { get; set; }
     }
 
-    public class GameResult
-    {
-        public List<GameAccountInfo> Players { get; set; }
-        public GameAccountInfo Winner { get; set; }
-        public long Prize { get; set; }
-        public DateTime StartTime { get; set; }
-        public DateTime EndTime { get; set; }
-        public GamePlayType Type { get; set; }
-        public TimeSpan PlayTime
-        {
-            get { return StartTime - EndTime; }
-        }
-        public WinConditionType WinCondition{ get; set; }
-
-        
-    }
-
-    public enum WinConditionType
-    {
-        Bankruptcy, MonopolyTriple, MonopolySight, MonopolyLine
-    }
-
-    public enum GamePlayType
-    {
-        TeamPlay, Individual2PlayerPlay, Individual3PlayerPlay, Individual4PlayerPlay, Random
-    }
-
+    
     public class GameAccountStat
     {
+        public Guid Id { get; set; }
         //계정 레벨
         public int Level { get; set; }
         //다음 레벨업 필요 경험치

@@ -233,8 +233,184 @@ namespace DragonMarble
                         }
                     }
 				break;
+			case StageTileInfo.TYPE.CHANCE:
+				foreach (var gameAction in ChanceCardOpen()) yield return gameAction;
+			        break;
+			case StageTileInfo.TYPE.OLYMPIC:
+				foreach (var gameAction in OpenOlympic()) yield return gameAction;
+			        break;
+				break;
+			case StageTileInfo.TYPE.TAX:
+				break;
+			case StageTileInfo.TYPE.GAMBLE:
+				break;
+				
+				
+				
 			}
 		}
+		
+		private IEnumerable<IGameMessage> OpenOlympic(){
+			if ( lands.Count == 0 ) yield break;
+			OpenOlympicGameMessage receivedMessage = (OpenOlympicGameMessage) ReceivedMessage;
+			if ( receivedMessage.TileIndex > 0 ){
+				if ( lands.ContainsKey(receivedMessage.TileIndex) ){
+					Stage.OpenOlympicCity(receivedMessage.TileIndex);
+				}else{
+					SelfBan();
+				}
+			}
+			yield return receivedMessage;
+		}
+		
+		
+		private IEnumerable<IGameMessage> ChanceCardOpen(){
+			int[] chanceGroup = { 2,7,8,19,13,16,15,21,10 };
+			int chanceId = chanceGroup[RandomUtil.Next(0, chanceGroup.Length)];
+			//StageManager.Cards
+			yield return new OpenChanceCardGameMessage
+			{
+				CardId = (char)chanceId,
+				Actor = Id
+			};
+			IDragonMarbleGameMessage receivedMessage = ReceivedMessage;
+			StageChanceCardInfo chance = StageManager.Cards[chanceId];
+			switch( chance.type ){
+			case StageChanceCardInfo.TYPE.GOTO:
+				ChanceCardGoToGameMessage gotoMsg = (ChanceCardGoToGameMessage) receivedMessage;
+				GoTo(chance.tileIndex);
+				yield return receivedMessage;
+				foreach (var destinationGameAction in DestinationGameAction())
+	            {
+	                yield return destinationGameAction;
+	            }
+				break;
+			case StageChanceCardInfo.TYPE.BUFF:
+				ChanceCardBuffGameMessage buffMsg = (ChanceCardBuffGameMessage) receivedMessage;
+				switch( chance.buffTarget ){
+				case StageBuffInfo.TARGET.OWNER:
+					AddBuff(chance.buffType, chance.buffPower, chance.buffTurn);
+					yield return receivedMessage;
+					break;
+				case StageBuffInfo.TARGET.BUILDING_ENEMY:
+				case StageBuffInfo.TARGET.CITY_ENEMY:
+				{
+					StageTileInfo tile = Stage.Tiles[buffMsg.SelectTile];
+					if ( tile.IsEnemyTeam(this) ){
+						tile.AddBuff( chance.buffType, chance.buffPower, chance.buffTurn);
+						yield return receivedMessage;
+					}else{
+						SelfBan();
+					}
+					break;
+				}
+				case StageBuffInfo.TARGET.BUILDINGGROUP_ENEMY:
+				case StageBuffInfo.TARGET.CITYGROUP_ENEMY:
+				{
+					StageTileInfo tile = Stage.Tiles[buffMsg.SelectTile];
+					if ( tile.IsEnemyTeam(this) ){
+						tile.AddBuff(chance.buffType, chance.buffPower, chance.buffTurn);
+						foreach ( StageTileInfo t in tile.colorGroup ){
+							if ( t.owner != null && t.owner.teamGroup == tile.owner.teamGroup ){
+								t.AddBuff( chance.buffType, chance.buffPower, chance.buffTurn);
+							}
+						}
+						yield return receivedMessage;
+					}else{
+						SelfBan();
+					}
+					break;
+				}
+				}
+				break;
+			case StageChanceCardInfo.TYPE.ORDER:
+				ChanceCardOrderGameMessage orderMsg = (ChanceCardOrderGameMessage) receivedMessage;
+				switch( chance.orderType ){
+				case StageChanceCardInfo.ORDER_TYPE.GO_ISLAND:
+					tileIndex = Stage.TILE_INDEX_PRISON;
+					Prison();
+					yield return receivedMessage;
+					break;
+				case StageChanceCardInfo.ORDER_TYPE.GO_OLYMPIC_CITY:
+					if ( Stage.tile_index_olympic >= 0 ){
+						GoTo(Stage.tile_index_olympic);
+						yield return receivedMessage;
+						foreach (var destinationGameAction in DestinationGameAction())
+			            {
+			                yield return destinationGameAction;
+			            }
+						
+						break;
+					}else{
+						yield return receivedMessage;
+					}
+					break;
+				case StageChanceCardInfo.ORDER_TYPE.OPEN_OLYMPIC:
+					yield return receivedMessage;
+					foreach (var gameAction in OpenOlympic()) yield return gameAction;
+					break;
+				case StageChanceCardInfo.ORDER_TYPE.DONATE_CITY:
+				{
+					if ( lands.ContainsKey(orderMsg.Value1) && Id.Equals(orderMsg.Target) == false ){
+						StageTileInfo tile = Stage.Tiles[orderMsg.Value1];
+						tile.SetOwner(StageManager.Units[orderMsg.Target]);
+						yield return receivedMessage;
+					}else{
+						SelfBan();
+					}
+					break;
+				}
+				case StageChanceCardInfo.ORDER_TYPE.DONATE_MONEY:
+					DonateMoneyToPoorest();
+					yield return receivedMessage;
+					break;
+				case StageChanceCardInfo.ORDER_TYPE.SELL:
+					if ( lands.ContainsKey(orderMsg.Value1) ){
+						lands[orderMsg.Value1].Sell();
+						yield return receivedMessage;
+					}else{
+						SelfBan();
+					}
+					break;
+				case StageChanceCardInfo.ORDER_TYPE.CHANGE_CITY:
+					if ( lands.ContainsKey(orderMsg.Value1) && Stage.Tiles[orderMsg.Value2].IsEnemyTeam(this) ){
+						lands[orderMsg.Value1].ChangeOwner(Stage.Tiles[orderMsg.Value2]);
+						yield return receivedMessage;
+					}else{
+						SelfBan();
+					}
+					break;
+				}
+				break;
+			case StageChanceCardInfo.TYPE.COUPON:
+				ChanceCardCouponGameMessage couponMsg = (ChanceCardCouponGameMessage) receivedMessage;
+				if ( couponMsg.Save ){
+					chanceCoupon = chance.couponType;
+				}
+				yield return receivedMessage;
+				break;
+			}
+		}
+		
+		private void DonateMoneyToPoorest(){
+			//System.Guid poor = Id;
+			StageUnitInfo poorUnit = this;
+			foreach ( StageUnitInfo u in StageManager.Units.Values ){
+				if ( !poorUnit.Equals(u) ){
+					if ( poorUnit.property > u.property ){
+						poorUnit = u;
+					}
+				}
+			}
+			long m = 0;
+			foreach ( StageUnitInfo u in StageManager.Units.Values ){
+				if ( !poorUnit.Equals(u) ){
+					m += u.DonateMoney(GameBoard.DONATE_MONEY);
+				}
+			}
+			poorUnit.AddGold(m);
+		}
+		
 		
 		private IEnumerable<IGameMessage> BuyLandRequest(StageTileInfo stageTile){
 			yield return new BuyLandRequestGameMessage

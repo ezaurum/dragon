@@ -256,16 +256,19 @@ namespace DragonMarble
             return false;
         }
 
-        public int GetTax(int taxPercent)
+        public long GetTax()
         {
-            int p = 0;
+            long p = 0;
             foreach (StageTileInfo t in lands.Values)
             {
                 p += t.builtPrice;
             }
-            return p*taxPercent/100;
+            return p*GameBoard.TAX_PERCENT/100;
         }
-
+		public bool PayTax(){
+			return AddGold( - GetTax() );
+		}
+		
         public void AddBuff(StageBuffInfo.TYPE buffType, int buffTurn, int power)
         {
             if (buffTurn > 0)

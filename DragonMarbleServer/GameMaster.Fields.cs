@@ -36,7 +36,7 @@ namespace DragonMarble
             PlayerNumberForPlay = playerNumberForPlayer;
             _state = GameState.JustMade;
             Id = Guid.NewGuid();
-            Units = new List<StageUnitInfo>();
+            Units = new Dictionary<Guid, StageUnitInfo>();
             Cards = new Dictionary<int, StageChanceCardInfo>();
             ChanceCardList.ForEach(c => Cards.Add(c.classId,c));
         }

@@ -6,7 +6,7 @@ namespace DragonMarble
 {
     public partial class GameMaster : IStageManager
     {
-        public List<StageUnitInfo> Units { get; set; }
+        public Dictionary<Guid, StageUnitInfo> Units { get; set; }
         public Guid Id { get; set; }
         /// <summary>
         ///     Notify message for every players
@@ -14,7 +14,10 @@ namespace DragonMarble
         /// <param name="message">message to notify</param>
         public void Notify(IDragonMarbleGameMessage message)
         {
-            Units.ForEach(p => p.SendingMessage = message);
+            foreach (StageUnitInfo stageUnitInfo in Units.Values)
+            {
+                stageUnitInfo.SendingMessage = message;
+            }
         }
 
         /// <summary>

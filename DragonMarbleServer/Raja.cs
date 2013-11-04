@@ -1,5 +1,6 @@
 ﻿using System.Net.Sockets;
 using Dragon;
+using DragonMarble.Account;
 using log4net;
 
 namespace DragonMarble
@@ -32,6 +33,7 @@ namespace DragonMarble
         public SocketAsyncEventArgs ReadArgs { get; set; }
         public SocketAsyncEventArgs WriteArgs { get; set; }
         public bool IsDisposed { get; set; }
+        public GameAccountInfo GameAccount { get; set; }
 
         public void Dispose()
         {
