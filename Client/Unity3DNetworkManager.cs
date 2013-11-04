@@ -17,6 +17,9 @@ namespace Dragon.Client
         private readonly EndPoint _ipEndpoint;
 
         public bool OnLine { get; set; }
+
+        //session key 
+        public Session.Session Session { get; set; }
         
         public event EventHandler<SocketAsyncEventArgs> OnAfterMessageSend;
         public event EventHandler<SocketAsyncEventArgs> OnAfterMessageReceive;

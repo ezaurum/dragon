@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.Sockets;
 
 namespace Dragon.Message
@@ -42,5 +43,17 @@ namespace Dragon
     {
         IRajaProvider RajaProvider { get; set; }
         void SendBytes(Socket socket, SocketAsyncEventArgs e);
+    }
+}
+
+namespace Dragon.Session
+{
+    public class Session : IDisposable
+    {
+        public Guid Id { get; set; }
+        public virtual void Dispose()
+        {
+            Id = Guid.Empty;
+        }
     }
 }
