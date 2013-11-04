@@ -13,7 +13,7 @@ Header :
     fields :
         - type : GameMessageType
           name : MessageType
-          cast : Int32        
+          cast : Int32
 
 InitializeGame :
     comment : 게임 초기화 정보

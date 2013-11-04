@@ -61,16 +61,10 @@ namespace DragonMarble
 
                 if (readLine.Contains("A") || readLine.Contains("a"))
                 {
-                    StageUnitInfo s = new AIStageUnitInfo
-                    {
-                        Id = Guid.NewGuid(),
-                        UnitColor = StageUnitInfo.UNIT_COLOR.GREEN,
-                        Gold = 2000000,
-                        ControlMode = StageUnitInfo.ControlModeType.AI_0,
-                        CharacterId = 1,
-                    };
+                    StageUnitInfo s = GetNewAI();
 
                     pool.Join(s);
+                    continue;
                 }
 
                 if (readLine.Contains("Q") || readLine.Contains("q")) Running = false;
@@ -79,6 +73,18 @@ namespace DragonMarble
             DataCollection.StopProfile(
                 ProfileLevel.Global,
                 DataCollection.CurrentId);
+        }
+
+        private static AIStageUnitInfo GetNewAI()
+        {
+            return new AIStageUnitInfo
+            {
+                Id = Guid.NewGuid(),
+                UnitColor = StageUnitInfo.UNIT_COLOR.GREEN,
+                Gold = 2000000,
+                ControlMode = StageUnitInfo.ControlModeType.AI_0,
+                CharacterId = 1,
+            };
         }
 
         public static bool Running { get; set; }
