@@ -19,11 +19,15 @@ namespace DragonMarble
         public int TILE_INDEX_PRISON;
         public int TILE_INDEX_TRAVEL;
         public int tile_index_olympic;
+		
+		public int olympic_scale;
 
         public GameBoard(List<StageTileInfo> tiles)
         {
             Tiles = tiles;
             FeeBoostedTiles = new List<short>();
+			tile_index_olympic = -1;
+			olympic_scale = 1;
         }
 
         public long GrossAssets { get; set; }
@@ -33,7 +37,20 @@ namespace DragonMarble
         //public Dictionary<> 
 
         public List<short> FeeBoostedTiles { get; set; }
-
+		
+		public bool OpenOlympicCity(int tileIndex){
+			if ( tileIndex >= 0 ){
+				if ( olympic_scale < MAX_OLYMPIC_CNT ) olympic_scale++;
+				if ( tile_index_olympic >= 0 ){
+					Tiles[tile_index_olympic].olympic = 0;
+				}
+				tile_index_olympic = tileIndex;
+				Tiles[tile_index_olympic].olympic = olympic_scale;
+				return true;
+			}
+			return false;
+		}
+		
         public void Init()
         {
             //StageTile from _tiles

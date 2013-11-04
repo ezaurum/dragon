@@ -201,7 +201,7 @@ namespace DragonMarble
                 return p;
             }
         }
-        public int GetMinBuyPrice(StageUnitInfo unit)
+        public long GetMinBuyPrice(StageUnitInfo unit)
         {
 			if ( isAbleToBuildLandmark ){
 				return buildings[4].buyPrice;
@@ -218,11 +218,11 @@ namespace DragonMarble
             return 0;
         }
 		
-        public int builtPrice
+        public long builtPrice
         {
             get
             {
-                int p = 0;
+                long p = 0;
                 foreach (Building b in buildings)
                 {
                     if (b.isBuilt)
@@ -234,11 +234,11 @@ namespace DragonMarble
             }
         }
 
-        public int sellPrice
+        public long sellPrice
         {
             get
             {
-                int p = 0;
+                long p = 0;
                 foreach (Building b in buildings)
                 {
                     if (b.isBuilt)
@@ -266,14 +266,14 @@ namespace DragonMarble
             }
         }
 
-        public int takeOverPrice
+        public long takeOverPrice
         {
             get { return builtPrice * 2; }
         }
         
         public void AddBuff(StageBuffInfo.TYPE buffType, int power, int buffTurn)
         {
-            if (buffType == StageBuffInfo.TYPE.DESTROY)
+            if (buffType == StageBuffInfo.TYPE.DESTROY && type == TYPE.CITY && buildings[4].isBuilt == false)
             {
                 for (int i = 3; i >= 1; i--)
                 {
@@ -291,34 +291,34 @@ namespace DragonMarble
             }
         }
 		public bool IsEnemyTeam(StageUnitInfo unit){
-			if ( owner == null || owner.teamGroup == unit.teamGroup ){
-				return false;
+			if ( owner != null && owner.teamGroup != unit.teamGroup ){
+				return true;
 			}
-			return true;
+			return false;
 		}
 		
         public bool IsSameOwner(StageUnitInfo unit)
         {
-            if (owner == null || !owner.Equals(unit))
+            if (owner != null && owner.Equals(unit))
             {
-                return false;
+                return true;
             }
-            return true;
+            return false;
         }
 
         public bool IsSameTeam(StageUnitInfo unit)
         {
-            if (owner == null || owner.teamGroup != unit.teamGroup)
+            if (owner != null && owner.teamGroup == unit.teamGroup)
             {
-                return false;
+                return true;
             }
-            return true;
+            return false;
         }
 
 
         public bool Buy(StageUnitInfo unit, List<int> buildingIndex)
         {
-            int price = 0;
+            long price = 0;
             foreach (int i in buildingIndex)
             {
                 if ( i >= 4 ) return false;
@@ -356,7 +356,7 @@ namespace DragonMarble
         public bool IsAbleToBuy(StageUnitInfo unit){
             if ( type == TYPE.SIGHT || type == TYPE.CITY ){
                 if ( owner == null || owner.teamGroup == unit.teamGroup ){
-                    int minBuyPrice = GetMinBuyPrice( unit );
+                    long minBuyPrice = GetMinBuyPrice( unit );
                     if ( minBuyPrice > 0 && minBuyPrice <= unit.gold ){
                         return true;
                     }
@@ -376,7 +376,7 @@ namespace DragonMarble
         public bool TakeOver(StageUnitInfo unit)
         {
 			if ( owner.teamGroup == unit.teamGroup ) return false;
-            int p = takeOverPrice;
+            long p = takeOverPrice;
             if (unit.AddGold(-p))
             {
                 owner.AddGold(p);
@@ -394,8 +394,8 @@ namespace DragonMarble
         public void ChangeOwner(StageTileInfo tile)
         {
             StageUnitInfo exOwner = owner;
-            owner = tile.owner;
-            tile.owner = exOwner;
+			owner = tile.owner;
+			tile.owner = exOwner;
         }
 
         public void Sell()
@@ -403,6 +403,7 @@ namespace DragonMarble
             owner.AddGold(sellPrice);
             owner = null;
             foreach (Building b in buildings) b.isBuilt = false;
+			olympic = 0;
         }
 
         public void Earthquake()
@@ -433,10 +434,10 @@ namespace DragonMarble
 		[Serializable]
         public class Building
         {
-            public int buyPrice;
-            public int fee;
+            public long buyPrice;
+            public long fee;
             public bool isBuilt;
-            public int sellPrice;
+            public long sellPrice;
         }
     }
 }
