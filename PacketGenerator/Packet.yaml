@@ -153,6 +153,16 @@ BuyLand :
       length : 16
       options : [byte_param_constructor, to_byte_array, property]
 
+OpenOlympic :
+  comment : open olympic
+  fields :
+    - name : TileIndex
+      type : Char
+    - name : Actor
+      type : Guid
+      length : 16
+      options : [byte_param_constructor, to_byte_array, property]
+
 UseCouponRequest :
   comment : request use chance chance coupon
   fields :
@@ -330,6 +340,28 @@ SellLands :
       type : Char
       collection : List
       size : LandCount
+    - name : Actor
+      type : Guid
+      length : 16
+      options : [byte_param_constructor, to_byte_array, property]
+
+GambleBatting :
+  comment : batting
+  fields :
+    - name : BattingPrice
+      type : Char
+
+GambleChoice :
+  comment : choice
+  fields :
+    - name : Choice
+      type : Char
+
+GambleResult :
+  comment : gamble result
+  fields :
+    - name : WinCount
+      type : Char
     - name : Actor
       type : Guid
       length : 16
