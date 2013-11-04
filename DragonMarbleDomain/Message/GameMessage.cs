@@ -18,6 +18,9 @@ public enum GameMessageType
 	ChanceCardOrder,
 	EveryoneIsReady,
 	ExitWaitingRoom,
+	GambleBatting,
+	GambleChoice,
+	GambleResult,
 	GameResult,
 	InitializeGame,
 	InitializePlayer,
@@ -27,6 +30,7 @@ public enum GameMessageType
 	NewPlayerJoin,
 	NothingToDo,
 	OpenChanceCard,
+	OpenOlympic,
 	OrderCardResult,
 	OrderCardSelect,
 	PayFee,
@@ -94,6 +98,15 @@ public static class GameMessageFactory
 		case GameMessageType.ExitWaitingRoom:
 		message = new ExitWaitingRoomGameMessage();
 		break;
+		case GameMessageType.GambleBatting:
+		message = new GambleBattingGameMessage();
+		break;
+		case GameMessageType.GambleChoice:
+		message = new GambleChoiceGameMessage();
+		break;
+		case GameMessageType.GambleResult:
+		message = new GambleResultGameMessage();
+		break;
 		case GameMessageType.GameResult:
 		message = new GameResultGameMessage();
 		break;
@@ -120,6 +133,9 @@ public static class GameMessageFactory
 		break;
 		case GameMessageType.OpenChanceCard:
 		message = new OpenChanceCardGameMessage();
+		break;
+		case GameMessageType.OpenOlympic:
+		message = new OpenOlympicGameMessage();
 		break;
 		case GameMessageType.OrderCardResult:
 		message = new OrderCardResultGameMessage();
@@ -723,6 +739,128 @@ public void FromByteArray(byte[] bytes)
 	}
 }
 
+// batting	
+public class GambleBattingGameMessage : IDragonMarbleGameMessage	
+{
+	public GameMessageType MessageType {get{return GameMessageType.GambleBatting;}}
+	public Char BattingPrice;
+
+	public byte[] ToByteArray()
+	{
+		byte[] bytes = new byte[Length];
+		int index = 0;
+		BitConverter.GetBytes(Length)
+		.CopyTo(bytes,index);
+		index += sizeof(Int16);
+		BitConverter.GetBytes((Int32)MessageType)
+		.CopyTo(bytes,index);
+		index += sizeof(GameMessageType);
+		BitConverter.GetBytes(BattingPrice)
+		.CopyTo(bytes,index);
+		index += sizeof(Char);
+	return bytes;
+}
+
+public void FromByteArray(byte[] bytes)
+{
+		int index = 6;
+		BattingPrice = BitConverter.ToChar(bytes, index);
+		index += sizeof(Char);
+}
+
+	public Int16 Length
+	{
+		get
+		{
+			return (Int16)(2+sizeof(GameMessageType)+sizeof(Char));
+		}
+	}
+}
+
+// choice	
+public class GambleChoiceGameMessage : IDragonMarbleGameMessage	
+{
+	public GameMessageType MessageType {get{return GameMessageType.GambleChoice;}}
+	public Char Choice;
+
+	public byte[] ToByteArray()
+	{
+		byte[] bytes = new byte[Length];
+		int index = 0;
+		BitConverter.GetBytes(Length)
+		.CopyTo(bytes,index);
+		index += sizeof(Int16);
+		BitConverter.GetBytes((Int32)MessageType)
+		.CopyTo(bytes,index);
+		index += sizeof(GameMessageType);
+		BitConverter.GetBytes(Choice)
+		.CopyTo(bytes,index);
+		index += sizeof(Char);
+	return bytes;
+}
+
+public void FromByteArray(byte[] bytes)
+{
+		int index = 6;
+		Choice = BitConverter.ToChar(bytes, index);
+		index += sizeof(Char);
+}
+
+	public Int16 Length
+	{
+		get
+		{
+			return (Int16)(2+sizeof(GameMessageType)+sizeof(Char));
+		}
+	}
+}
+
+// gamble result	
+public class GambleResultGameMessage : IDragonMarbleGameMessage	
+{
+	public GameMessageType MessageType {get{return GameMessageType.GambleResult;}}
+	public Char WinCount;
+	public Guid Actor { get; set;}
+
+	public byte[] ToByteArray()
+	{
+		byte[] bytes = new byte[Length];
+		int index = 0;
+		BitConverter.GetBytes(Length)
+		.CopyTo(bytes,index);
+		index += sizeof(Int16);
+		BitConverter.GetBytes((Int32)MessageType)
+		.CopyTo(bytes,index);
+		index += sizeof(GameMessageType);
+		BitConverter.GetBytes(WinCount)
+		.CopyTo(bytes,index);
+		index += sizeof(Char);
+		Actor.ToByteArray()
+		.CopyTo(bytes,index);
+		index += 16;
+	return bytes;
+}
+
+public void FromByteArray(byte[] bytes)
+{
+		int index = 6;
+		WinCount = BitConverter.ToChar(bytes, index);
+		index += sizeof(Char);
+		byte[] tempActor = new byte[16];
+		Buffer.BlockCopy(bytes, index, tempActor, 0,16);
+		Actor = new Guid(tempActor);
+		index += 16;
+}
+
+	public Int16 Length
+	{
+		get
+		{
+			return (Int16)(2+sizeof(GameMessageType)+sizeof(Char)+16);
+		}
+	}
+}
+
 // game result	
 public class GameResultGameMessage : IDragonMarbleGameMessage	
 {
@@ -1190,6 +1328,52 @@ public void FromByteArray(byte[] bytes)
 {
 		int index = 6;
 		CardId = BitConverter.ToChar(bytes, index);
+		index += sizeof(Char);
+		byte[] tempActor = new byte[16];
+		Buffer.BlockCopy(bytes, index, tempActor, 0,16);
+		Actor = new Guid(tempActor);
+		index += 16;
+}
+
+	public Int16 Length
+	{
+		get
+		{
+			return (Int16)(2+sizeof(GameMessageType)+sizeof(Char)+16);
+		}
+	}
+}
+
+// open olympic	
+public class OpenOlympicGameMessage : IDragonMarbleGameMessage	
+{
+	public GameMessageType MessageType {get{return GameMessageType.OpenOlympic;}}
+	public Char TileIndex;
+	public Guid Actor { get; set;}
+
+	public byte[] ToByteArray()
+	{
+		byte[] bytes = new byte[Length];
+		int index = 0;
+		BitConverter.GetBytes(Length)
+		.CopyTo(bytes,index);
+		index += sizeof(Int16);
+		BitConverter.GetBytes((Int32)MessageType)
+		.CopyTo(bytes,index);
+		index += sizeof(GameMessageType);
+		BitConverter.GetBytes(TileIndex)
+		.CopyTo(bytes,index);
+		index += sizeof(Char);
+		Actor.ToByteArray()
+		.CopyTo(bytes,index);
+		index += 16;
+	return bytes;
+}
+
+public void FromByteArray(byte[] bytes)
+{
+		int index = 6;
+		TileIndex = BitConverter.ToChar(bytes, index);
 		index += sizeof(Char);
 		byte[] tempActor = new byte[16];
 		Buffer.BlockCopy(bytes, index, tempActor, 0,16);
