@@ -4,7 +4,6 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using Dragon.Server;
-using DragonMarble.Message;
 using GameUtils;
 using log4net;
 using log4net.Config;
@@ -41,9 +40,9 @@ namespace DragonMarble
             };
             GameMasterPool pool =new GameMasterPool();
             ISessionManager sessionManager = new SessionManager();
-            //server.OnAfterAccept += sessionManager.Login;
+            server.OnAfterAccept += sessionManager.Login;
             
-            server.OnAfterAccept += pool.AddPlayer;
+            //server.OnAfterAccept += pool.AddPlayer;
 
             server.Start();
 
@@ -111,17 +110,6 @@ namespace DragonMarble
         /// <param name="e"></param>
         public void AddPlayer(object sender, SocketAsyncEventArgs e)
         {
-            StageUnitInfo dummyUnit = new AIStageUnitInfo
-            {
-                Id = Guid.NewGuid(),
-                Order = 1,
-                UnitColor = StageUnitInfo.UNIT_COLOR.GREEN,
-                CharacterId = 1,
-                Gold = 2000000
-            };
-
-            Join(dummyUnit);
-
             Raja token = (Raja)e.UserToken;
             token.Unit = new StageUnitInfo
             {
@@ -133,13 +121,7 @@ namespace DragonMarble
             };
             
             Join(token.Unit);
-
-            //TODO all ready force
-            token.ReceivedMessage = new ReadyStateGameMessage()
-            {
-                Actor = token.Unit.Id,
-                Ready = true
-            };
+            
         }
 
         public void Join(StageUnitInfo unit)
