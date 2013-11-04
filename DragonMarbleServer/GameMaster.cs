@@ -12,7 +12,7 @@ namespace DragonMarble
         {
             InitGame();
             EndOrder();
-            Logger.Debug("Starg gmae and");
+            Logger.Debug("Start Game End");
         }
 
         private void InitGame()

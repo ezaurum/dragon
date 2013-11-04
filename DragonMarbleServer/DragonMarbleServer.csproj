@@ -56,6 +56,7 @@
     <Compile Include="GameMaster.cs" />
     <Compile Include="DragonMarbleServerProgram.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SessionManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

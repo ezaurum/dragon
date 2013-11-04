@@ -39,7 +39,10 @@ namespace DragonMarble
                 RajaProvider = rajaProvider
             };
             GameMasterPool pool =new GameMasterPool();
-            server.OnAfterAccept += pool.AddPlayer;
+            ISessionManager sessionManager = new SessionManager();
+            server.OnAfterAccept += sessionManager.Login;
+            
+            //server.OnAfterAccept += pool.AddPlayer;
 
             server.Start();
 
@@ -88,6 +91,8 @@ namespace DragonMarble
             
         }
     }
+
+    
 
     internal class GameMasterPool
     {
