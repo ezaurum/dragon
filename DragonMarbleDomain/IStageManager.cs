@@ -12,6 +12,7 @@ namespace DragonMarble
         void Notify(IDragonMarbleGameMessage gameActions);
         void Join(StageUnitInfo player);
         void Ban(StageUnitInfo stageUnitInfo);
+        void StartGame(Guid starterId);
 
         //real time checker
         void ActionResultCopySended();

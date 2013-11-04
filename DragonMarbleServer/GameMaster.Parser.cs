@@ -86,11 +86,19 @@ namespace DragonMarble
         {
             using (var ms = new MemoryStream())
             {
-                var formatter = new BinaryFormatter();
-                formatter.Serialize(ms, gameBoard);
-                ms.Position = 0;
+                try
+                {
+                    var formatter = new BinaryFormatter();
+                    formatter.Serialize(ms, gameBoard);
+                    ms.Position = 0;
 
-                return (GameBoard)formatter.Deserialize(ms);
+                    return (GameBoard) formatter.Deserialize(ms);
+                }
+                catch (Exception e)
+                {
+                    throw e;
+                }
+                
             }
         }
     }

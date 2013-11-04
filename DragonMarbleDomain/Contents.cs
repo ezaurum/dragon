@@ -5,6 +5,7 @@ using DragonMarble.Message;
 
 namespace DragonMarble
 {
+    [Serializable]
     public class StageBuffInfo
     {
         public enum TARGET
