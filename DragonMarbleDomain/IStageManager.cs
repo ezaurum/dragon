@@ -8,6 +8,7 @@ namespace DragonMarble
     {
         Guid Id { get; set; }
         List<StageUnitInfo> Units { get; set; }
+        Dictionary<Int32, StageChanceCardInfo> Cards { get; set; }
         void Notify(IDragonMarbleGameMessage gameActions);
         void Join(StageUnitInfo player);
         void Ban(StageUnitInfo stageUnitInfo);

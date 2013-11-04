@@ -37,6 +37,8 @@ namespace DragonMarble
             _state = GameState.JustMade;
             Id = Guid.NewGuid();
             Units = new List<StageUnitInfo>();
+            Cards = new Dictionary<int, StageChanceCardInfo>();
+            ChanceCardList.ForEach(c => Cards.Add(c.classId,c));
         }
         
         public static GameBoard OriginalBoard { get; set; }
@@ -74,5 +76,7 @@ namespace DragonMarble
             }
             set { _gameContinue = value; }
         }
+
+        public Dictionary<int, StageChanceCardInfo> Cards { get; set; }
     }
 }
