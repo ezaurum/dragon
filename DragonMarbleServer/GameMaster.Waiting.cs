@@ -10,7 +10,7 @@ namespace DragonMarble
         public void StartGame(Guid owner)
         {
             if (IsStartable
-                && Units.Any(p => p.Id == owner) 
+                && Units.Values.Any(p => p.Id == owner) 
                 )
             {
                 Task.Factory.StartNew(StartGame);
@@ -22,7 +22,7 @@ namespace DragonMarble
             get
             {
                 return Units.Count == PlayerNumberForPlay
-                       && Units.All(p => p.IsReady);
+                       && Units.Values.All(p => p.IsReady);
             }
         }
 
@@ -53,16 +53,16 @@ namespace DragonMarble
                 player.IsRoomOwner = true;
             }
 
-            Units.Add(player);
+            Units.Add(player.Id, player);
             
             Notify(new RoomOwnerGameMessage()
             {
-                RoomOwner = Units[0].Id
+                RoomOwner = Units.Values.ToArray()[0].Id
             });
 
             Notify(new InitializeWaitingRoomGameMessage
             {
-                Units = Units,
+                Units = Units.Values.ToList(),
                 BoardType = 0,
                 CurrentNumberOfPlayers = (short)Units.Count,
                 NumberOfPlayers = PlayerNumberForPlay
@@ -81,20 +81,20 @@ namespace DragonMarble
             };
             Notify(message);
 
-            Units.Remove(player);
+            Units.Remove(player.Id);
 
             if (player.IsRoomOwner)
             {
-                Units[0].IsRoomOwner = true;
+                Units.Values.ToArray()[0].IsRoomOwner = true;
                 Notify(new RoomOwnerGameMessage()
                 {
-                    RoomOwner = Units[0].Id
+                    RoomOwner = Units.Values.ToArray()[0].Id
                 });
             }
 
             Notify(new InitializeWaitingRoomGameMessage
             {
-                Units = Units,
+                Units = Units.Values.ToList(),
                 BoardType = 0,
                 CurrentNumberOfPlayers = (short)Units.Count,
                 NumberOfPlayers = PlayerNumberForPlay
