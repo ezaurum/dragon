@@ -49,6 +49,7 @@ InitializeGame :
               length : 16
               options : [byte_param_constructor, to_byte_array]
 
+# game play actions
 RollMoveDice :
     comment : 클라이언트에서 이동 주사위 굴리기
     fields :
@@ -377,6 +378,8 @@ GameResult :
 ActionResultCopy :
   comment : Client received Player's action result signal
 
+# in waiting room actions
+
 ReadyState :
   comment : Indicate Ready or not for game Start
   fields :
@@ -401,14 +404,6 @@ EveryoneIsReady :
     - name : ResponseLimit
       type : Int32
 
-BuyItemInGame :
-  comment : Buy a game item in waiting room or game playing
-  fields :
-    - name : ItemId
-      type : Guid
-      length : 16
-      options : [byte_param_constructor, to_byte_array, property]
-
 ExitWaitingRoom :
   comment : Exit waiting room
   fields :
@@ -421,7 +416,8 @@ InitializeWaitingRoom :
     comment : 게임 대기방 초기화 정보
     fields :
         - name : BoardType
-          type : Int16
+          cast : Int16
+          type : GameBoard.BoardType
         - type : Int16
           name : NumberOfPlayers
         - type : Int16
@@ -443,6 +439,37 @@ InitializeWaitingRoom :
             - name : IsReady
               type : Boolean
 
+MakeNewGameRoom :
+    comment : 게임 대기방 새로 생성
+    fields :
+        - name : BoardType
+          cast : Int16
+          type : GameBoard.BoardType
+        - type : Int16
+          name : NumberOfPlayers
+        - type : Int16
+          name : CurrentNumberOfPlayers
+
+JoinToRandomGameRoom :
+  comment : 무작위 게임 방 참가
+  fields :
+    - name : BoardType
+      cast : Int16
+      type : GameBoard.BoardType
+    - name : NumberOfPlayers
+      type : Int16
+    - name : PlayType
+      cast : Char
+      type : GamePlayType
+
+JoinToSpecificGameRoom :
+  comment : 지정 게임 방 참가
+  fields :
+    - type : Guid
+      name : GameRoomId
+      length : 16
+      options : [byte_param_constructor, to_byte_array, property]
+
 NewPlayerJoin :
   comment : 게임 대기방 추가 정보
   fields :
@@ -453,6 +480,10 @@ NewPlayerJoin :
 
 StartGame :
   comment : start game      
+
+# in waiting room actions ends.
+
+#session actions
 
 Session :
   comment : 세션 키 발급/조회
@@ -470,3 +501,13 @@ Session :
       length : 16
       options : [byte_param_constructor, to_byte_array, property]
 
+
+#shop actions
+
+BuyItemInGame :
+  comment : Buy a game item in waiting room or game playing
+  fields :
+    - name : ItemId
+      type : Guid
+      length : 16
+      options : [byte_param_constructor, to_byte_array, property]
