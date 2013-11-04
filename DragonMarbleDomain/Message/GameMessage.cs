@@ -1909,6 +1909,7 @@ public class SessionGameMessage : IDragonMarbleGameMessage
 {
 	public GameMessageType MessageType {get{return GameMessageType.Session;}}
 	public Guid SessionKey { get; set;}
+	public Guid GameRoomId { get; set;}
 	public Guid GameAccountId { get; set;}
 
 	public byte[] ToByteArray()
@@ -1924,6 +1925,9 @@ public class SessionGameMessage : IDragonMarbleGameMessage
 		SessionKey.ToByteArray()
 		.CopyTo(bytes,index);
 		index += 16;
+		GameRoomId.ToByteArray()
+		.CopyTo(bytes,index);
+		index += 16;
 		GameAccountId.ToByteArray()
 		.CopyTo(bytes,index);
 		index += 16;
@@ -1937,6 +1941,10 @@ public void FromByteArray(byte[] bytes)
 		Buffer.BlockCopy(bytes, index, tempSessionKey, 0,16);
 		SessionKey = new Guid(tempSessionKey);
 		index += 16;
+		byte[] tempGameRoomId = new byte[16];
+		Buffer.BlockCopy(bytes, index, tempGameRoomId, 0,16);
+		GameRoomId = new Guid(tempGameRoomId);
+		index += 16;
 		byte[] tempGameAccountId = new byte[16];
 		Buffer.BlockCopy(bytes, index, tempGameAccountId, 0,16);
 		GameAccountId = new Guid(tempGameAccountId);
@@ -1947,7 +1955,7 @@ public void FromByteArray(byte[] bytes)
 	{
 		get
 		{
-			return (Int16)(2+sizeof(GameMessageType)+16+16);
+			return (Int16)(2+sizeof(GameMessageType)+16+16+16);
 		}
 	}
 }

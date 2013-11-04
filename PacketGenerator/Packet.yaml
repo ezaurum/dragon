@@ -462,6 +462,11 @@ Session :
       length : 16
       options : [byte_param_constructor, to_byte_array, property]
     - type : Guid
+      name : GameRoomId
+      length : 16
+      options : [byte_param_constructor, to_byte_array, property]
+    - type : Guid
       name : GameAccountId
       length : 16
       options : [byte_param_constructor, to_byte_array, property]
+
