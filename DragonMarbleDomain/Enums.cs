@@ -33,10 +33,10 @@
 
     public enum GamePlayType
     {
-        TeamPlay,
-        Individual2PlayerPlay,
-        Individual3PlayerPlay,
-        Individual4PlayerPlay,
-        Random
+        TeamPlay = 0,
+        Random = 1,
+        Individual2PlayerPlay = 2,
+        Individual3PlayerPlay = 3,
+        Individual4PlayerPlay = 4,
     }
 }

@@ -18,6 +18,7 @@ namespace ConsoleTest
 
         private static void Main(string[] args)
         {
+
             OrderCardSelectState = new List<bool>();
             _units = new Dictionary<Guid, StageUnitInfo>();
 
