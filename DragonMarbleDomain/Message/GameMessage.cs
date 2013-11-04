@@ -41,6 +41,7 @@ public enum GameMessageType
 	RollMoveDiceResult,
 	RoomOwner,
 	SellLands,
+	Session,
 	StartGame,
 	Takeover,
 	TakeoverRequest,
@@ -166,6 +167,9 @@ public static class GameMessageFactory
 		break;
 		case GameMessageType.SellLands:
 		message = new SellLandsGameMessage();
+		break;
+		case GameMessageType.Session:
+		message = new SessionGameMessage();
 		break;
 		case GameMessageType.StartGame:
 		message = new StartGameGameMessage();
@@ -1896,6 +1900,54 @@ public void FromByteArray(byte[] bytes)
 		get
 		{
 			return (Int16)(2+sizeof(GameMessageType)+sizeof(Char)+LandCount*(sizeof(Char))+16);
+		}
+	}
+}
+
+// 세션 키 발급/조회	
+public class SessionGameMessage : IDragonMarbleGameMessage	
+{
+	public GameMessageType MessageType {get{return GameMessageType.Session;}}
+	public Guid SessionKey { get; set;}
+	public Guid GameAccountId { get; set;}
+
+	public byte[] ToByteArray()
+	{
+		byte[] bytes = new byte[Length];
+		int index = 0;
+		BitConverter.GetBytes(Length)
+		.CopyTo(bytes,index);
+		index += sizeof(Int16);
+		BitConverter.GetBytes((Int32)MessageType)
+		.CopyTo(bytes,index);
+		index += sizeof(GameMessageType);
+		SessionKey.ToByteArray()
+		.CopyTo(bytes,index);
+		index += 16;
+		GameAccountId.ToByteArray()
+		.CopyTo(bytes,index);
+		index += 16;
+	return bytes;
+}
+
+public void FromByteArray(byte[] bytes)
+{
+		int index = 6;
+		byte[] tempSessionKey = new byte[16];
+		Buffer.BlockCopy(bytes, index, tempSessionKey, 0,16);
+		SessionKey = new Guid(tempSessionKey);
+		index += 16;
+		byte[] tempGameAccountId = new byte[16];
+		Buffer.BlockCopy(bytes, index, tempGameAccountId, 0,16);
+		GameAccountId = new Guid(tempGameAccountId);
+		index += 16;
+}
+
+	public Int16 Length
+	{
+		get
+		{
+			return (Int16)(2+sizeof(GameMessageType)+16+16);
 		}
 	}
 }
