@@ -7,6 +7,12 @@ namespace DragonMarble
     [Serializable]
     public class GameBoard
     {
+        public enum BoardType
+        {
+            DragonNest,
+            Classic
+        }
+
         //public const int IndexOfPrison = 8;
 
         public const int SALARY = 200000;
