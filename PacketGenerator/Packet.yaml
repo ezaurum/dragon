@@ -345,22 +345,46 @@ SellLands :
       length : 16
       options : [byte_param_constructor, to_byte_array, property]
 
+GambleRequest :
+  comment : gamble request
+  fields :
+    - name : CardList
+      type : Char
+      collection : List
+      size : StageGambleInfo.BASIC_SHOW_COUNT
+    - name : Actor
+      type : Guid
+      length : 16
+      options : [byte_param_constructor, to_byte_array, property]
+
 GambleBatting :
   comment : batting
   fields :
-    - name : BattingPrice
+    - name : BattingIndex
       type : Char
+    - name : Actor
+      type : Guid
+      length : 16
+      options : [byte_param_constructor, to_byte_array, property]
 
 GambleChoice :
   comment : choice
   fields :
     - name : Choice
       type : Char
+    - name : Actor
+      type : Guid
+      length : 16
+      options : [byte_param_constructor, to_byte_array, property]
 
 GambleResult :
   comment : gamble result
   fields :
+    - name : Choice
+      type : Char
     - name : WinCount
+      type : Char
+    - name : Card
       type : Char
     - name : Actor
       type : Guid
