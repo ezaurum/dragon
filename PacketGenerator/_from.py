@@ -31,8 +31,12 @@ def bit_convert_to(field_name, field_type, cast_type, options, length):
 		result += '\n\t\tBuffer.BlockCopy(bytes, index, temp%s, 0,%s);'%(field_name_no_dot, length)
 		result += '\n\t\t%s = new %s(temp%s);'%(field_name, field_type,field_name_no_dot)
 	else:
-		if cast_type is None:
-			result += '\n\t\t%s = BitConverter.To%s(bytes, index);'%(field_name, field_type)
+		if field_type == 'Byte' or field_type == 'byte':			
+			result += '\n\t\t%s = bytes[index];'%(field_name)
+		elif cast_type == 'Byte' or cast_type == 'byte':			
+			result += '\n\t\t%s = (%s)bytes[index];'%(field_name, field_type)
+		elif cast_type is None:
+			result += '\n\t\t%s = BitConverter.To%s(bytes, index);'%(field_name, field_type)		
 		else:
 			result += '\n\t\t%s = (%s)BitConverter.To%s(bytes, index);'%(field_name, field_type, cast_type)
 	

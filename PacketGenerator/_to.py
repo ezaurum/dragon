@@ -1,6 +1,6 @@
 # ToByteArray method implementation	
 def convert_to_bit(target, length, cast):
-	result = ''
+	result = ''	
 	if cast is not None:
 		result += '\n\t\tBitConverter.GetBytes((%s)%s)'%(cast,target)
 	else:
@@ -40,6 +40,13 @@ def inner_make(prefix, fields):
 		if prefix is None:
 			prefix = ''
 		field_name = prefix+field['name']
+
+		if field['type'] == 'byte' or field['type'] == 'Byte':
+			result += '\n\t\tbytes[index] = %s;\n\t\tindex++;'%(field_name)
+		elif cast == 'byte' or cast == 'Byte':
+			result += '\n\t\tbytes[index] = (Byte)%s;\n\t\tindex++;'%(field_name)
+		continue
+
 		if 'collection' in field:
 			if 'size' not in field:
 				print('Collection of %s, %s is not have size.'%(field['type'],field_name))
