@@ -43,9 +43,10 @@ def inner_make(prefix, fields):
 
 		if field['type'] == 'byte' or field['type'] == 'Byte':
 			result += '\n\t\tbytes[index] = %s;\n\t\tindex++;'%(field_name)
+			continue
 		elif cast == 'byte' or cast == 'Byte':
 			result += '\n\t\tbytes[index] = (Byte)%s;\n\t\tindex++;'%(field_name)
-		continue
+			continue
 
 		if 'collection' in field:
 			if 'size' not in field:
