@@ -31,6 +31,10 @@
         MonopolyLine
     }
 
+    /// <summary>
+    /// in message, cast into byte.
+    /// cannot set under 0.
+    /// </summary>
     public enum GamePlayType
     {
         TeamPlay = 0,

@@ -1,5 +1,6 @@
 ﻿using System;
 using Dragon.Client;
+using DragonMarble;
 using DragonMarble.Message;
 
 namespace ConsoleTest
@@ -24,6 +25,16 @@ namespace ConsoleTest
                 {
                     SessionKey = Guid.NewGuid()
                 });
+                return false;
+            }
+            
+            if (readLine.Contains("c") || readLine.Contains("C"))
+            {
+                nm.SendMessage((new MakeNewGameRoomGameMessage
+                {
+                    BoardType = GameBoard.BoardType.DragonNest,
+                    PlayType = GamePlayType.Individual2PlayerPlay
+                }));
                 return false;
             }
 

@@ -51,6 +51,7 @@
     <Compile Include="GameMaster.Parser.cs" />
     <Compile Include="GameMaster.RealTime.cs" />
     <Compile Include="GameMaster.Waiting.cs" />
+    <Compile Include="Interface1.cs" />
     <Compile Include="Raja.cs" />
     <Compile Include="Raja.Message.cs" />
     <Compile Include="GameMaster.cs" />

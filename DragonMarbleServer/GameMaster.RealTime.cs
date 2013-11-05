@@ -81,5 +81,8 @@ namespace DragonMarble
                 _receiveMessageWaitHandler.Set();
             }
         }
+
+        //TODO remove
+        public static GameMaster Temp { get; set; }
     }
 }

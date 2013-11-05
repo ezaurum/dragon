@@ -8,6 +8,27 @@ namespace DragonMarble
 {
     public partial class GameMaster
     {
+        public GameMaster(GameBoard.BoardType boardType, GamePlayType gamePlayType)
+        {
+            BoardType = boardType;
+            GamePlayType = gamePlayType;
+            if (GamePlayType.TeamPlay == gamePlayType)
+            {
+                PlayerNumberForPlay = 4;
+            }
+            else
+            {
+                PlayerNumberForPlay = (short) gamePlayType;
+            }
+
+
+            _state = GameState.JustMade;
+            Id = Guid.NewGuid();
+            Units = new Dictionary<Guid, StageUnitInfo>();
+            Cards = new Dictionary<int, StageChanceCardInfo>();
+            ChanceCardList.ForEach(c => Cards.Add(c.classId, c));
+        }
+        
         public void StartGame()
         {
             InitGame();

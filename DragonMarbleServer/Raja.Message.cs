@@ -78,6 +78,50 @@ namespace DragonMarble
                 ResetTimer();
                 switch (value.MessageType)
                 {
+                    case GameMessageType.MakeNewGameRoom:
+                        MakeNewGameRoomGameMessage mngrgm = (MakeNewGameRoomGameMessage)value;
+
+                        GameBoard.BoardType mngrgmBoardType = mngrgm.BoardType;
+                        GamePlayType mngrgmGamePlayType = mngrgm.PlayType;
+
+                        //TODO Unit
+                        Unit = new StageUnitInfo
+                        {
+                            Id = Guid.NewGuid(),
+                            Order = 0,
+                            UnitColor = StageUnitInfo.UNIT_COLOR.BLUE,
+                            CharacterId = 1,
+                            Gold = 2000000
+                        };
+
+                        GameMaster gm = new GameMaster(mngrgmBoardType, mngrgmGamePlayType);
+                        gm.Join(Unit);
+
+                        GameMaster.Temp = gm;
+                        break;
+                    case GameMessageType.JoinToRandomGameRoom:
+                        JoinToRandomGameRoomGameMessage joinToRandomGameRoomGameMessage = (JoinToRandomGameRoomGameMessage) value;
+
+                        GameBoard.BoardType boardType = joinToRandomGameRoomGameMessage.BoardType;
+                        GamePlayType gamePlayType = joinToRandomGameRoomGameMessage.PlayType;
+
+                        //TODO Unit
+                        Unit = new StageUnitInfo
+                        {
+                            Id = Guid.NewGuid(),
+                            Order = 0,
+                            UnitColor = StageUnitInfo.UNIT_COLOR.BLUE,
+                            CharacterId = 1,
+                            Gold = 2000000
+                        };
+
+                        GameMaster gameMaster = new GameMaster(boardType, gamePlayType);
+                        gameMaster.Join(Unit);
+
+                        GameMaster.Temp = gameMaster;
+                        break;
+
+                    //in waiting room
                     case GameMessageType.ReadyState :
                         ReadyStateGameMessage readyStateGameMessage = (ReadyStateGameMessage)value;
                         if (Unit.Id == readyStateGameMessage.Actor)
@@ -90,20 +134,29 @@ namespace DragonMarble
                             });
                         }
                         break;
+                        
+                    //start game
                     case GameMessageType.StartGame:
                         if (Unit.IsRoomOwner)
                         {
                             ((GameMaster)Unit.StageManager).StartGame(Unit.Id);
                         }
                         break;
+
+                        //ordering
                     case GameMessageType.OrderCardSelect:
                         Unit.SelectOrderCard(value);
                         Logger.DebugFormat("received {0}, real time.", value.MessageType);
                         break;
+
+
+                        // in game play
                     case GameMessageType.ActionResultCopy:
                         Logger.DebugFormat("received {0}, real time.", value.MessageType);
                         Unit.IsActionResultCopySended = true;
                         break;
+
+
                     default:
                         _receivedMessages.Enqueue(value);
                         _receiveMessageWaitHandler.Set();

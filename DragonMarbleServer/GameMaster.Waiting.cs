@@ -7,6 +7,8 @@ namespace DragonMarble
 {
     public partial class GameMaster
     {
+        public bool IsPublicGame { get; set; }
+
         public void StartGame(Guid owner)
         {
             if (IsStartable
