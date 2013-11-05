@@ -398,6 +398,9 @@ GameResult :
     - name : WinTeam
       cast : Int32
       type : StageUnitInfo.TEAM_GROUP
+    - name : WinType
+      cast : Int32
+      type : WinConditionType
 
 ActionResultCopy :
   comment : Client received Player's action result signal

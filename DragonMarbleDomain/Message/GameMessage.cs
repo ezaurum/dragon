@@ -967,6 +967,7 @@ public class GameResultGameMessage : IDragonMarbleGameMessage
 {
 	public GameMessageType MessageType {get{return GameMessageType.GameResult;}}
 	public StageUnitInfo.TEAM_GROUP WinTeam;
+	public WinConditionType WinType;
 
 	public byte[] ToByteArray()
 	{
@@ -981,6 +982,9 @@ public class GameResultGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes((Int32)WinTeam)
 		.CopyTo(bytes,index);
 		index += sizeof(StageUnitInfo.TEAM_GROUP);
+		BitConverter.GetBytes((Int32)WinType)
+		.CopyTo(bytes,index);
+		index += sizeof(WinConditionType);
 	return bytes;
 }
 
@@ -989,13 +993,15 @@ public void FromByteArray(byte[] bytes)
 		int index = 6;
 		WinTeam = (StageUnitInfo.TEAM_GROUP)BitConverter.ToInt32(bytes, index);
 		index += sizeof(StageUnitInfo.TEAM_GROUP);
+		WinType = (WinConditionType)BitConverter.ToInt32(bytes, index);
+		index += sizeof(WinConditionType);
 }
 
 	public Int16 Length
 	{
 		get
 		{
-			return (Int16)(2+sizeof(GameMessageType)+sizeof(StageUnitInfo.TEAM_GROUP));
+			return (Int16)(2+sizeof(GameMessageType)+sizeof(StageUnitInfo.TEAM_GROUP)+sizeof(WinConditionType));
 		}
 	}
 }
