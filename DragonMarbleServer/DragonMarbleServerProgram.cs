@@ -105,7 +105,7 @@ namespace DragonMarble
 
     internal class GameMasterPool
     {
-        GameMaster gm = new GameMaster(GameBoard.BoardType.DragonNest, GamePlayType.Individual2PlayerPlay);
+        GameMaster gm = new GameMaster(0, GamePlayType.Individual2PlayerPlay);
 
         public GameMaster GetGameMaster()
         {

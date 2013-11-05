@@ -229,9 +229,6 @@ public class ActionResultCopyGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes(Length)
 		.CopyTo(bytes,index);
 		index += sizeof(Int16);
-		BitConverter.GetBytes((Int32)MessageType)
-		.CopyTo(bytes,index);
-		index += sizeof(GameMessageType);
 	return bytes;
 }
 
@@ -263,15 +260,6 @@ public class ActivateTurnGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes(Length)
 		.CopyTo(bytes,index);
 		index += sizeof(Int16);
-		BitConverter.GetBytes((Int32)MessageType)
-		.CopyTo(bytes,index);
-		index += sizeof(GameMessageType);
-		TurnOwner.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
-		BitConverter.GetBytes(ResponseLimit)
-		.CopyTo(bytes,index);
-		index += sizeof(Int32);
 	return bytes;
 }
 
@@ -308,12 +296,6 @@ public class AssignRoomOwnerGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes(Length)
 		.CopyTo(bytes,index);
 		index += sizeof(Int16);
-		BitConverter.GetBytes((Int32)MessageType)
-		.CopyTo(bytes,index);
-		index += sizeof(GameMessageType);
-		RoomOwner.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
 	return bytes;
 }
 
@@ -348,12 +330,6 @@ public class AssignWaitingRoomGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes(Length)
 		.CopyTo(bytes,index);
 		index += sizeof(Int16);
-		BitConverter.GetBytes((Int32)MessageType)
-		.CopyTo(bytes,index);
-		index += sizeof(GameMessageType);
-		RoomOwner.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
 	return bytes;
 }
 
@@ -388,12 +364,6 @@ public class BankruptGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes(Length)
 		.CopyTo(bytes,index);
 		index += sizeof(Int16);
-		BitConverter.GetBytes((Int32)MessageType)
-		.CopyTo(bytes,index);
-		index += sizeof(GameMessageType);
-		Actor.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
 	return bytes;
 }
 
@@ -428,12 +398,6 @@ public class BuyItemInGameGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes(Length)
 		.CopyTo(bytes,index);
 		index += sizeof(Int16);
-		BitConverter.GetBytes((Int32)MessageType)
-		.CopyTo(bytes,index);
-		index += sizeof(GameMessageType);
-		ItemId.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
 	return bytes;
 }
 
@@ -470,18 +434,6 @@ public class BuyLandGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes(Length)
 		.CopyTo(bytes,index);
 		index += sizeof(Int16);
-		BitConverter.GetBytes((Int32)MessageType)
-		.CopyTo(bytes,index);
-		index += sizeof(GameMessageType);
-		BitConverter.GetBytes(TileIndex)
-		.CopyTo(bytes,index);
-		index += sizeof(Char);
-		BitConverter.GetBytes(Buildings)
-		.CopyTo(bytes,index);
-		index += sizeof(Char);
-		Actor.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
 	return bytes;
 }
 
@@ -521,15 +473,6 @@ public class BuyLandRequestGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes(Length)
 		.CopyTo(bytes,index);
 		index += sizeof(Int16);
-		BitConverter.GetBytes((Int32)MessageType)
-		.CopyTo(bytes,index);
-		index += sizeof(GameMessageType);
-		BitConverter.GetBytes(ResponseLimit)
-		.CopyTo(bytes,index);
-		index += sizeof(Int32);
-		Actor.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
 	return bytes;
 }
 
@@ -568,18 +511,6 @@ public class ChanceCardBuffGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes(Length)
 		.CopyTo(bytes,index);
 		index += sizeof(Int16);
-		BitConverter.GetBytes((Int32)MessageType)
-		.CopyTo(bytes,index);
-		index += sizeof(GameMessageType);
-		BitConverter.GetBytes(CardId)
-		.CopyTo(bytes,index);
-		index += sizeof(Char);
-		BitConverter.GetBytes(SelectTile)
-		.CopyTo(bytes,index);
-		index += sizeof(Char);
-		Actor.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
 	return bytes;
 }
 
@@ -620,18 +551,6 @@ public class ChanceCardCouponGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes(Length)
 		.CopyTo(bytes,index);
 		index += sizeof(Int16);
-		BitConverter.GetBytes((Int32)MessageType)
-		.CopyTo(bytes,index);
-		index += sizeof(GameMessageType);
-		BitConverter.GetBytes(CardId)
-		.CopyTo(bytes,index);
-		index += sizeof(Char);
-		BitConverter.GetBytes(Save)
-		.CopyTo(bytes,index);
-		index += sizeof(Boolean);
-		Actor.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
 	return bytes;
 }
 
@@ -671,15 +590,6 @@ public class ChanceCardGoToGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes(Length)
 		.CopyTo(bytes,index);
 		index += sizeof(Int16);
-		BitConverter.GetBytes((Int32)MessageType)
-		.CopyTo(bytes,index);
-		index += sizeof(GameMessageType);
-		BitConverter.GetBytes(CardId)
-		.CopyTo(bytes,index);
-		index += sizeof(Char);
-		Actor.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
 	return bytes;
 }
 
@@ -720,24 +630,6 @@ public class ChanceCardOrderGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes(Length)
 		.CopyTo(bytes,index);
 		index += sizeof(Int16);
-		BitConverter.GetBytes((Int32)MessageType)
-		.CopyTo(bytes,index);
-		index += sizeof(GameMessageType);
-		BitConverter.GetBytes(CardId)
-		.CopyTo(bytes,index);
-		index += sizeof(Char);
-		BitConverter.GetBytes(Value1)
-		.CopyTo(bytes,index);
-		index += sizeof(Char);
-		BitConverter.GetBytes(Value2)
-		.CopyTo(bytes,index);
-		index += sizeof(Char);
-		Actor.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
-		Target.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
 	return bytes;
 }
 
@@ -782,12 +674,6 @@ public class EveryoneIsReadyGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes(Length)
 		.CopyTo(bytes,index);
 		index += sizeof(Int16);
-		BitConverter.GetBytes((Int32)MessageType)
-		.CopyTo(bytes,index);
-		index += sizeof(GameMessageType);
-		BitConverter.GetBytes(ResponseLimit)
-		.CopyTo(bytes,index);
-		index += sizeof(Int32);
 	return bytes;
 }
 
@@ -820,12 +706,6 @@ public class ExitWaitingRoomGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes(Length)
 		.CopyTo(bytes,index);
 		index += sizeof(Int16);
-		BitConverter.GetBytes((Int32)MessageType)
-		.CopyTo(bytes,index);
-		index += sizeof(GameMessageType);
-		Actor.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
 	return bytes;
 }
 
@@ -861,15 +741,6 @@ public class GambleBattingGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes(Length)
 		.CopyTo(bytes,index);
 		index += sizeof(Int16);
-		BitConverter.GetBytes((Int32)MessageType)
-		.CopyTo(bytes,index);
-		index += sizeof(GameMessageType);
-		BitConverter.GetBytes(BattingIndex)
-		.CopyTo(bytes,index);
-		index += sizeof(Char);
-		Actor.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
 	return bytes;
 }
 
@@ -907,15 +778,6 @@ public class GambleChoiceGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes(Length)
 		.CopyTo(bytes,index);
 		index += sizeof(Int16);
-		BitConverter.GetBytes((Int32)MessageType)
-		.CopyTo(bytes,index);
-		index += sizeof(GameMessageType);
-		BitConverter.GetBytes(Choice)
-		.CopyTo(bytes,index);
-		index += sizeof(Char);
-		Actor.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
 	return bytes;
 }
 
@@ -953,18 +815,6 @@ public class GambleRequestGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes(Length)
 		.CopyTo(bytes,index);
 		index += sizeof(Int16);
-		BitConverter.GetBytes((Int32)MessageType)
-		.CopyTo(bytes,index);
-		index += sizeof(GameMessageType);
-	for (int i = 0; i < StageGambleInfo.BASIC_SHOW_COUNT ; i++ )
-	{
-		BitConverter.GetBytes(CardList[i])
-		.CopyTo(bytes,index);
-		index += sizeof(Char);
-	}
-		Actor.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
 	return bytes;
 }
 
@@ -1008,21 +858,6 @@ public class GambleResultGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes(Length)
 		.CopyTo(bytes,index);
 		index += sizeof(Int16);
-		BitConverter.GetBytes((Int32)MessageType)
-		.CopyTo(bytes,index);
-		index += sizeof(GameMessageType);
-		BitConverter.GetBytes(Choice)
-		.CopyTo(bytes,index);
-		index += sizeof(Char);
-		BitConverter.GetBytes(WinCount)
-		.CopyTo(bytes,index);
-		index += sizeof(Char);
-		BitConverter.GetBytes(Card)
-		.CopyTo(bytes,index);
-		index += sizeof(Char);
-		Actor.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
 	return bytes;
 }
 
@@ -1064,15 +899,6 @@ public class GameResultGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes(Length)
 		.CopyTo(bytes,index);
 		index += sizeof(Int16);
-		BitConverter.GetBytes((Int32)MessageType)
-		.CopyTo(bytes,index);
-		index += sizeof(GameMessageType);
-		BitConverter.GetBytes((Int32)WinTeam)
-		.CopyTo(bytes,index);
-		index += sizeof(StageUnitInfo.TEAM_GROUP);
-		BitConverter.GetBytes((Int32)WinType)
-		.CopyTo(bytes,index);
-		index += sizeof(WinConditionType);
 	return bytes;
 }
 
@@ -1107,12 +933,6 @@ public class GoToWaitingRoomGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes(Length)
 		.CopyTo(bytes,index);
 		index += sizeof(Int16);
-		BitConverter.GetBytes((Int32)MessageType)
-		.CopyTo(bytes,index);
-		index += sizeof(GameMessageType);
-		GameRoomId.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
 	return bytes;
 }
 
@@ -1149,45 +969,6 @@ public class InitializeGameGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes(Length)
 		.CopyTo(bytes,index);
 		index += sizeof(Int16);
-		BitConverter.GetBytes((Int32)MessageType)
-		.CopyTo(bytes,index);
-		index += sizeof(GameMessageType);
-		BitConverter.GetBytes(FeeBoostedTiles[0])
-		.CopyTo(bytes,index);
-		index += sizeof(Int16);
-		BitConverter.GetBytes(FeeBoostedTiles[1])
-		.CopyTo(bytes,index);
-		index += sizeof(Int16);
-		BitConverter.GetBytes(FeeBoostedTiles[2])
-		.CopyTo(bytes,index);
-		index += sizeof(Int16);
-		BitConverter.GetBytes(FeeBoostedTiles[3])
-		.CopyTo(bytes,index);
-		index += sizeof(Int16);
-		BitConverter.GetBytes(NumberOfPlayers)
-		.CopyTo(bytes,index);
-		index += sizeof(Int16);
-	for (int i = 0; i < NumberOfPlayers ; i++ )
-	{
-		BitConverter.GetBytes(Units[i].gold)
-		.CopyTo(bytes,index);
-		index += sizeof(Int64);
-		BitConverter.GetBytes(Units[i].Order)
-		.CopyTo(bytes,index);
-		index += sizeof(Int32);
-		BitConverter.GetBytes((Int32)Units[i].unitColor)
-		.CopyTo(bytes,index);
-		index += sizeof(StageUnitInfo.UNIT_COLOR);
-		BitConverter.GetBytes((Int32)Units[i].teamGroup)
-		.CopyTo(bytes,index);
-		index += sizeof(StageUnitInfo.TEAM_GROUP);
-		BitConverter.GetBytes((Int32)Units[i].ControlMode)
-		.CopyTo(bytes,index);
-		index += sizeof(StageUnitInfo.ControlModeType);
-		Units[i].Id.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
-	}
 	return bytes;
 }
 
@@ -1250,15 +1031,6 @@ public class InitializePlayerGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes(Length)
 		.CopyTo(bytes,index);
 		index += sizeof(Int16);
-		BitConverter.GetBytes((Int32)MessageType)
-		.CopyTo(bytes,index);
-		index += sizeof(GameMessageType);
-		Server.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
-		PlayerId.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
 	return bytes;
 }
 
@@ -1298,15 +1070,6 @@ public class LoanMoneyGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes(Length)
 		.CopyTo(bytes,index);
 		index += sizeof(Int16);
-		BitConverter.GetBytes((Int32)MessageType)
-		.CopyTo(bytes,index);
-		index += sizeof(GameMessageType);
-		BitConverter.GetBytes(LoanMoney)
-		.CopyTo(bytes,index);
-		index += sizeof(Int64);
-		Actor.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
 	return bytes;
 }
 
@@ -1344,15 +1107,6 @@ public class NeedMoneyRequestGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes(Length)
 		.CopyTo(bytes,index);
 		index += sizeof(Int16);
-		BitConverter.GetBytes((Int32)MessageType)
-		.CopyTo(bytes,index);
-		index += sizeof(GameMessageType);
-		BitConverter.GetBytes(NeedMoney)
-		.CopyTo(bytes,index);
-		index += sizeof(Int64);
-		Actor.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
 	return bytes;
 }
 
@@ -1389,12 +1143,6 @@ public class NewPlayerInWaitingRoomGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes(Length)
 		.CopyTo(bytes,index);
 		index += sizeof(Int16);
-		BitConverter.GetBytes((Int32)MessageType)
-		.CopyTo(bytes,index);
-		index += sizeof(GameMessageType);
-		PlayerId.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
 	return bytes;
 }
 
@@ -1429,12 +1177,6 @@ public class NothingToDoGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes(Length)
 		.CopyTo(bytes,index);
 		index += sizeof(Int16);
-		BitConverter.GetBytes((Int32)MessageType)
-		.CopyTo(bytes,index);
-		index += sizeof(GameMessageType);
-		Actor.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
 	return bytes;
 }
 
@@ -1470,15 +1212,6 @@ public class OpenChanceCardGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes(Length)
 		.CopyTo(bytes,index);
 		index += sizeof(Int16);
-		BitConverter.GetBytes((Int32)MessageType)
-		.CopyTo(bytes,index);
-		index += sizeof(GameMessageType);
-		BitConverter.GetBytes(CardId)
-		.CopyTo(bytes,index);
-		index += sizeof(Char);
-		Actor.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
 	return bytes;
 }
 
@@ -1516,15 +1249,6 @@ public class OpenOlympicGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes(Length)
 		.CopyTo(bytes,index);
 		index += sizeof(Int16);
-		BitConverter.GetBytes((Int32)MessageType)
-		.CopyTo(bytes,index);
-		index += sizeof(GameMessageType);
-		BitConverter.GetBytes(TileIndex)
-		.CopyTo(bytes,index);
-		index += sizeof(Char);
-		Actor.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
 	return bytes;
 }
 
@@ -1562,15 +1286,6 @@ public class OrderCardResultGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes(Length)
 		.CopyTo(bytes,index);
 		index += sizeof(Int16);
-		BitConverter.GetBytes((Int32)MessageType)
-		.CopyTo(bytes,index);
-		index += sizeof(GameMessageType);
-		BitConverter.GetBytes(FirstCardNumber)
-		.CopyTo(bytes,index);
-		index += sizeof(Int16);
-		FirstPlayerId.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
 	return bytes;
 }
 
@@ -1610,24 +1325,6 @@ public class OrderCardSelectGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes(Length)
 		.CopyTo(bytes,index);
 		index += sizeof(Int16);
-		BitConverter.GetBytes((Int32)MessageType)
-		.CopyTo(bytes,index);
-		index += sizeof(GameMessageType);
-		BitConverter.GetBytes(SelectedCardNumber)
-		.CopyTo(bytes,index);
-		index += sizeof(Int16);
-		BitConverter.GetBytes(NumberOfPlayers)
-		.CopyTo(bytes,index);
-		index += sizeof(Int16);
-	for (int i = 0; i < NumberOfPlayers ; i++ )
-	{
-		BitConverter.GetBytes(OrderCardSelectState[i])
-		.CopyTo(bytes,index);
-		index += sizeof(Boolean);
-	}
-		Actor.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
 	return bytes;
 }
 
@@ -1673,15 +1370,6 @@ public class PayFeeGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes(Length)
 		.CopyTo(bytes,index);
 		index += sizeof(Int16);
-		BitConverter.GetBytes((Int32)MessageType)
-		.CopyTo(bytes,index);
-		index += sizeof(GameMessageType);
-		BitConverter.GetBytes(Fee)
-		.CopyTo(bytes,index);
-		index += sizeof(Int64);
-		Actor.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
 	return bytes;
 }
 
@@ -1719,15 +1407,6 @@ public class PrisonActionGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes(Length)
 		.CopyTo(bytes,index);
 		index += sizeof(Int16);
-		BitConverter.GetBytes((Int32)MessageType)
-		.CopyTo(bytes,index);
-		index += sizeof(GameMessageType);
-		BitConverter.GetBytes(ActionIndex)
-		.CopyTo(bytes,index);
-		index += sizeof(Char);
-		Actor.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
 	return bytes;
 }
 
@@ -1766,18 +1445,6 @@ public class PrisonActionResultGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes(Length)
 		.CopyTo(bytes,index);
 		index += sizeof(Int16);
-		BitConverter.GetBytes((Int32)MessageType)
-		.CopyTo(bytes,index);
-		index += sizeof(GameMessageType);
-		BitConverter.GetBytes(EscapeResult)
-		.CopyTo(bytes,index);
-		index += sizeof(Boolean);
-		BitConverter.GetBytes(EscapeType)
-		.CopyTo(bytes,index);
-		index += sizeof(Char);
-		Actor.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
 	return bytes;
 }
 
@@ -1817,15 +1484,6 @@ public class ReadyStateGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes(Length)
 		.CopyTo(bytes,index);
 		index += sizeof(Int16);
-		BitConverter.GetBytes((Int32)MessageType)
-		.CopyTo(bytes,index);
-		index += sizeof(GameMessageType);
-		Actor.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
-		BitConverter.GetBytes(Ready)
-		.CopyTo(bytes,index);
-		index += sizeof(Boolean);
 	return bytes;
 }
 
@@ -1863,15 +1521,6 @@ public class ReadyStateRequestGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes(Length)
 		.CopyTo(bytes,index);
 		index += sizeof(Int16);
-		BitConverter.GetBytes((Int32)MessageType)
-		.CopyTo(bytes,index);
-		index += sizeof(GameMessageType);
-		Actor.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
-		BitConverter.GetBytes(ResponseLimit)
-		.CopyTo(bytes,index);
-		index += sizeof(Int32);
 	return bytes;
 }
 
@@ -1910,29 +1559,23 @@ public class RequestNewWaitingRoomGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes(Length)
 		.CopyTo(bytes,index);
 		index += sizeof(Int16);
-		BitConverter.GetBytes((Int32)MessageType)
-		.CopyTo(bytes,index);
-		index += sizeof(GameMessageType);
-		BitConverter.GetBytes(BoardType)
-		.CopyTo(bytes,index);
-		index += sizeof(Byte);
-		BitConverter.GetBytes(PlayMode)
-		.CopyTo(bytes,index);
-		index += sizeof(Byte);
-		BitConverter.GetBytes((Byte)PlayType)
-		.CopyTo(bytes,index);
-		index += sizeof(GamePlayType);
+		bytes[index] = BoardType;
+		index++;
+		bytes[index] = PlayMode;
+		index++;
+		bytes[index] = (Byte)PlayType;
+		index++;
 	return bytes;
 }
 
 public void FromByteArray(byte[] bytes)
 {
 		int index = 6;
-		BoardType = BitConverter.ToByte(bytes, index);
+		BoardType = bytes[index];
 		index += sizeof(Byte);
-		PlayMode = BitConverter.ToByte(bytes, index);
+		PlayMode = bytes[index];
 		index += sizeof(Byte);
-		PlayType = (GamePlayType)BitConverter.ToByte(bytes, index);
+		PlayType = (GamePlayType)bytes[index];
 		index += sizeof(GamePlayType);
 }
 
@@ -1960,29 +1603,23 @@ public class RequestRandomWaitingRoomGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes(Length)
 		.CopyTo(bytes,index);
 		index += sizeof(Int16);
-		BitConverter.GetBytes((Int32)MessageType)
-		.CopyTo(bytes,index);
-		index += sizeof(GameMessageType);
-		BitConverter.GetBytes(BoardType)
-		.CopyTo(bytes,index);
-		index += sizeof(Byte);
-		BitConverter.GetBytes(PlayMode)
-		.CopyTo(bytes,index);
-		index += sizeof(Byte);
-		BitConverter.GetBytes((Byte)PlayType)
-		.CopyTo(bytes,index);
-		index += sizeof(GamePlayType);
+		bytes[index] = BoardType;
+		index++;
+		bytes[index] = PlayMode;
+		index++;
+		bytes[index] = (Byte)PlayType;
+		index++;
 	return bytes;
 }
 
 public void FromByteArray(byte[] bytes)
 {
 		int index = 6;
-		BoardType = BitConverter.ToByte(bytes, index);
+		BoardType = bytes[index];
 		index += sizeof(Byte);
-		PlayMode = BitConverter.ToByte(bytes, index);
+		PlayMode = bytes[index];
 		index += sizeof(Byte);
-		PlayType = (GamePlayType)BitConverter.ToByte(bytes, index);
+		PlayType = (GamePlayType)bytes[index];
 		index += sizeof(GamePlayType);
 }
 
@@ -2011,21 +1648,6 @@ public class RollMoveDiceGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes(Length)
 		.CopyTo(bytes,index);
 		index += sizeof(Int16);
-		BitConverter.GetBytes((Int32)MessageType)
-		.CopyTo(bytes,index);
-		index += sizeof(GameMessageType);
-		BitConverter.GetBytes(Pressed)
-		.CopyTo(bytes,index);
-		index += sizeof(Single);
-		BitConverter.GetBytes(Odd)
-		.CopyTo(bytes,index);
-		index += sizeof(Boolean);
-		BitConverter.GetBytes(Even)
-		.CopyTo(bytes,index);
-		index += sizeof(Boolean);
-		Actor.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
 	return bytes;
 }
 
@@ -2067,18 +1689,6 @@ public class RollMoveDiceResultGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes(Length)
 		.CopyTo(bytes,index);
 		index += sizeof(Int16);
-		BitConverter.GetBytes((Int32)MessageType)
-		.CopyTo(bytes,index);
-		index += sizeof(GameMessageType);
-		BitConverter.GetBytes(Dices[0])
-		.CopyTo(bytes,index);
-		index += sizeof(Char);
-		BitConverter.GetBytes(Dices[1])
-		.CopyTo(bytes,index);
-		index += sizeof(Char);
-		Actor.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
 	return bytes;
 }
 
@@ -2120,21 +1730,6 @@ public class SellLandsGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes(Length)
 		.CopyTo(bytes,index);
 		index += sizeof(Int16);
-		BitConverter.GetBytes((Int32)MessageType)
-		.CopyTo(bytes,index);
-		index += sizeof(GameMessageType);
-		BitConverter.GetBytes(LandCount)
-		.CopyTo(bytes,index);
-		index += sizeof(Char);
-	for (int i = 0; i < LandCount ; i++ )
-	{
-		BitConverter.GetBytes(LandList[i])
-		.CopyTo(bytes,index);
-		index += sizeof(Char);
-	}
-		Actor.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
 	return bytes;
 }
 
@@ -2179,18 +1774,6 @@ public class SessionGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes(Length)
 		.CopyTo(bytes,index);
 		index += sizeof(Int16);
-		BitConverter.GetBytes((Int32)MessageType)
-		.CopyTo(bytes,index);
-		index += sizeof(GameMessageType);
-		SessionKey.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
-		GameRoomId.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
-		GameAccountId.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
 	return bytes;
 }
 
@@ -2232,9 +1815,6 @@ public class StartGameGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes(Length)
 		.CopyTo(bytes,index);
 		index += sizeof(Int16);
-		BitConverter.GetBytes((Int32)MessageType)
-		.CopyTo(bytes,index);
-		index += sizeof(GameMessageType);
 	return bytes;
 }
 
@@ -2266,15 +1846,6 @@ public class TakeoverGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes(Length)
 		.CopyTo(bytes,index);
 		index += sizeof(Int16);
-		BitConverter.GetBytes((Int32)MessageType)
-		.CopyTo(bytes,index);
-		index += sizeof(GameMessageType);
-		BitConverter.GetBytes(Takeover)
-		.CopyTo(bytes,index);
-		index += sizeof(Boolean);
-		Actor.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
 	return bytes;
 }
 
@@ -2311,12 +1882,6 @@ public class TakeoverRequestGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes(Length)
 		.CopyTo(bytes,index);
 		index += sizeof(Int16);
-		BitConverter.GetBytes((Int32)MessageType)
-		.CopyTo(bytes,index);
-		index += sizeof(GameMessageType);
-		Actor.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
 	return bytes;
 }
 
@@ -2352,15 +1917,6 @@ public class TravelActionGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes(Length)
 		.CopyTo(bytes,index);
 		index += sizeof(Int16);
-		BitConverter.GetBytes((Int32)MessageType)
-		.CopyTo(bytes,index);
-		index += sizeof(GameMessageType);
-		BitConverter.GetBytes(TileIndex)
-		.CopyTo(bytes,index);
-		index += sizeof(Char);
-		Actor.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
 	return bytes;
 }
 
@@ -2398,15 +1954,6 @@ public class UseCouponGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes(Length)
 		.CopyTo(bytes,index);
 		index += sizeof(Int16);
-		BitConverter.GetBytes((Int32)MessageType)
-		.CopyTo(bytes,index);
-		index += sizeof(GameMessageType);
-		BitConverter.GetBytes(Use)
-		.CopyTo(bytes,index);
-		index += sizeof(Boolean);
-		Actor.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
 	return bytes;
 }
 
@@ -2443,12 +1990,6 @@ public class UseCouponRequestGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes(Length)
 		.CopyTo(bytes,index);
 		index += sizeof(Int16);
-		BitConverter.GetBytes((Int32)MessageType)
-		.CopyTo(bytes,index);
-		index += sizeof(GameMessageType);
-		Actor.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
 	return bytes;
 }
 
@@ -2489,50 +2030,23 @@ public class WaitingRoomInfoGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes(Length)
 		.CopyTo(bytes,index);
 		index += sizeof(Int16);
-		BitConverter.GetBytes((Int32)MessageType)
-		.CopyTo(bytes,index);
-		index += sizeof(GameMessageType);
-		BitConverter.GetBytes(BoardType)
-		.CopyTo(bytes,index);
-		index += sizeof(Byte);
-		BitConverter.GetBytes(PlayMode)
-		.CopyTo(bytes,index);
-		index += sizeof(Byte);
-		BitConverter.GetBytes((Byte)PlayType)
-		.CopyTo(bytes,index);
-		index += sizeof(GamePlayType);
-		BitConverter.GetBytes(NumberOfPlayers)
-		.CopyTo(bytes,index);
-		index += sizeof(Int16);
-		BitConverter.GetBytes(CurrentNumberOfPlayers)
-		.CopyTo(bytes,index);
-		index += sizeof(Int16);
-		RoomOwner.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
-	for (int i = 0; i < CurrentNumberOfPlayers ; i++ )
-	{
-		BitConverter.GetBytes((Int32)Units[i].teamGroup)
-		.CopyTo(bytes,index);
-		index += sizeof(StageUnitInfo.TEAM_GROUP);
-		Units[i].Id.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
-		BitConverter.GetBytes(Units[i].IsReady)
-		.CopyTo(bytes,index);
-		index += sizeof(Boolean);
-	}
+		bytes[index] = BoardType;
+		index++;
+		bytes[index] = PlayMode;
+		index++;
+		bytes[index] = (Byte)PlayType;
+		index++;
 	return bytes;
 }
 
 public void FromByteArray(byte[] bytes)
 {
 		int index = 6;
-		BoardType = BitConverter.ToByte(bytes, index);
+		BoardType = bytes[index];
 		index += sizeof(Byte);
-		PlayMode = BitConverter.ToByte(bytes, index);
+		PlayMode = bytes[index];
 		index += sizeof(Byte);
-		PlayType = (GamePlayType)BitConverter.ToByte(bytes, index);
+		PlayType = (GamePlayType)bytes[index];
 		index += sizeof(GamePlayType);
 		NumberOfPlayers = BitConverter.ToInt16(bytes, index);
 		index += sizeof(Int16);

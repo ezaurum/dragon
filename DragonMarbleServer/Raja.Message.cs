@@ -78,10 +78,10 @@ namespace DragonMarble
                 ResetTimer();
                 switch (value.MessageType)
                 {
-                    case GameMessageType.MakeNewGameRoom:
-                        MakeNewGameRoomGameMessage mngrgm = (MakeNewGameRoomGameMessage)value;
+                    case GameMessageType.RequestNewWaitingRoom:
+                        RequestNewWaitingRoomGameMessage mngrgm = (RequestNewWaitingRoomGameMessage)value;
 
-                        GameBoard.BoardType mngrgmBoardType = mngrgm.BoardType;
+                        byte mngrgmBoardType = mngrgm.BoardType;
                         GamePlayType mngrgmGamePlayType = mngrgm.PlayType;
 
                         //TODO Unit
@@ -99,11 +99,11 @@ namespace DragonMarble
 
                         GameMaster.Temp = gm;
                         break;
-                    case GameMessageType.JoinToRandomGameRoom:
-                        JoinToRandomGameRoomGameMessage joinToRandomGameRoomGameMessage = (JoinToRandomGameRoomGameMessage) value;
+                    case GameMessageType.RequestRandomWaitingRoom:
+                        RequestRandomWaitingRoomGameMessage RequestRandomWaitingRoomGameMessage = (RequestRandomWaitingRoomGameMessage) value;
 
-                        GameBoard.BoardType boardType = joinToRandomGameRoomGameMessage.BoardType;
-                        GamePlayType gamePlayType = joinToRandomGameRoomGameMessage.PlayType;
+                        byte boardType = RequestRandomWaitingRoomGameMessage.BoardType;
+                        GamePlayType gamePlayType = RequestRandomWaitingRoomGameMessage.PlayType;
 
                         //TODO Unit
                         Unit = new StageUnitInfo

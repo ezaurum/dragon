@@ -36,7 +36,7 @@ namespace DragonMarble
         public static List<StageChanceCardInfo> ChanceCardList = new List<StageChanceCardInfo>();
 
 
-        public GameBoard.BoardType BoardType { get; set; }
+        public Byte BoardType { get; set; }
         public GamePlayType GamePlayType { get; set; }
         public GameBoard Board { get; set; }
         public int Turn { get; set; }

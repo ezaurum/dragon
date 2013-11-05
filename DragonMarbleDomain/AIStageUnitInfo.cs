@@ -40,7 +40,7 @@ namespace DragonMarble
                 case GameMessageType.EveryoneIsReady:
                     ReceivedMessage = new StartGameGameMessage();
                     break;
-                case GameMessageType.InitializeWaitingRoom:
+                case GameMessageType.WaitingRoomInfo:
                     ReadyStateGameMessage dragonMarbleGameMessage = new ReadyStateGameMessage
                     {
                         Actor = Id,

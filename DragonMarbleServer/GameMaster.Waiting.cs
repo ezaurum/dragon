@@ -44,9 +44,9 @@ namespace DragonMarble
                 Server = Id
             };
 
-            IDragonMarbleGameMessage message = new NewPlayerJoinGameMessage
+            IDragonMarbleGameMessage message = new GoToWaitingRoomGameMessage
             {
-                PlayerId = player.Id
+                //GameRoomId = player.Id
             };
             Notify(message);
 
@@ -57,12 +57,12 @@ namespace DragonMarble
 
             Units.Add(player.Id, player);
             
-            Notify(new RoomOwnerGameMessage()
+            Notify(new AssignRoomOwnerGameMessage
             {
                 RoomOwner = Units.Values.ToArray()[0].Id
             });
 
-            Notify(new InitializeWaitingRoomGameMessage
+            Notify(new WaitingRoomInfoGameMessage
             {
                 Units = Units.Values.ToList(),
                 BoardType = 0,
@@ -88,14 +88,15 @@ namespace DragonMarble
             if (player.IsRoomOwner)
             {
                 Units.Values.ToArray()[0].IsRoomOwner = true;
-                Notify(new RoomOwnerGameMessage()
+                Notify(new AssignRoomOwnerGameMessage
                 {
                     RoomOwner = Units.Values.ToArray()[0].Id
                 });
             }
 
-            Notify(new InitializeWaitingRoomGameMessage
+            Notify(new WaitingRoomInfoGameMessage
             {
+                
                 Units = Units.Values.ToList(),
                 BoardType = 0,
                 CurrentNumberOfPlayers = (short)Units.Count,

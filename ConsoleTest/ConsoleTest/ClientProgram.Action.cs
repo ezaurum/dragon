@@ -30,9 +30,9 @@ namespace ConsoleTest
             
             if (readLine.Contains("c") || readLine.Contains("C"))
             {
-                nm.SendMessage((new MakeNewGameRoomGameMessage
+                nm.SendMessage((new RequestNewWaitingRoomGameMessage()
                 {
-                    BoardType = GameBoard.BoardType.DragonNest,
+                    BoardType = 0,
                     PlayType = GamePlayType.Individual2PlayerPlay
                 }));
                 return false;

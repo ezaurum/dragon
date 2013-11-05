@@ -22,17 +22,17 @@ namespace ConsoleTest
                 case GameMessageType.InitializePlayer:
                     InitPlayer(dragonMarbleGameMessage);
                     break;
-                case GameMessageType.NewPlayerJoin:
-                    Join((NewPlayerJoinGameMessage)dragonMarbleGameMessage);
+                case GameMessageType.GoToWaitingRoom:
+                    Join((GoToWaitingRoomGameMessage)dragonMarbleGameMessage);
                     break;
-                case GameMessageType.InitializeWaitingRoom:
-                    InitWaitingRoom((InitializeWaitingRoomGameMessage)dragonMarbleGameMessage);
+                case GameMessageType.WaitingRoomInfo:
+                    InitWaitingRoom((WaitingRoomInfoGameMessage)dragonMarbleGameMessage);
                     break;
                 case GameMessageType.EveryoneIsReady:
 
                     break;
-                case GameMessageType.RoomOwner:
-                    if (_unitInfo.Id == ((RoomOwnerGameMessage) dragonMarbleGameMessage).RoomOwner)
+                case GameMessageType.AssignRoomOwner:
+                    if (_unitInfo.Id == ((AssignRoomOwnerGameMessage) dragonMarbleGameMessage).RoomOwner)
                     {
                         _unitInfo.IsRoomOwner = true;
                     }
@@ -59,15 +59,15 @@ namespace ConsoleTest
             }
         }
 
-        private static void InitWaitingRoom(InitializeWaitingRoomGameMessage dragonMarbleGameMessage)
+        private static void InitWaitingRoom(WaitingRoomInfoGameMessage dragonMarbleGameMessage)
         {
         }
 
-        private static void Join(NewPlayerJoinGameMessage dragonMarbleGameMessage)
+        private static void Join(GoToWaitingRoomGameMessage dragonMarbleGameMessage)
         {
             StageUnitInfo stageUnitInfo = new StageUnitInfo
             {
-                Id = dragonMarbleGameMessage.PlayerId
+                //Id = dragonMarbleGameMessage..PlayerId
             };
             _units.Add(stageUnitInfo.Id, stageUnitInfo);
             Console.WriteLine("SYSTEM: new Player {0} joined.", stageUnitInfo.Id);

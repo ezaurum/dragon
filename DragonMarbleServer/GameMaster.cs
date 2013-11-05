@@ -8,7 +8,7 @@ namespace DragonMarble
 {
     public partial class GameMaster
     {
-        public GameMaster(GameBoard.BoardType boardType, GamePlayType gamePlayType)
+        public GameMaster(Byte boardType, GamePlayType gamePlayType)
         {
             BoardType = boardType;
             GamePlayType = gamePlayType;
