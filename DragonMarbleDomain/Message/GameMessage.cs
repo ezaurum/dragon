@@ -1893,7 +1893,8 @@ public void FromByteArray(byte[] bytes)
 public class RequestNewWaitingRoomGameMessage : IDragonMarbleGameMessage	
 {
 	public GameMessageType MessageType {get{return GameMessageType.RequestNewWaitingRoom;}}
-	public GameBoardType BoardType;
+	public Byte BoardType;
+	public Byte PlayMode;
 	public GamePlayType PlayType;
 
 	public byte[] ToByteArray()
@@ -1906,10 +1907,13 @@ public class RequestNewWaitingRoomGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes((Int32)MessageType)
 		.CopyTo(bytes,index);
 		index += sizeof(GameMessageType);
-		BitConverter.GetBytes((Int16)BoardType)
+		BitConverter.GetBytes(BoardType)
 		.CopyTo(bytes,index);
-		index += sizeof(GameBoardType);
-		BitConverter.GetBytes((Char)PlayType)
+		index += sizeof(Byte);
+		BitConverter.GetBytes(PlayMode)
+		.CopyTo(bytes,index);
+		index += sizeof(Byte);
+		BitConverter.GetBytes((Byte)PlayType)
 		.CopyTo(bytes,index);
 		index += sizeof(GamePlayType);
 	return bytes;
@@ -1918,9 +1922,11 @@ public class RequestNewWaitingRoomGameMessage : IDragonMarbleGameMessage
 public void FromByteArray(byte[] bytes)
 {
 		int index = 6;
-		BoardType = (GameBoardType)BitConverter.ToInt16(bytes, index);
-		index += sizeof(GameBoardType);
-		PlayType = (GamePlayType)BitConverter.ToChar(bytes, index);
+		BoardType = BitConverter.ToByte(bytes, index);
+		index += sizeof(Byte);
+		PlayMode = BitConverter.ToByte(bytes, index);
+		index += sizeof(Byte);
+		PlayType = (GamePlayType)BitConverter.ToByte(bytes, index);
 		index += sizeof(GamePlayType);
 }
 
@@ -1928,7 +1934,7 @@ public void FromByteArray(byte[] bytes)
 	{
 		get
 		{
-			return (Int16)(2+sizeof(GameMessageType)+sizeof(GameBoardType)+sizeof(GamePlayType));
+			return (Int16)(2+sizeof(GameMessageType)+sizeof(Byte)+sizeof(Byte)+sizeof(GamePlayType));
 		}
 	}
 }
@@ -1937,7 +1943,8 @@ public void FromByteArray(byte[] bytes)
 public class RequestRandomWaitingRoomGameMessage : IDragonMarbleGameMessage	
 {
 	public GameMessageType MessageType {get{return GameMessageType.RequestRandomWaitingRoom;}}
-	public GameBoardType BoardType;
+	public Byte BoardType;
+	public Byte PlayMode;
 	public GamePlayType PlayType;
 
 	public byte[] ToByteArray()
@@ -1950,10 +1957,13 @@ public class RequestRandomWaitingRoomGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes((Int32)MessageType)
 		.CopyTo(bytes,index);
 		index += sizeof(GameMessageType);
-		BitConverter.GetBytes((Int16)BoardType)
+		BitConverter.GetBytes(BoardType)
 		.CopyTo(bytes,index);
-		index += sizeof(GameBoardType);
-		BitConverter.GetBytes((Char)PlayType)
+		index += sizeof(Byte);
+		BitConverter.GetBytes(PlayMode)
+		.CopyTo(bytes,index);
+		index += sizeof(Byte);
+		BitConverter.GetBytes((Byte)PlayType)
 		.CopyTo(bytes,index);
 		index += sizeof(GamePlayType);
 	return bytes;
@@ -1962,9 +1972,11 @@ public class RequestRandomWaitingRoomGameMessage : IDragonMarbleGameMessage
 public void FromByteArray(byte[] bytes)
 {
 		int index = 6;
-		BoardType = (GameBoardType)BitConverter.ToInt16(bytes, index);
-		index += sizeof(GameBoardType);
-		PlayType = (GamePlayType)BitConverter.ToChar(bytes, index);
+		BoardType = BitConverter.ToByte(bytes, index);
+		index += sizeof(Byte);
+		PlayMode = BitConverter.ToByte(bytes, index);
+		index += sizeof(Byte);
+		PlayType = (GamePlayType)BitConverter.ToByte(bytes, index);
 		index += sizeof(GamePlayType);
 }
 
@@ -1972,7 +1984,7 @@ public void FromByteArray(byte[] bytes)
 	{
 		get
 		{
-			return (Int16)(2+sizeof(GameMessageType)+sizeof(GameBoardType)+sizeof(GamePlayType));
+			return (Int16)(2+sizeof(GameMessageType)+sizeof(Byte)+sizeof(Byte)+sizeof(GamePlayType));
 		}
 	}
 }
@@ -2456,7 +2468,9 @@ public void FromByteArray(byte[] bytes)
 public class WaitingRoomInfoGameMessage : IDragonMarbleGameMessage	
 {
 	public GameMessageType MessageType {get{return GameMessageType.WaitingRoomInfo;}}
-	public GameBoardType BoardType;
+	public Byte BoardType;
+	public Byte PlayMode;
+	public GamePlayType PlayType;
 	public Int16 NumberOfPlayers;
 	public Int16 CurrentNumberOfPlayers;
 	public Guid RoomOwner { get; set;}
@@ -2472,9 +2486,15 @@ public class WaitingRoomInfoGameMessage : IDragonMarbleGameMessage
 		BitConverter.GetBytes((Int32)MessageType)
 		.CopyTo(bytes,index);
 		index += sizeof(GameMessageType);
-		BitConverter.GetBytes((Int16)BoardType)
+		BitConverter.GetBytes(BoardType)
 		.CopyTo(bytes,index);
-		index += sizeof(GameBoardType);
+		index += sizeof(Byte);
+		BitConverter.GetBytes(PlayMode)
+		.CopyTo(bytes,index);
+		index += sizeof(Byte);
+		BitConverter.GetBytes((Byte)PlayType)
+		.CopyTo(bytes,index);
+		index += sizeof(GamePlayType);
 		BitConverter.GetBytes(NumberOfPlayers)
 		.CopyTo(bytes,index);
 		index += sizeof(Int16);
@@ -2502,8 +2522,12 @@ public class WaitingRoomInfoGameMessage : IDragonMarbleGameMessage
 public void FromByteArray(byte[] bytes)
 {
 		int index = 6;
-		BoardType = (GameBoardType)BitConverter.ToInt16(bytes, index);
-		index += sizeof(GameBoardType);
+		BoardType = BitConverter.ToByte(bytes, index);
+		index += sizeof(Byte);
+		PlayMode = BitConverter.ToByte(bytes, index);
+		index += sizeof(Byte);
+		PlayType = (GamePlayType)BitConverter.ToByte(bytes, index);
+		index += sizeof(GamePlayType);
 		NumberOfPlayers = BitConverter.ToInt16(bytes, index);
 		index += sizeof(Int16);
 		CurrentNumberOfPlayers = BitConverter.ToInt16(bytes, index);
@@ -2532,7 +2556,7 @@ public void FromByteArray(byte[] bytes)
 	{
 		get
 		{
-			return (Int16)(2+sizeof(GameMessageType)+sizeof(GameBoardType)+sizeof(Int16)+sizeof(Int16)+16+CurrentNumberOfPlayers*(sizeof(StageUnitInfo.TEAM_GROUP)+16+sizeof(Boolean)));
+			return (Int16)(2+sizeof(GameMessageType)+sizeof(Byte)+sizeof(Byte)+sizeof(GamePlayType)+sizeof(Int16)+sizeof(Int16)+16+CurrentNumberOfPlayers*(sizeof(StageUnitInfo.TEAM_GROUP)+16+sizeof(Boolean)));
 		}
 	}
 }

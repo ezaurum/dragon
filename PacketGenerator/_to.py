@@ -17,7 +17,10 @@ def convert_to_bit_by_self(target, length):
 
 def convert_to(prefix, field_name,field, length,cast):
 	result =''
-	if 'targets' in field:					
+	if 'targets' in field:
+		if field['targets'] is None:
+			print("field : %s, None targets"%field)
+
 		result += inner_make(field_name + prefix+'.', field['targets'])
 	else:
 		target_string = field_name + prefix
@@ -27,7 +30,11 @@ def convert_to(prefix, field_name,field, length,cast):
 def inner_make(prefix, fields):
 	result = ''	
 	for field in fields:
-		options = field.get('options',[])
+		
+		if field.get('type') is None:
+			print("field %s has None type."%(field['name']))
+
+		options = field.get('options',[])	
 		length = field.get('length','sizeof(%s)'%field['type'])
 		cast = field.get('cast')
 		if prefix is None:

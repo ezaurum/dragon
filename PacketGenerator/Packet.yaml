@@ -22,8 +22,8 @@ InitializeGame :
           type : Int16
           collection : List
           size : 4
-        - type : Int16
-          name : NumberOfPlayers
+        - name : NumberOfPlayers
+          type : Int16
         - name : Units
           type : StageUnitInfo
           options : [constructor]
@@ -406,22 +406,24 @@ ActionResultCopy :
 RequestNewWaitingRoom :
   comment : 게임 대기방 생성 요청 (client->server)
   fields :
-    - name : BoardType
-      cast : Int16
-      type : GameBoardType
+    - name : BoardType      
+      type : Byte    
+    - name : PlayMode      
+      type : Byte
     - name : PlayType
-      cast : Char
       type : GamePlayType
+      cast : Byte
 
 RequestRandomWaitingRoom :
   comment : 무작위 게임 방 요청 (client->server)
   fields :
-    - name : BoardType
-      cast : Int16
-      type : GameBoardType    
+    - name : BoardType      
+      type : Byte    
+    - name : PlayMode      
+      type : Byte
     - name : PlayType
-      cast : Char
       type : GamePlayType
+      cast : Byte
 
 AssignWaitingRoom :
   comment : assign waiting room (server->client)
@@ -441,34 +443,38 @@ GoToWaitingRoom :
 
 WaitingRoomInfo :
     comment : 게임 대기방 초기화 정보 (server->client)
-    fields :
-        - name : BoardType
-          cast : Int16
-          type : GameBoardType
-        - type : Int16
-          name : NumberOfPlayers
-        - type : Int16
-          name : CurrentNumberOfPlayers
-        - name : RoomOwner
-          type : Guid
-          length : 16
-          options : [byte_param_constructor, to_byte_array, property]
-        - name : Units
-          type : StageUnitInfo
-          options : [constructor]
-          collection : List
-          length : sizeof(Int16)
-          size : CurrentNumberOfPlayers
-          targets :            
-            - name : teamGroup
-              cast : Int32
-              type : StageUnitInfo.TEAM_GROUP            
-            - name : Id
-              type : Guid
-              length : 16
-              options : [byte_param_constructor, to_byte_array]
-            - name : IsReady
-              type : Boolean
+    fields :        
+      - name : BoardType      
+        type : Byte    
+      - name : PlayMode      
+        type : Byte
+      - name : PlayType
+        type : GamePlayType
+        cast : Byte
+      - name : NumberOfPlayers
+        type : Int16  
+      - name : CurrentNumberOfPlayers
+        type : Int16
+      - name : RoomOwner
+        type : Guid
+        length : 16
+        options : [byte_param_constructor, to_byte_array, property]
+      - name : Units
+        type : StageUnitInfo
+        options : [constructor]
+        collection : List
+        length : sizeof(Int16)
+        size : CurrentNumberOfPlayers
+        targets :
+          - name : teamGroup
+            cast : Int32
+            type : StageUnitInfo.TEAM_GROUP            
+          - name : Id
+            type : Guid
+            length : 16
+            options : [byte_param_constructor, to_byte_array]
+          - name : IsReady
+            type : Boolean
 
 ExitWaitingRoom :
   comment : Exit waiting room (server->client|client->server)
