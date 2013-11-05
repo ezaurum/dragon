@@ -4,8 +4,8 @@ namespace DragonMarble
 {
     public interface IRoomManager
     {
-        IDragonMarbleGameMessage RequestNew(GameBoardType boardType, GamePlayType playType, GamePlayMode mode);
-        IDragonMarbleGameMessage RequestRandom(GameBoardType boardType, GamePlayType playType, GamePlayMode mode);
+        IDragonMarbleGameMessage RequestNew(byte boardType, GamePlayType playType, byte mode);
+        IDragonMarbleGameMessage RequestRandom(byte boardType, GamePlayType playType, byte mode);
     }
 
     public interface IWaitingRoom
