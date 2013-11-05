@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Xml.Linq;
+using log4net.Repository.Hierarchy;
 
 namespace DragonMarble
 {

@@ -63,7 +63,10 @@ namespace DragonMarble
                 {
                     StageUnitInfo s = GetNewAI();
 
-                    pool.Join(s);
+                    if (null != GameMaster.Temp)
+                    {
+                        GameMaster.Temp.Join(s);
+                    }
                     continue;
                 }
 
@@ -102,7 +105,7 @@ namespace DragonMarble
 
     internal class GameMasterPool
     {
-        GameMaster gm = new GameMaster(2);
+        GameMaster gm = new GameMaster(GameBoard.BoardType.DragonNest, GamePlayType.Individual2PlayerPlay);
 
         public GameMaster GetGameMaster()
         {
@@ -112,7 +115,7 @@ namespace DragonMarble
         /// <summary>
         /// after Connect event
         /// </summary>
-        /// <param name="sender"></param>
+        /// <param name="sender"></param> 
         /// <param name="e"></param>
         public void AddPlayer(object sender, SocketAsyncEventArgs e)
         {

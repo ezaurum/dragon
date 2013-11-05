@@ -15,12 +15,9 @@ namespace DragonMarble
         {
             set
             {
-                if (value.MessageType == GameMessageType.StartGame)
+                if (value.MessageType == GameMessageType.StartGame && IsRoomOwner)
                 {
-                    if (IsRoomOwner)
-                    {
-                        StageManager.StartGame(Id);
-                    }
+                    StageManager.StartGame(Id);
                 }
                 else
                 {
@@ -43,7 +40,19 @@ namespace DragonMarble
                 case GameMessageType.EveryoneIsReady:
                     ReceivedMessage = new StartGameGameMessage();
                     break;
-                
+                case GameMessageType.InitializeWaitingRoom:
+                    ReadyStateGameMessage dragonMarbleGameMessage = new ReadyStateGameMessage
+                    {
+                        Actor = Id,
+                        Ready = true,
+                    };
+
+                    ReceivedMessage = dragonMarbleGameMessage;
+
+                    IsReady = true;
+
+                    StageManager.ReadyNotify(dragonMarbleGameMessage);
+                    break;
             }            
         }
     }

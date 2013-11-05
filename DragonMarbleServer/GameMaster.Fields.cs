@@ -30,21 +30,14 @@ namespace DragonMarble
         private List<StageUnitInfo> _availablePlayers;
         private bool _gameContinue;
         private GameState _state;
-
-        public GameMaster(short playerNumberForPlayer)
-        {
-            PlayerNumberForPlay = playerNumberForPlayer;
-            _state = GameState.JustMade;
-            Id = Guid.NewGuid();
-            Units = new Dictionary<Guid, StageUnitInfo>();
-            Cards = new Dictionary<int, StageChanceCardInfo>();
-            ChanceCardList.ForEach(c => Cards.Add(c.classId,c));
-        }
         
         public static GameBoard OriginalBoard { get; set; }
         public short PlayerNumberForPlay { get; private set; }
         public static List<StageChanceCardInfo> ChanceCardList = new List<StageChanceCardInfo>();
 
+
+        public GameBoard.BoardType BoardType { get; set; }
+        public GamePlayType GamePlayType { get; set; }
         public GameBoard Board { get; set; }
         public int Turn { get; set; }
 
