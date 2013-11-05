@@ -403,49 +403,56 @@ ActionResultCopy :
   comment : Client received Player's action result signal
 
 # in waiting room actions
-
-ReadyState :
-  comment : Indicate Ready or not for game Start
+RequestNewWaitingRoom :
+  comment : 게임 대기방 생성 요청 (client->server)
   fields :
-    - name : Actor
-      type : Guid
-      length : 16
-      options : [byte_param_constructor, to_byte_array, property]
-    - name : Ready
-      type : Boolean
+    - name : BoardType
+      cast : Int16
+      type : GameBoardType
+    - name : PlayType
+      cast : Char
+      type : GamePlayType
 
-RoomOwner :
-  comment : Indicate who is room owner
+RequestRandomWaitingRoom :
+  comment : 무작위 게임 방 요청 (client->server)
+  fields :
+    - name : BoardType
+      cast : Int16
+      type : GameBoardType    
+    - name : PlayType
+      cast : Char
+      type : GamePlayType
+
+AssignWaitingRoom :
+  comment : assign waiting room (server->client)
   fields :
     - name : RoomOwner
       type : Guid
       length : 16
       options : [byte_param_constructor, to_byte_array, property]
 
-EveryoneIsReady :
-  comment : Everyone is ready for game start
+GoToWaitingRoom :
+  comment : 지정 게임 방 참가 (client->server)
   fields :
-    - name : ResponseLimit
-      type : Int32
-
-ExitWaitingRoom :
-  comment : Exit waiting room
-  fields :
-    - name : Actor
-      type : Guid
+    - type : Guid
+      name : GameRoomId
       length : 16
       options : [byte_param_constructor, to_byte_array, property]
 
-InitializeWaitingRoom :
-    comment : 게임 대기방 초기화 정보
+WaitingRoomInfo :
+    comment : 게임 대기방 초기화 정보 (server->client)
     fields :
         - name : BoardType
           cast : Int16
-          type : GameBoard.BoardType
+          type : GameBoardType
         - type : Int16
           name : NumberOfPlayers
         - type : Int16
           name : CurrentNumberOfPlayers
+        - name : RoomOwner
+          type : Guid
+          length : 16
+          options : [byte_param_constructor, to_byte_array, property]
         - name : Units
           type : StageUnitInfo
           options : [constructor]
@@ -463,41 +470,55 @@ InitializeWaitingRoom :
             - name : IsReady
               type : Boolean
 
-MakeNewGameRoom :
-  comment : 게임 대기방 새로 생성
+ExitWaitingRoom :
+  comment : Exit waiting room (server->client|client->server)
   fields :
-    - name : BoardType
-      cast : Int16
-      type : GameBoard.BoardType
-    - name : PlayType
-      cast : Char
-      type : GamePlayType
-
-JoinToRandomGameRoom :
-  comment : 무작위 게임 방 참가
-  fields :
-    - name : BoardType
-      cast : Int16
-      type : GameBoard.BoardType    
-    - name : PlayType
-      cast : Char
-      type : GamePlayType
-
-JoinToSpecificGameRoom :
-  comment : 지정 게임 방 참가
-  fields :
-    - type : Guid
-      name : GameRoomId
+    - name : Actor
+      type : Guid
       length : 16
       options : [byte_param_constructor, to_byte_array, property]
 
-NewPlayerJoin :
-  comment : 게임 대기방 추가 정보
+AssignRoomOwner :
+  comment : change room owner (server->client)
+  fields :
+    - name : RoomOwner
+      type : Guid
+      length : 16
+      options : [byte_param_constructor, to_byte_array, property]
+
+NewPlayerInWaitingRoom :
+  comment : 게임 대기방에 사용자 추가 (server->client)
   fields :
     - type : Guid
       name : PlayerId
       length : 16
       options : [byte_param_constructor, to_byte_array, property]
+
+ReadyStateRequest :
+  comment : Request ready message (server->client)
+  fields :
+    - name : Actor
+      type : Guid
+      length : 16
+      options : [byte_param_constructor, to_byte_array, property]
+    - name : ResponseLimit
+      type : Int32
+
+ReadyState :
+  comment : Indicate Ready or not for game Start (client->server|server->client)
+  fields :
+    - name : Actor
+      type : Guid
+      length : 16
+      options : [byte_param_constructor, to_byte_array, property]
+    - name : Ready
+      type : Boolean
+
+EveryoneIsReady :
+  comment : Everyone is ready for game start, start request (server->client)
+  fields :
+    - name : ResponseLimit
+      type : Int32
 
 StartGame :
   comment : start game      
