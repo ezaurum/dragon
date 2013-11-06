@@ -553,6 +553,11 @@ ValidateSession :
 
 RequestSession :
   comment : 세션 키 발급 요청
+  fields :
+    - type : Guid
+      name : GameAccountId
+      length : 16
+      options : [byte_param_constructor, to_byte_array, property]
 
 RedirectConnection :
   comment : 세션이 존재하는 경우 연결 리다이렉트
