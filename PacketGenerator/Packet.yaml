@@ -536,7 +536,7 @@ StartGame :
 
 #session actions
 ValidateSession :
-  comment : 세션 키 발급/조회
+  comment : 세션 키 조회
   fields :
     - type : Guid
       name : SessionKey
@@ -558,6 +558,22 @@ RequestSession :
       name : GameAccountId
       length : 16
       options : [byte_param_constructor, to_byte_array, property]
+
+Session :
+  comment : 세션 키 발급
+  fields :
+    - type : Guid
+      name : SessionKey
+      length : 16
+      options : [byte_param_constructor, to_byte_array, property]
+    - type : Guid
+      name : GameRoomId
+      length : 16
+      options : [byte_param_constructor, to_byte_array, property]
+    - type : Guid
+      name : GameAccountId
+      length : 16
+      options : [byte_param_constructor, to_byte_array, property]      
 
 RedirectConnection :
   comment : 세션이 존재하는 경우 연결 리다이렉트
