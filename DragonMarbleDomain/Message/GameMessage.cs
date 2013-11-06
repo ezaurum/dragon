@@ -12,6 +12,7 @@ public enum GameMessageType
 	AssignWaitingRoom,
 	Bankrupt,
 	BuyItemInGame,
+	BuyItemInGameResult,
 	BuyLand,
 	BuyLandRequest,
 	ChanceCardBuff,
@@ -41,18 +42,22 @@ public enum GameMessageType
 	PrisonActionResult,
 	ReadyState,
 	ReadyStateRequest,
+	RedirectConnection,
 	RequestNewWaitingRoom,
 	RequestRandomWaitingRoom,
+	RequestSession,
+	ReserveItemInGame,
+	ReserveItemInGameResult,
 	RollMoveDice,
 	RollMoveDiceResult,
 	SellLands,
-	Session,
 	StartGame,
 	Takeover,
 	TakeoverRequest,
 	TravelAction,
 	UseCoupon,
 	UseCouponRequest,
+	ValidateSession,
 	WaitingRoomInfo,
 }
 public static class GameMessageFactory
@@ -86,6 +91,9 @@ public static class GameMessageFactory
 		break;
 		case GameMessageType.BuyItemInGame:
 		message = new BuyItemInGameGameMessage();
+		break;
+		case GameMessageType.BuyItemInGameResult:
+		message = new BuyItemInGameResultGameMessage();
 		break;
 		case GameMessageType.BuyLand:
 		message = new BuyLandGameMessage();
@@ -174,11 +182,23 @@ public static class GameMessageFactory
 		case GameMessageType.ReadyStateRequest:
 		message = new ReadyStateRequestGameMessage();
 		break;
+		case GameMessageType.RedirectConnection:
+		message = new RedirectConnectionGameMessage();
+		break;
 		case GameMessageType.RequestNewWaitingRoom:
 		message = new RequestNewWaitingRoomGameMessage();
 		break;
 		case GameMessageType.RequestRandomWaitingRoom:
 		message = new RequestRandomWaitingRoomGameMessage();
+		break;
+		case GameMessageType.RequestSession:
+		message = new RequestSessionGameMessage();
+		break;
+		case GameMessageType.ReserveItemInGame:
+		message = new ReserveItemInGameGameMessage();
+		break;
+		case GameMessageType.ReserveItemInGameResult:
+		message = new ReserveItemInGameResultGameMessage();
 		break;
 		case GameMessageType.RollMoveDice:
 		message = new RollMoveDiceGameMessage();
@@ -188,9 +208,6 @@ public static class GameMessageFactory
 		break;
 		case GameMessageType.SellLands:
 		message = new SellLandsGameMessage();
-		break;
-		case GameMessageType.Session:
-		message = new SessionGameMessage();
 		break;
 		case GameMessageType.StartGame:
 		message = new StartGameGameMessage();
@@ -209,6 +226,9 @@ public static class GameMessageFactory
 		break;
 		case GameMessageType.UseCouponRequest:
 		message = new UseCouponRequestGameMessage();
+		break;
+		case GameMessageType.ValidateSession:
+		message = new ValidateSessionGameMessage();
 		break;
 		case GameMessageType.WaitingRoomInfo:
 		message = new WaitingRoomInfoGameMessage();
@@ -415,7 +435,7 @@ public void FromByteArray(byte[] bytes)
 	}
 }
 
-// Buy a game item in waiting room or game playing	
+// Buy a game item in waiting room or game playing. In instance	
 public class BuyItemInGameGameMessage : IDragonMarbleGameMessage	
 {
 	public GameMessageType MessageType {get{return GameMessageType.BuyItemInGame;}}
@@ -451,6 +471,60 @@ public void FromByteArray(byte[] bytes)
 		get
 		{
 			return (Int16)(2+sizeof(GameMessageType)+16);
+		}
+	}
+}
+
+// Buy a game item result in waiting room or game playing. In instance.	
+public class BuyItemInGameResultGameMessage : IDragonMarbleGameMessage	
+{
+	public GameMessageType MessageType {get{return GameMessageType.BuyItemInGameResult;}}
+	public Guid ItemId { get; set;}
+	public Guid ItemInstanceId { get; set;}
+	public Boolean Result;
+
+	public byte[] ToByteArray()
+	{
+		byte[] bytes = new byte[Length];
+		int index = 0;
+		BitConverter.GetBytes(Length)
+		.CopyTo(bytes,index);
+		index += sizeof(Int16);
+		BitConverter.GetBytes((Int32)MessageType)
+		.CopyTo(bytes,index);
+		index += sizeof(GameMessageType);
+		ItemId.ToByteArray()
+		.CopyTo(bytes,index);
+		index += 16;
+		ItemInstanceId.ToByteArray()
+		.CopyTo(bytes,index);
+		index += 16;
+		BitConverter.GetBytes(Result)
+		.CopyTo(bytes,index);
+		index += sizeof(Boolean);
+	return bytes;
+}
+
+public void FromByteArray(byte[] bytes)
+{
+		int index = 6;
+		byte[] tempItemId = new byte[16];
+		Buffer.BlockCopy(bytes, index, tempItemId, 0,16);
+		ItemId = new Guid(tempItemId);
+		index += 16;
+		byte[] tempItemInstanceId = new byte[16];
+		Buffer.BlockCopy(bytes, index, tempItemInstanceId, 0,16);
+		ItemInstanceId = new Guid(tempItemInstanceId);
+		index += 16;
+		Result = BitConverter.ToBoolean(bytes, index);
+		index += sizeof(Boolean);
+}
+
+	public Int16 Length
+	{
+		get
+		{
+			return (Int16)(2+sizeof(GameMessageType)+16+16+sizeof(Boolean));
 		}
 	}
 }
@@ -1895,6 +1969,66 @@ public void FromByteArray(byte[] bytes)
 	}
 }
 
+// 세션이 존재하는 경우 연결 리다이렉트	
+public class RedirectConnectionGameMessage : IDragonMarbleGameMessage	
+{
+	public GameMessageType MessageType {get{return GameMessageType.RedirectConnection;}}
+	public Int32 IPAddress;
+	public Int16 Port;
+	public Guid SessionKey { get; set;}
+	public Guid GameRoomId { get; set;}
+
+	public byte[] ToByteArray()
+	{
+		byte[] bytes = new byte[Length];
+		int index = 0;
+		BitConverter.GetBytes(Length)
+		.CopyTo(bytes,index);
+		index += sizeof(Int16);
+		BitConverter.GetBytes((Int32)MessageType)
+		.CopyTo(bytes,index);
+		index += sizeof(GameMessageType);
+		BitConverter.GetBytes(IPAddress)
+		.CopyTo(bytes,index);
+		index += sizeof(Int32);
+		BitConverter.GetBytes(Port)
+		.CopyTo(bytes,index);
+		index += sizeof(Int16);
+		SessionKey.ToByteArray()
+		.CopyTo(bytes,index);
+		index += 16;
+		GameRoomId.ToByteArray()
+		.CopyTo(bytes,index);
+		index += 16;
+	return bytes;
+}
+
+public void FromByteArray(byte[] bytes)
+{
+		int index = 6;
+		IPAddress = BitConverter.ToInt32(bytes, index);
+		index += sizeof(Int32);
+		Port = BitConverter.ToInt16(bytes, index);
+		index += sizeof(Int16);
+		byte[] tempSessionKey = new byte[16];
+		Buffer.BlockCopy(bytes, index, tempSessionKey, 0,16);
+		SessionKey = new Guid(tempSessionKey);
+		index += 16;
+		byte[] tempGameRoomId = new byte[16];
+		Buffer.BlockCopy(bytes, index, tempGameRoomId, 0,16);
+		GameRoomId = new Guid(tempGameRoomId);
+		index += 16;
+}
+
+	public Int16 Length
+	{
+		get
+		{
+			return (Int16)(2+sizeof(GameMessageType)+sizeof(Int32)+sizeof(Int16)+16+16);
+		}
+	}
+}
+
 // 게임 대기방 생성 요청 (client->server)	
 public class RequestNewWaitingRoomGameMessage : IDragonMarbleGameMessage	
 {
@@ -1985,6 +2119,132 @@ public void FromByteArray(byte[] bytes)
 		get
 		{
 			return (Int16)(2+sizeof(GameMessageType)+sizeof(Byte)+sizeof(Byte)+sizeof(GamePlayType));
+		}
+	}
+}
+
+// 세션 키 발급 요청	
+public class RequestSessionGameMessage : IDragonMarbleGameMessage	
+{
+	public GameMessageType MessageType {get{return GameMessageType.RequestSession;}}
+
+	public byte[] ToByteArray()
+	{
+		byte[] bytes = new byte[Length];
+		int index = 0;
+		BitConverter.GetBytes(Length)
+		.CopyTo(bytes,index);
+		index += sizeof(Int16);
+		BitConverter.GetBytes((Int32)MessageType)
+		.CopyTo(bytes,index);
+		index += sizeof(GameMessageType);
+	return bytes;
+}
+
+public void FromByteArray(byte[] bytes)
+{
+		int index = 6;
+}
+
+	public Int16 Length
+	{
+		get
+		{
+			return (Int16)(2+sizeof(GameMessageType));
+		}
+	}
+}
+
+// Reserve to buy a game item in waiting room or game playing.	
+public class ReserveItemInGameGameMessage : IDragonMarbleGameMessage	
+{
+	public GameMessageType MessageType {get{return GameMessageType.ReserveItemInGame;}}
+	public Guid ItemId { get; set;}
+
+	public byte[] ToByteArray()
+	{
+		byte[] bytes = new byte[Length];
+		int index = 0;
+		BitConverter.GetBytes(Length)
+		.CopyTo(bytes,index);
+		index += sizeof(Int16);
+		BitConverter.GetBytes((Int32)MessageType)
+		.CopyTo(bytes,index);
+		index += sizeof(GameMessageType);
+		ItemId.ToByteArray()
+		.CopyTo(bytes,index);
+		index += 16;
+	return bytes;
+}
+
+public void FromByteArray(byte[] bytes)
+{
+		int index = 6;
+		byte[] tempItemId = new byte[16];
+		Buffer.BlockCopy(bytes, index, tempItemId, 0,16);
+		ItemId = new Guid(tempItemId);
+		index += 16;
+}
+
+	public Int16 Length
+	{
+		get
+		{
+			return (Int16)(2+sizeof(GameMessageType)+16);
+		}
+	}
+}
+
+// Reserve to buy a game item in waiting room or game playing	
+public class ReserveItemInGameResultGameMessage : IDragonMarbleGameMessage	
+{
+	public GameMessageType MessageType {get{return GameMessageType.ReserveItemInGameResult;}}
+	public Guid ItemId { get; set;}
+	public Guid ItemInstanceId { get; set;}
+	public Boolean Result;
+
+	public byte[] ToByteArray()
+	{
+		byte[] bytes = new byte[Length];
+		int index = 0;
+		BitConverter.GetBytes(Length)
+		.CopyTo(bytes,index);
+		index += sizeof(Int16);
+		BitConverter.GetBytes((Int32)MessageType)
+		.CopyTo(bytes,index);
+		index += sizeof(GameMessageType);
+		ItemId.ToByteArray()
+		.CopyTo(bytes,index);
+		index += 16;
+		ItemInstanceId.ToByteArray()
+		.CopyTo(bytes,index);
+		index += 16;
+		BitConverter.GetBytes(Result)
+		.CopyTo(bytes,index);
+		index += sizeof(Boolean);
+	return bytes;
+}
+
+public void FromByteArray(byte[] bytes)
+{
+		int index = 6;
+		byte[] tempItemId = new byte[16];
+		Buffer.BlockCopy(bytes, index, tempItemId, 0,16);
+		ItemId = new Guid(tempItemId);
+		index += 16;
+		byte[] tempItemInstanceId = new byte[16];
+		Buffer.BlockCopy(bytes, index, tempItemInstanceId, 0,16);
+		ItemInstanceId = new Guid(tempItemInstanceId);
+		index += 16;
+		Result = BitConverter.ToBoolean(bytes, index);
+		index += sizeof(Boolean);
+}
+
+	public Int16 Length
+	{
+		get
+		{
+			return (Int16)(2+sizeof(GameMessageType)+16+16+sizeof(Boolean));
 		}
 	}
 }
@@ -2154,62 +2414,6 @@ public void FromByteArray(byte[] bytes)
 		get
 		{
 			return (Int16)(2+sizeof(GameMessageType)+sizeof(Char)+LandCount*(sizeof(Char))+16);
-		}
-	}
-}
-
-// 세션 키 발급/조회	
-public class SessionGameMessage : IDragonMarbleGameMessage	
-{
-	public GameMessageType MessageType {get{return GameMessageType.Session;}}
-	public Guid SessionKey { get; set;}
-	public Guid GameRoomId { get; set;}
-	public Guid GameAccountId { get; set;}
-
-	public byte[] ToByteArray()
-	{
-		byte[] bytes = new byte[Length];
-		int index = 0;
-		BitConverter.GetBytes(Length)
-		.CopyTo(bytes,index);
-		index += sizeof(Int16);
-		BitConverter.GetBytes((Int32)MessageType)
-		.CopyTo(bytes,index);
-		index += sizeof(GameMessageType);
-		SessionKey.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
-		GameRoomId.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
-		GameAccountId.ToByteArray()
-		.CopyTo(bytes,index);
-		index += 16;
-	return bytes;
-}
-
-public void FromByteArray(byte[] bytes)
-{
-		int index = 6;
-		byte[] tempSessionKey = new byte[16];
-		Buffer.BlockCopy(bytes, index, tempSessionKey, 0,16);
-		SessionKey = new Guid(tempSessionKey);
-		index += 16;
-		byte[] tempGameRoomId = new byte[16];
-		Buffer.BlockCopy(bytes, index, tempGameRoomId, 0,16);
-		GameRoomId = new Guid(tempGameRoomId);
-		index += 16;
-		byte[] tempGameAccountId = new byte[16];
-		Buffer.BlockCopy(bytes, index, tempGameAccountId, 0,16);
-		GameAccountId = new Guid(tempGameAccountId);
-		index += 16;
-}
-
-	public Int16 Length
-	{
-		get
-		{
-			return (Int16)(2+sizeof(GameMessageType)+16+16+16);
 		}
 	}
 }
@@ -2460,6 +2664,62 @@ public void FromByteArray(byte[] bytes)
 		get
 		{
 			return (Int16)(2+sizeof(GameMessageType)+16);
+		}
+	}
+}
+
+// 세션 키 발급/조회	
+public class ValidateSessionGameMessage : IDragonMarbleGameMessage	
+{
+	public GameMessageType MessageType {get{return GameMessageType.ValidateSession;}}
+	public Guid SessionKey { get; set;}
+	public Guid GameRoomId { get; set;}
+	public Guid GameAccountId { get; set;}
+
+	public byte[] ToByteArray()
+	{
+		byte[] bytes = new byte[Length];
+		int index = 0;
+		BitConverter.GetBytes(Length)
+		.CopyTo(bytes,index);
+		index += sizeof(Int16);
+		BitConverter.GetBytes((Int32)MessageType)
+		.CopyTo(bytes,index);
+		index += sizeof(GameMessageType);
+		SessionKey.ToByteArray()
+		.CopyTo(bytes,index);
+		index += 16;
+		GameRoomId.ToByteArray()
+		.CopyTo(bytes,index);
+		index += 16;
+		GameAccountId.ToByteArray()
+		.CopyTo(bytes,index);
+		index += 16;
+	return bytes;
+}
+
+public void FromByteArray(byte[] bytes)
+{
+		int index = 6;
+		byte[] tempSessionKey = new byte[16];
+		Buffer.BlockCopy(bytes, index, tempSessionKey, 0,16);
+		SessionKey = new Guid(tempSessionKey);
+		index += 16;
+		byte[] tempGameRoomId = new byte[16];
+		Buffer.BlockCopy(bytes, index, tempGameRoomId, 0,16);
+		GameRoomId = new Guid(tempGameRoomId);
+		index += 16;
+		byte[] tempGameAccountId = new byte[16];
+		Buffer.BlockCopy(bytes, index, tempGameAccountId, 0,16);
+		GameAccountId = new Guid(tempGameAccountId);
+		index += 16;
+}
+
+	public Int16 Length
+	{
+		get
+		{
+			return (Int16)(2+sizeof(GameMessageType)+16+16+16);
 		}
 	}
 }

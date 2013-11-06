@@ -535,8 +535,7 @@ StartGame :
 # in waiting room actions ends.
 
 #session actions
-
-Session :
+ValidateSession :
   comment : 세션 키 발급/조회
   fields :
     - type : Guid
@@ -552,13 +551,68 @@ Session :
       length : 16
       options : [byte_param_constructor, to_byte_array, property]
 
+RequestSession :
+  comment : 세션 키 발급 요청
+
+RedirectConnection :
+  comment : 세션이 존재하는 경우 연결 리다이렉트
+  fields :
+    - name : IPAddress
+      type : Int32
+    - name : Port
+      type : Int16
+    - type : Guid
+      name : SessionKey
+      length : 16
+      options : [byte_param_constructor, to_byte_array, property]
+    - type : Guid
+      name : GameRoomId
+      length : 16
+      options : [byte_param_constructor, to_byte_array, property]
+
 
 #shop actions
 
 BuyItemInGame :
-  comment : Buy a game item in waiting room or game playing
+  comment : Buy a game item in waiting room or game playing. In instance
   fields :
     - name : ItemId
       type : Guid
       length : 16
       options : [byte_param_constructor, to_byte_array, property]
+
+BuyItemInGameResult :
+  comment : Buy a game item result in waiting room or game playing. In instance.
+  fields :
+    - name : ItemId
+      type : Guid
+      length : 16
+      options : [byte_param_constructor, to_byte_array, property]
+    - name : ItemInstanceId
+      type : Guid
+      length : 16
+      options : [byte_param_constructor, to_byte_array, property]
+    - name : Result
+      type : Boolean
+
+ReserveItemInGame :
+  comment : Reserve to buy a game item in waiting room or game playing.
+  fields :
+    - name : ItemId
+      type : Guid
+      length : 16
+      options : [byte_param_constructor, to_byte_array, property]
+
+ReserveItemInGameResult :
+  comment : Reserve to buy a game item in waiting room or game playing
+  fields :
+    - name : ItemId
+      type : Guid
+      length : 16
+      options : [byte_param_constructor, to_byte_array, property]
+    - name : ItemInstanceId
+      type : Guid
+      length : 16
+      options : [byte_param_constructor, to_byte_array, property]
+    - name : Result
+      type : Boolean
