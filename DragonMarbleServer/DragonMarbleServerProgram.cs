@@ -14,9 +14,9 @@ namespace DragonMarble
     public class DragonMarbleServerProgram
     {
         private const int Port = 10008;
-        private const int QueueNumber = 1000;
+        private const int QueueNumber = 8000;
         private const int BufferSize = 1024;
-        private const int MaxConnection = 3000;
+        private const int MaxConnection = 16000;
         private static readonly ILog Logger = LogManager.GetLogger(typeof (DragonMarbleServerProgram));
 
         private static void Main(string[] args)
@@ -38,6 +38,7 @@ namespace DragonMarble
             {
                 RajaProvider = rajaProvider
             };
+            
             GameMasterPool pool =new GameMasterPool();
             ISessionManager sessionManager = new SessionManager();
             server.OnAfterAccept += sessionManager.Login;
