@@ -11,7 +11,7 @@ namespace DragonMarble
 {
     public partial class Raja : IMessageProcessor<IDragonMarbleGameMessage>
     {
-        private readonly EventWaitHandle _receiveMessageWaitHandler = new ManualResetEvent(false);
+        private readonly ManualResetEventSlim _receiveMessageWaitHandler = new ManualResetEventSlim(false);
         
         private readonly CircularQueue<IDragonMarbleGameMessage> _receivedMessages = new CircularQueue<IDragonMarbleGameMessage>();
 
@@ -44,7 +44,7 @@ namespace DragonMarble
                 }
                 Logger.DebugFormat("Start waiting. {0}, {1}", _receivedMessages.Count, _timeout);
 
-                _receiveMessageWaitHandler.WaitOne(_timeout);
+                _receiveMessageWaitHandler.Wait(_timeout);
                 
                 
                     if (null != _timerMessage)

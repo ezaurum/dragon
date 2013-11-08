@@ -37,7 +37,7 @@ namespace DragonMarble
 
         public void Dispose()
         {
-           _receiveMessageWaitHandler.Close();
+           _receiveMessageWaitHandler.Dispose();
            Socket = null;
            ReadArgs.UserToken = null;
            ReadArgs = null;
