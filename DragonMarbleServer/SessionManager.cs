@@ -1,33 +1,71 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
+using Dragon;
 using DragonMarble.Account;
 using DragonMarble.Message;
 using log4net;
 
 namespace DragonMarble
 {
-    public class SessionManager :ISessionManager
+    public class SessionManager : ISessionManager
     {
-        private static readonly ILog Logger = LogManager.GetLogger(typeof(SessionManager));
-        public Dictionary<Guid, GameAccountInfo> Session { get; set; }
+        private static readonly ILog Logger = LogManager.GetLogger(typeof (SessionManager));
 
-        public SessionManager ()
+        public SessionManager()
         {
             Session = new Dictionary<Guid, GameAccountInfo>();
+            AccountSession = new Dictionary<Guid, Guid>();
         }
+
+        public Dictionary<Guid, GameAccountInfo> Session { get; set; }
+        public Dictionary<Guid, Guid> AccountSession { get; set; }
 
         public void Login(object sender, SocketAsyncEventArgs e)
         {
             //check key from session
-            Raja token = (Raja)e.UserToken;
+            Raja token = (Raja) e.UserToken;
 
-            SessionGameMessage message= (SessionGameMessage) token.ReceivedMessage;
-            Guid gameAccountId = message.GameAccountId;
-            Guid sessionKey = message.SessionKey;
+            IDragonMarbleGameMessage dragonMarbleGameMessage = token.ReceivedMessage;
 
+            switch (dragonMarbleGameMessage.MessageType)
+            {
+                case GameMessageType.Session:
+                    SessionGameMessage message = (SessionGameMessage) dragonMarbleGameMessage;
+                    SetSessionValues(message.SessionKey, message.GameAccountId, token, message);
+                    break;
+
+                case GameMessageType.RequestSession:
+                    RequestSessionGameMessage rsgm = (RequestSessionGameMessage) dragonMarbleGameMessage;
+                
+                //logged on already
+                    if (AccountSession.ContainsKey(rsgm.GameAccountId))
+                    {
+                        //TODO
+                        Guid sessionId = AccountSession[rsgm.GameAccountId];
+                        SetSessionValues(sessionId, rsgm.GameAccountId, token, new SessionGameMessage
+                        {
+                            GameAccountId = rsgm.GameAccountId,
+                            SessionKey = sessionId
+                        });
+                    }
+                    else
+                    {
+                        //TODO
+                        SetSessionValues(GetNewSessionId(), rsgm.GameAccountId, token, new SessionGameMessage
+                        {
+                            GameAccountId = rsgm.GameAccountId
+                        });
+                    }
+                    break;
+                case GameMessageType.ValidateSession:
+                    break;
+            }
+        }
+
+        private void SetSessionValues(Guid sessionKey, Guid gameAccountId, Raja token, SessionGameMessage message)
+        {
             GameAccountInfo gameAccountInfo;
-
             if (Session.ContainsKey(sessionKey))
             {
                 Logger.DebugFormat("Session key {0} is exist.", sessionKey);
@@ -35,7 +73,7 @@ namespace DragonMarble
             }
             else
             {
-                Logger.DebugFormat("Session key {0} is not exist.",sessionKey);
+                Logger.DebugFormat("Session key {0} is not exist.", sessionKey);
                 gameAccountInfo = GetGameAccount(gameAccountId);
                 sessionKey = GetNewSessionId();
                 Session.Add(sessionKey, gameAccountInfo);
@@ -43,7 +81,6 @@ namespace DragonMarble
             }
 
             token.GameAccount = gameAccountInfo;
-
         }
 
         private Guid GetNewSessionId()
@@ -58,13 +95,8 @@ namespace DragonMarble
         {
             return new GameAccountInfo
             {
-                Id=gameAccountId
+                Id = gameAccountId
             };
         }
-    }
-
-    public interface ISessionManager
-    {
-        void Login(object sender, SocketAsyncEventArgs e);
     }
 }

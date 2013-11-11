@@ -43,6 +43,12 @@ namespace Dragon
         IRajaProvider RajaProvider { get; set; }
         void SendBytes(Socket socket, SocketAsyncEventArgs e);
     }
+
+
+    public interface ISessionManager
+    {
+        void Login(object sender, SocketAsyncEventArgs e);
+    }
 }
 
 namespace Dragon.Session

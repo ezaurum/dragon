@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Threading;
+using Dragon;
 using Dragon.Client;
 using DragonMarble;
 using DragonMarble.Message;
@@ -27,7 +28,8 @@ namespace ConsoleTest
             Unity3DNetworkManager nm = new Unity3DNetworkManager("127.0.0.1", 10008);
             nm.OnAfterMessageReceive += ProcessClientReceivedMessage;
             nm.OnAfterMessageSend += (sender, eventArgs) => Console.WriteLine("Message Sent");
-            nm.OnAfterConnectOnce += sessionManager.SessionAssign;
+            nm.OnAfterConnectOnce += sessionManager.Login;
+            sessionManager.NetworkManager = nm;
 
             nm.Start();
 
@@ -62,7 +64,7 @@ namespace ConsoleTest
         }
     }
 
-    public class ClientSessionManager
+    public class ClientSessionManager : ISessionManager
     {
         public Guid SessionId { get; set; }
         public Guid AccountId { get; set; }
@@ -70,22 +72,21 @@ namespace ConsoleTest
         public PhysicalAddress MacAddress { get; set; }
 
         public Unity3DNetworkManager NetworkManager { get; set; }
-        
+       
+        public bool IsConnected { get; set; }
         /// <summary>
         /// 
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="eventArgs">connected socket args</param>
-        public void SessionAssign(object sender, SocketAsyncEventArgs eventArgs)
+        public void Login(object sender, SocketAsyncEventArgs e)
         {
             Console.WriteLine("Session Assign");
-            
+
             NetworkManager.SendMessage(new RequestSessionGameMessage
             {
                 GameAccountId = Guid.NewGuid()
             });
-            
         }
-        public bool IsConnected { get; set; }
     }
 }
