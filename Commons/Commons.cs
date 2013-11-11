@@ -14,7 +14,6 @@ namespace Dragon.Message
     {
         T ReceivedMessage { get; set; }
         T SendingMessage { set; }
-        void ResetMessages();
     }
 }
 

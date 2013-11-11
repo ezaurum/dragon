@@ -6,8 +6,4 @@ namespace DragonMarble.Message
     {
         GameMessageType MessageType { get; }
     }
-
-    public interface IDragonMarbleMessageProcessor : IMessageProcessor<IDragonMarbleGameMessage>
-    {
-    }
 }

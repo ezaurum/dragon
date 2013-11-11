@@ -144,11 +144,6 @@ namespace DragonMarble
 
         public GameBoard Stage { get; set; }
 
-        public void ResetMessages()
-        {
-            MessageProcessor.ResetMessages();
-        }
-
         public bool AddGold(long a)
         {
             if (gold + a < 0) return false;
