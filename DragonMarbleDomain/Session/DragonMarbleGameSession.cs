@@ -3,7 +3,7 @@ using DragonMarble.Account;
 
 namespace DragonMarble.Session
 {
-    public class GameSession : Dragon.Session.Session
+    public class DragonMarbleGameSession : Dragon.Session.GameSession
     {
         public static readonly TimeSpan SessionExpire = new TimeSpan(0, 30, 0);
 

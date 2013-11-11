@@ -47,7 +47,7 @@ namespace Dragon
 
 namespace Dragon.Session
 {
-    public class Session : IDisposable
+    public class GameSession : IDisposable
     {
         public Guid Id { get; set; }
         public virtual void Dispose()
