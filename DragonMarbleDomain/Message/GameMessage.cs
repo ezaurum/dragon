@@ -1459,6 +1459,7 @@ public class NewPlayerInWaitingRoomGameMessage : IDragonMarbleGameMessage
 {
 	public GameMessageType MessageType {get{return GameMessageType.NewPlayerInWaitingRoom;}}
 	public Guid PlayerId { get; set;}
+	public Int16 Order;
 
 	public byte[] ToByteArray()
 	{
@@ -1473,6 +1474,9 @@ public class NewPlayerInWaitingRoomGameMessage : IDragonMarbleGameMessage
 		PlayerId.ToByteArray()
 		.CopyTo(bytes,index);
 		index += 16;
+		BitConverter.GetBytes(Order)
+		.CopyTo(bytes,index);
+		index += sizeof(Int16);
 	return bytes;
 }
 
@@ -1483,13 +1487,15 @@ public void FromByteArray(byte[] bytes)
 		Buffer.BlockCopy(bytes, index, tempPlayerId, 0,16);
 		PlayerId = new Guid(tempPlayerId);
 		index += 16;
+		Order = BitConverter.ToInt16(bytes, index);
+		index += sizeof(Int16);
 }
 
 	public Int16 Length
 	{
 		get
 		{
-			return (Int16)(2+sizeof(GameMessageType)+16);
+			return (Int16)(2+sizeof(GameMessageType)+16+sizeof(Int16));
 		}
 	}
 }

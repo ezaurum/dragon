@@ -496,12 +496,14 @@ AssignRoomOwner :
       options : [byte_param_constructor, to_byte_array, property]
 
 NewPlayerInWaitingRoom :
-  comment : 게임 대기방에 사용자 추가 (server->client)
+  comment : 게임 대기방에 사용자 추가 (server->client)  
   fields :
     - type : Guid
       name : PlayerId
       length : 16
       options : [byte_param_constructor, to_byte_array, property]
+    - type : Int16
+      name : Order      
 
 ReadyStateRequest :
   comment : Request ready message (server->client)
