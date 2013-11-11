@@ -2,7 +2,6 @@
 using System.Net;
 using System.Net.Sockets;
 using log4net;
-using System.Threading;
 
 namespace Dragon.Server
 {
@@ -28,7 +27,7 @@ namespace Dragon.Server
         private readonly IPEndPoint _ipEndpoint;
 
         private Socket _listenSocket; // the socket used to listen for incoming connection requests 
-        private Semaphore _maxNumberAcceptedClients;
+        
         private readonly int _numConnections;
         private readonly int _receiveBufferSize;
         // pool of reusable SocketAsyncEventArgs objects for write, read and accept socket operations
@@ -88,8 +87,6 @@ namespace Dragon.Server
 
             _acceptPool = new SocketAsyncEventArgsPool(_numConnections, OnAfterAccept);
 
-            _maxNumberAcceptedClients = new Semaphore(_numConnections, _numConnections);
-
             // create the socket which listens for incoming connections
             _listenSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
@@ -119,8 +116,6 @@ namespace Dragon.Server
         private void StartAccept()
         {
             Logger.Debug("Start Accpet");
-
-            _maxNumberAcceptedClients.WaitOne();
 
             SocketAsyncEventArgs acceptEventArg
                 = _acceptPool.Count > 1
