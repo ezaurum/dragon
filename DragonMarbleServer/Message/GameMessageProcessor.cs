@@ -198,16 +198,15 @@ namespace DragonMarble.Message
                 GameMessageFactory.GetGameMessage(GameMessageType.ActivateTurn);
             atgm.ResponseLimit = 10000;
 
-            p.ReceiveBytes(atgm.ToByteArray(), 0, atgm.Length);
-
             byte[] buffer2 = new byte[atgm.Length + 13];
             Buffer.BlockCopy(atgm.ToByteArray(), 0, buffer2, 0, atgm.Length);
             Buffer.BlockCopy(atgm.ToByteArray(), 0, buffer2, atgm.Length, 13);
 
             p.ReceiveBytes(buffer2, 0, buffer2.Length);
-
+            
+            Assert.True(p._receivedMessages.Count == 1);
             Assert.NotNull(p.ReceivedMessage);
-            Assert.True(p._receivedMessages.Count < 1);
+            
         }
 
         [Test]
