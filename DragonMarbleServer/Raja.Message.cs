@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Dragon;
+using Dragon.Interfaces;
 using Dragon.Message;
 using DragonMarble.Message;
 
@@ -37,7 +38,7 @@ namespace DragonMarble
         {
             get
             {
-                if (_receivedMessages.Count < 1)
+                if (_receivedMessages.IsEmpty)
                 {
                     _receiveMessageWaitHandler.Reset();
                     Logger.Debug("no message in queue. wait for message");

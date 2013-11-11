@@ -68,6 +68,9 @@ namespace Dragon.Interfaces
             }
         }
         
+        /// <summary>
+        /// 
+        /// </summary>
         public bool IsEmpty
         {
             get

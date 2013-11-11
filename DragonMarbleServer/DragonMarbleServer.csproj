@@ -32,12 +32,17 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="log4net, Version=1.2.12.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>lib\log4net.dll</HintPath>
+    <Reference Include="log4net">
+      <HintPath>..\packages\log4net.2.0.2\lib\net40-full\log4net.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Profiler">
       <HintPath>..\..\..\..\..\Program Files (x86)\Microsoft Visual Studio 11.0\Team Tools\Performance Tools\Microsoft.VisualStudio.Profiler.dll</HintPath>
+    </Reference>
+    <Reference Include="Moq">
+      <HintPath>..\packages\Moq.4.1.1309.1617\lib\net40\Moq.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.framework">
+      <HintPath>..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -51,7 +56,7 @@
     <Compile Include="GameMaster.Parser.cs" />
     <Compile Include="GameMaster.RealTime.cs" />
     <Compile Include="GameMaster.Waiting.cs" />
-    <Compile Include="Message\DragonMarbleGameMessageProcessor.cs" />
+    <Compile Include="Message\GameMessageProcessor.cs" />
     <Compile Include="WaitingRoom.cs" />
     <Compile Include="Raja.cs" />
     <Compile Include="Raja.Message.cs" />
@@ -62,6 +67,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="data_chance.xml" />
@@ -70,8 +76,7 @@
       <SubType>Designer</SubType>
     </Content>
     <Content Include="data_unit.xml" />
-    <Content Include="lib\log4net.dll" />
-    <Content Include="lib\log4net.xml" />
+    <Content Include="log4net.xml" />
     <Content Include="text_language.xml" />
   </ItemGroup>
   <ItemGroup>

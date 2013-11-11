@@ -4,8 +4,10 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Dragon;
+using Dragon.Interfaces;
 using Dragon.Message;
 using log4net;
+using NUnit.Framework;
 
 namespace DragonMarble.Message
 {
@@ -26,6 +28,14 @@ namespace DragonMarble.Message
         private int _resendInterval;
         private int _timeout = Timeout.Infinite;
         private IDragonMarbleGameMessage _timerMessage;
+        private int _writeOffset;
+        private byte[] _buffer;
+        private int _readOffest;
+
+        public GameMessageProcessor()
+        {
+            _buffer = new byte[1024];
+        }
 
         public IEnumerable<IDragonMarbleGameMessage> ReceivedMessages
         {
@@ -47,7 +57,7 @@ namespace DragonMarble.Message
         {
             get
             {
-                if (_receivedMessages.Count < 1)
+                if (_receivedMessages.IsEmpty )
                 {
                     _receiveMessageWaitHandler.Reset();
                     Logger.Debug("no message in queue. wait for message");
@@ -92,29 +102,60 @@ namespace DragonMarble.Message
         public void ReceiveBytes(byte[] buffer, int offset, int bytesTransferred)
         {
             if (bytesTransferred < sizeof (Int16))
-                return;
-
-            short messageLength = BitConverter.ToInt16(buffer, offset);
-            if (messageLength == bytesTransferred)
             {
-                Convert(buffer, offset, messageLength);
+                CopyToBuffer(buffer, offset, bytesTransferred);
             }
-            else if (messageLength > bytesTransferred)
+
+            if (_writeOffset > sizeof (Int16))
             {
-                //TODO
+                short length = BitConverter.ToInt16(_buffer, 0);
+
+                int i = _readOffest > _writeOffset ? _readOffest - _writeOffset : _writeOffset - _readOffest;
+
+                if (  i < length)
+                {
+                    return;
+                }
+            }
+
+            short messageLength = -1;
+            while (bytesTransferred >= messageLength)
+            {
+                messageLength = BitConverter.ToInt16(buffer, offset);
+                Convert(buffer, offset, messageLength);
+                bytesTransferred -= messageLength;
+                offset += messageLength;
+            }
+
+            if (bytesTransferred > 0)
+            {
+                //TODO byte low
                 throw new NotImplementedException("bytes transferred is smaller than message length");
             }
-            else if (messageLength < bytesTransferred)
-            {
-                while (bytesTransferred >= messageLength)
-                {
-                    Convert(buffer, offset, messageLength);
-                    bytesTransferred -= messageLength;
-                    offset += messageLength;
-                }
-
                 
-            }
+            
+        }
+
+        private void CopyToBuffer(byte[] buffer, int offset, int bytesTransferred)
+        {
+            Buffer.BlockCopy(buffer, offset, _buffer, _writeOffset, bytesTransferred);
+            _writeOffset += bytesTransferred;
+        }
+
+        [Test]
+        public void TestReceiveBytes()
+        {
+            GameMessageProcessor p = new GameMessageProcessor();
+
+            ActivateTurnGameMessage atgm 
+                = (ActivateTurnGameMessage) 
+                GameMessageFactory.GetGameMessage(GameMessageType.ActivateTurn);
+            atgm.ResponseLimit = 10000;
+            
+            p.ReceiveBytes(atgm.ToByteArray(), 0, atgm.Length);
+
+            Assert.NotNull(p.ReceivedMessage);
+            
         }
 
         private void Convert(byte[] buffer, int offset, int bytesTransferred)
