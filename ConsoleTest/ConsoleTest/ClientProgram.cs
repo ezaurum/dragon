@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Threading;
 using Dragon.Client;
@@ -18,6 +19,7 @@ namespace ConsoleTest
 
         private static void Main(string[] args)
         {
+            ClientSessionManager sessionManager = new ClientSessionManager();
 
             OrderCardSelectState = new List<bool>();
             _units = new Dictionary<Guid, StageUnitInfo>();
@@ -25,6 +27,7 @@ namespace ConsoleTest
             Unity3DNetworkManager nm = new Unity3DNetworkManager("127.0.0.1", 10008);
             nm.OnAfterMessageReceive += ProcessClientReceivedMessage;
             nm.OnAfterMessageSend += (sender, eventArgs) => Console.WriteLine("Message Sent");
+            nm.OnAfterConnectOnce += sessionManager.SessionAssign;
 
             nm.Start();
 
@@ -57,5 +60,32 @@ namespace ConsoleTest
             Console.WriteLine("=======================================================================");
             Console.WriteLine("current thread : {0}", Thread.CurrentThread.ManagedThreadId);
         }
+    }
+
+    public class ClientSessionManager
+    {
+        public Guid SessionId { get; set; }
+        public Guid AccountId { get; set; }
+        public Guid GameRoomId { get; set; }
+        public PhysicalAddress MacAddress { get; set; }
+
+        public Unity3DNetworkManager NetworkManager { get; set; }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="eventArgs">connected socket args</param>
+        public void SessionAssign(object sender, SocketAsyncEventArgs eventArgs)
+        {
+            Console.WriteLine("Session Assign");
+            
+            NetworkManager.SendMessage(new RequestSessionGameMessage
+            {
+                GameAccountId = Guid.NewGuid()
+            });
+            
+        }
+        public bool IsConnected { get; set; }
     }
 }

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Net;
+using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Threading;
 using Dragon.Message;
+using Dragon.Session;
 
 namespace Dragon.Client
 {
@@ -19,10 +21,11 @@ namespace Dragon.Client
         public bool OnLine { get; set; }
 
         //session key 
-        public Session.Session Session { get; set; }
+        public GameSession GameSession { get; set; }
         
         public event EventHandler<SocketAsyncEventArgs> OnAfterMessageSend;
         public event EventHandler<SocketAsyncEventArgs> OnAfterMessageReceive;
+        public event EventHandler<SocketAsyncEventArgs> OnAfterConnectOnce;
 
         public Unity3DNetworkManager(string ipAddress, int port)
         {
@@ -115,24 +118,28 @@ namespace Dragon.Client
 
         private void Read_Completed(object sender, SocketAsyncEventArgs e)
         {
-            Console.WriteLine("READ_COMPLETED");
-            if (e.SocketError == SocketError.Success && e.BytesTransferred > 0)
+            while (true)
             {
-                Console.WriteLine("Has Data {0}",e.BytesTransferred);
-                OnAfterMessageReceive(sender, e);
-                Console.WriteLine("Recursive READ");
-                
-            } else if (e.SocketError != SocketError.Success)
-            {
-                OnLine = false;
-                return;
-            }
+                Console.WriteLine("READ_COMPLETED");
+                if (e.SocketError == SocketError.Success && e.BytesTransferred > 0)
+                {
+                    Console.WriteLine("Has Data {0}", e.BytesTransferred);
+                    OnAfterMessageReceive(sender, e);
+                    Console.WriteLine("Recursive READ");
+                }
+                else if (e.SocketError != SocketError.Success)
+                {
+                    OnLine = false;
+                    return;
+                }
 
-            if (!_socket.ReceiveAsync(e))
-            {
-                Read_Completed(sender, e);
+                if (!_socket.ReceiveAsync(e))
+                {
+                    continue;
+                }
+
+                break;
             }
-            
         }
 
         private void Connect_Completed(object sender, SocketAsyncEventArgs e)
@@ -141,6 +148,7 @@ namespace Dragon.Client
 
             if (e.SocketError == SocketError.Success)
             {
+                OnAfterConnectOnce(sender, e);
                 _readEventArgs.UserToken = RajaProvider.NewInstance();
                 _writeEventArgs.UserToken = ((ClientRajaProvider)RajaProvider).NewWriteAsyncUserToken();
                 
@@ -160,6 +168,27 @@ namespace Dragon.Client
         public void SendBytes(Socket socket, SocketAsyncEventArgs e)
         {
             throw new NotImplementedException();
+        }
+
+        public static void DisplayTypeAndAddress()
+        {
+            IPGlobalProperties computerProperties = IPGlobalProperties.GetIPGlobalProperties();
+            NetworkInterface[] nics = NetworkInterface.GetAllNetworkInterfaces();
+            Console.WriteLine("Interface information for {0}.{1}     ",
+                    computerProperties.HostName, computerProperties.DomainName);
+            foreach (NetworkInterface adapter in nics)
+            {
+                PhysicalAddress physicalAddress = adapter.GetPhysicalAddress();
+                IPInterfaceProperties properties = adapter.GetIPProperties();
+                Console.WriteLine(adapter.Description);
+                Console.WriteLine(String.Empty.PadLeft(adapter.Description.Length, '='));
+                Console.WriteLine("  Interface type .......................... : {0}", adapter.NetworkInterfaceType);
+                Console.WriteLine("  Physical Address ........................ : {0}",
+                           physicalAddress.ToString());
+                Console.WriteLine("  Is receive only.......................... : {0}", adapter.IsReceiveOnly);
+                Console.WriteLine("  Multicast................................ : {0}", adapter.SupportsMulticast);
+                Console.WriteLine();
+            }
         }
     }
 
