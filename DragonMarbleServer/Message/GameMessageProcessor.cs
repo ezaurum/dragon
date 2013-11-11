@@ -103,7 +103,7 @@ namespace DragonMarble.Message
         {
             if (bytesTransferred < sizeof(Int16))
             {
-                CopyToBuffer(buffer, offset, bytesTransferred);
+                CopyToBuffer(buffer, ref offset, ref bytesTransferred);
                 return;
             }
 
@@ -114,9 +114,7 @@ namespace DragonMarble.Message
                 
                 if (messageLength > bytesTransferred)
                 {
-                    CopyToBuffer(buffer, offset, bytesTransferred);
-                    bytesTransferred -= messageLength;
-                    offset += messageLength;
+                    CopyToBuffer(buffer, ref offset, ref bytesTransferred);
                 }
                 else
                 {
@@ -127,17 +125,20 @@ namespace DragonMarble.Message
             }
         }
 
-        private void CopyToBuffer(byte[] buffer, int offset, int bytesTransferred)
+        private void CopyToBuffer(byte[] buffer,ref int offset, ref int bytesTransferred)
         {
             if (bytesTransferred > WriteAbleLength)
             {
                 Buffer.BlockCopy(buffer, offset, _buffer, _writeOffset, WriteAbleLength);
                 bytesTransferred -= WriteAbleLength;
                 offset += WriteAbleLength;
+                _writeOffset = 0;
             }
 
             Buffer.BlockCopy(buffer, offset, _buffer, _writeOffset, bytesTransferred);
             _writeOffset += bytesTransferred;
+            bytesTransferred -= bytesTransferred;
+
         }
 
         private int WriteAbleLength
