@@ -29,7 +29,7 @@ namespace Dragon.Interfaces
 
         public int Count
         {
-            get { return _head > _tail  ? _head - _tail : _length - _tail + _head; }
+            get { return _head < _tail ? _length - _tail + _head : _head - _tail; }
         }
 
         public bool Enqueue(T t)
@@ -38,9 +38,8 @@ namespace Dragon.Interfaces
                 throw new ArgumentNullException(String.Format("Parameter cannot be null. {0}",t.GetType()));
             if ( IsFull)
                 throw new ArgumentOutOfRangeException(String.Format("Queue is full. {0}",t.GetType()));
-            
-            _head = (_head + 1) % _length;
             _container[_head] = t;
+            _head = (_head + 1) % _length;
             return true;
         }
 
@@ -53,8 +52,9 @@ namespace Dragon.Interfaces
             if ( IsEmpty )
                 throw new InvalidOperationException("No data.");
 
-            _tail = (_tail+1) % _length;
-            return _container[_tail];
+            T result = _container[_tail];
+            _tail = (_tail + 1) % _length;
+            return result;
         }
 
         public bool IsFull
