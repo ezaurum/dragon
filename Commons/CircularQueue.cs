@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DragonMarble
+namespace Dragon.Interfaces
 {
     public class CircularQueue<T>
     {
@@ -9,11 +9,16 @@ namespace DragonMarble
         private int _tail;
         private int _length;
 
-        public CircularQueue()
+        public CircularQueue() : this(5)
+        {
+          
+        }
+
+        public CircularQueue(int i)
         {
             _head = 0;
             _tail = 0;
-            Extend(5);
+            Extend(i);
         }
 
         public void Extend(int size)
@@ -24,13 +29,15 @@ namespace DragonMarble
 
         public int Count
         {
-            get { return _head > _tail  ? _head - _tail : _tail - _head; }
+            get { return _head > _tail  ? _head - _tail : _length - _tail + _head; }
         }
 
         public bool Enqueue(T t)
         {
-            if ( null == t) 
-                throw new InvalidOperationException("Parameter cannot be null.");
+            if (null == t) 
+                throw new ArgumentNullException(String.Format("Parameter cannot be null. {0}",t.GetType()));
+            if ( IsFull)
+                throw new ArgumentOutOfRangeException(String.Format("Queue is full. {0}",t.GetType()));
             
             _head = (_head + 1) % _length;
             _container[_head] = t;
@@ -50,6 +57,17 @@ namespace DragonMarble
             return _container[_tail];
         }
 
+        public bool IsFull
+        {
+            get
+            {
+                if (((_head + 1) % _length) == _tail)
+                    return true;
+
+                return false;
+            }
+        }
+        
         public bool IsEmpty
         {
             get
