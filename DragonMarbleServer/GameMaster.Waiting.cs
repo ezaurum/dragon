@@ -44,9 +44,16 @@ namespace DragonMarble
                 Server = Id
             };
 
-            IDragonMarbleGameMessage message = new GoToWaitingRoomGameMessage
+            /*player.SendingMessage  = new GoToWaitingRoomGameMessage
             {
-                //GameRoomId = player.Id
+                GameRoomId = Id
+            };*/
+
+            IDragonMarbleGameMessage message = new NewPlayerInWaitingRoomGameMessage
+            {
+                PlayerId = player.Id,
+                Order = (short) player.Order
+
             };
             Notify(message);
 

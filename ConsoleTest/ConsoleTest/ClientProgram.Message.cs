@@ -23,10 +23,13 @@ namespace ConsoleTest
                     InitPlayer(dragonMarbleGameMessage);
                     break;
                 case GameMessageType.GoToWaitingRoom:
-                    Join((GoToWaitingRoomGameMessage)dragonMarbleGameMessage);
+                    throw new Exception("GOTO?");
                     break;
                 case GameMessageType.WaitingRoomInfo:
                     InitWaitingRoom((WaitingRoomInfoGameMessage)dragonMarbleGameMessage);
+                    break;
+                case GameMessageType.NewPlayerInWaitingRoom:
+                    Join((NewPlayerInWaitingRoomGameMessage)dragonMarbleGameMessage);
                     break;
                 case GameMessageType.EveryoneIsReady:
 
@@ -63,11 +66,13 @@ namespace ConsoleTest
         {
         }
 
-        private static void Join(GoToWaitingRoomGameMessage dragonMarbleGameMessage)
+        private static void Join( NewPlayerInWaitingRoomGameMessage message)
         {
             StageUnitInfo stageUnitInfo = new StageUnitInfo
             {
-                //Id = dragonMarbleGameMessage..PlayerId
+                Id = message.PlayerId,
+                //Order = 
+                
             };
             _units.Add(stageUnitInfo.Id, stageUnitInfo);
             Console.WriteLine("SYSTEM: new Player {0} joined.", stageUnitInfo.Id);
