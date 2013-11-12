@@ -93,7 +93,7 @@ namespace Dragon.Server
 
         private void DefaultAfterReceive(object sender, SocketAsyncEventArgs e)
         {
-            if (e.BytesTransferred > 0)
+            if (e.BytesTransferred > 0 && e.SocketError == SocketError.Success)
             {
                 if (Logger.IsDebugEnabled)
                 {

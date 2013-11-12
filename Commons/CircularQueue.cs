@@ -16,9 +16,12 @@ namespace Dragon.Interfaces
 
         public CircularQueue(int i)
         {
-            _head = 0;
-            _tail = 0;
             Extend(i);
+        }
+
+        public CircularQueue(T[] container)
+        {
+            _container = container;
         }
 
         public void Extend(int size)
