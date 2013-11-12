@@ -7,8 +7,8 @@
     <ProjectGuid>{6A94673F-AE42-4A0D-BADC-83933C0976C1}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Dragon.Interfaces</RootNamespace>
-    <AssemblyName>DragonInterfaces</AssemblyName>
+    <RootNamespace>Dragon</RootNamespace>
+    <AssemblyName>DragonCommons</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />

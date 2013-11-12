@@ -93,6 +93,8 @@ namespace Dragon.Server
 
         // Starts the server such that it is listening for  
         // incoming connection requests.
+        // ReSharper disable once UnusedMember.Global
+        // This is called outside.
         public void Start()
         {
             if (ManagerState.InitializedHelperObjects >= _state)
