@@ -21,7 +21,7 @@
 // [assembly: AssemblyVersion("1.0.*")]
 using System.Reflection;
 [assembly: AssemblyTitle("Dragon Engine Client Network Manager")]
-[assembly: AssemblyDescription("Client Network Manager")]
+[assembly: AssemblyDescription("Dragon Engine Client Network Manager")]
 [assembly: AssemblyCompany("CUBE Games")]
 [assembly: AssemblyProduct("Dragon Engine")]
 [assembly: AssemblyTrademark("Dragon Engine")]
