@@ -20,10 +20,10 @@
 // 지정되도록 할 수 있습니다.
 // [assembly: AssemblyVersion("1.0.*")]
 using System.Reflection;
-[assembly: AssemblyTitleAttribute("Dragon Engine Client Network Manager")]
-[assembly: AssemblyDescriptionAttribute("Client Network Manager")]
-[assembly: AssemblyCompanyAttribute("CUBE Games")]
-[assembly: AssemblyProductAttribute("Dragon Engine")]
-[assembly: AssemblyTrademarkAttribute("Dragon Engine")]
-[assembly: AssemblyVersionAttribute("0.0.0.1")]
-[assembly: AssemblyFileVersionAttribute("0.0.0.1")]
+[assembly: AssemblyTitle("Dragon Engine Client Network Manager")]
+[assembly: AssemblyDescription("Client Network Manager")]
+[assembly: AssemblyCompany("CUBE Games")]
+[assembly: AssemblyProduct("Dragon Engine")]
+[assembly: AssemblyTrademark("Dragon Engine")]
+[assembly: AssemblyVersion("0.0.0.1")]
+[assembly: AssemblyFileVersion("0.0.0.1")]

@@ -32,6 +32,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DragonCommons">
+      <HintPath>..\packages\DragonCommons.0.0.0.1\lib\net35\DragonCommons.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
@@ -39,14 +42,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Unity3DNetworkManager.cs" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
-    <ProjectReference Include="..\Commons\Commons.csproj">
-      <Project>{6A94673F-AE42-4A0D-BADC-83933C0976C1}</Project>
-      <Name>Commons</Name>
-    </ProjectReference>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>nugetbuild $(ProjectDir)$(ProjectFileName) $(TargetDir)</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

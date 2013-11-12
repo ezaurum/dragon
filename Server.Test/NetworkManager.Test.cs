@@ -7,13 +7,8 @@ namespace Dragon.Server
     {
         public NetworkManager()
         {
-            
-        }
 
-        [Test]
-        public void Test()
-        {
-            Assert.IsTrue(true);
         }
     }
+
 }

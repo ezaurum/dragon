@@ -53,7 +53,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <Compile Include="NetworkManager.Test.cs" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -63,4 +62,7 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  </Project>
+  <PropertyGroup>
+    <PostBuildEvent>nugetbuild $(ProjectDir)$(ProjectFileName) $(TargetDir)</PostBuildEvent>
+  </PropertyGroup>
+</Project>
