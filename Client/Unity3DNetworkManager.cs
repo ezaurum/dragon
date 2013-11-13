@@ -148,7 +148,7 @@ namespace Dragon.Client
 
             if (e.SocketError == SocketError.Success)
             {
-                OnAfterConnectOnce(sender, e);
+                if( null != OnAfterConnectOnce) OnAfterConnectOnce(sender, e);
                 _readEventArgs.UserToken = RajaProvider.NewInstance();
                 _writeEventArgs.UserToken = ((ClientRajaProvider)RajaProvider).NewWriteAsyncUserToken();
                 
