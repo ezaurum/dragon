@@ -85,10 +85,7 @@ namespace Dragon.Server
         //send doesn't need continuasly run
         private void DefaultAfterSend(object sender, SocketAsyncEventArgs e)
         {
-            Logger.DebugFormat("Sended.");
-            IRaja userToken = (IRaja) e.UserToken;
-            userToken.AbleToSend = true;
-
+            Logger.DebugFormat("Sended. {0} bytes. {1}", e.BytesTransferred, e.SocketError);
         }
 
         private void DefaultAfterReceive(object sender, SocketAsyncEventArgs e)

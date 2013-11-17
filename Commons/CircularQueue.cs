@@ -62,12 +62,8 @@ namespace Dragon
 
         public byte[] GetBytes(int bytesLength)
         {
-            byte[] lenghtBytes = new byte[bytesLength];
-            for (int i = 0; i < bytesLength; i++)
-            {
-                lenghtBytes[i] = _container[_tail];
-                _tail = (_tail + 1) % _length;
-            }
+            byte[] lenghtBytes = PickBytes(bytesLength);
+            _tail = (_tail + bytesLength) % _length;
             return lenghtBytes;
         }
 
