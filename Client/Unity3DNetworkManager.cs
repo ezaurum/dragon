@@ -144,8 +144,6 @@ namespace Dragon.Client
 
         private void Connect_Completed(object sender, SocketAsyncEventArgs e)
         {
-            OnLine = true;
-
             if (e.SocketError == SocketError.Success)
             {
                 if( null != OnAfterConnectOnce) OnAfterConnectOnce(sender, e);
@@ -154,6 +152,8 @@ namespace Dragon.Client
                 
                 Console.WriteLine("Start to read");
                 Read_Completed(this, _readEventArgs);
+
+                OnLine = true;
             }
         }
 
