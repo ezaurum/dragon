@@ -17,6 +17,7 @@ namespace Dragon.Client
         private SocketAsyncEventArgs _readEventArgs; 
         private SocketAsyncEventArgs _writeEventArgs;
         private readonly EndPoint _ipEndpoint;
+        private readonly object _lock = new object();
 
         public bool OnLine { get; set; }
 
@@ -40,15 +41,18 @@ namespace Dragon.Client
         public void SendMessage(IGameMessage gameMessage)
         {
             byte[] byteArray = gameMessage.ToByteArray();
-
+            
             Console.WriteLine("send {0} bytes.", byteArray.Length);
             
             try
             {
-                _writeEventArgs.SetBuffer(byteArray, 0, byteArray.Length);
-                if (!_socket.SendAsync(_writeEventArgs))
+                lock (_lock)
                 {
-                    Send_Completed(_writeEventArgs);
+                    _writeEventArgs.SetBuffer(byteArray, 0, byteArray.Length);
+                    if (!_socket.SendAsync(_writeEventArgs))
+                    {
+                        Send_Completed(_writeEventArgs);
+                    }
                 }
             }
             catch (InvalidOperationException e)
