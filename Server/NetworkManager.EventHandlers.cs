@@ -9,7 +9,7 @@ namespace Dragon.Server
 
         public void SendBytes(Socket socket, SocketAsyncEventArgs e)
         {
-            Logger.DebugFormat("WTF? {0}", e.SocketError);
+            Logger.DebugFormat("SocketError:{0}", e.SocketError);
             if (e.SocketError != SocketError.Success) return;
             if (!socket.SendAsync(e))
             {
