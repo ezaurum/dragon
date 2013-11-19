@@ -8,6 +8,7 @@ namespace Dragon.Message
         Int16 Length { get; }
         byte[] ToByteArray();
         void FromByteArray(byte[] bytes);
+        DateTime PacketTime { get; set; }
     }
 
     public interface IMessageProcessor<T> where T : IGameMessage
