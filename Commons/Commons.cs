@@ -47,6 +47,14 @@ namespace Dragon
     {
         void Login(object sender, SocketAsyncEventArgs e);
     }
+
+    public interface IEventArgsPool<T> where T : EventArgs
+    {
+        void Push(T item);
+        T Pop();
+        event EventHandler<T> Completed;
+        void Prepare(int capacity);
+    }
 }
 
 namespace Dragon.Session

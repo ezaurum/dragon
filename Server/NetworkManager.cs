@@ -7,35 +7,25 @@ namespace Dragon.Server
 {
     public partial class NetworkManager : INetworkManager
     {
-        private enum ManagerState
-        {
-            BeforeInitialized = 0,
-            InitializedFields = 100,
-            InitializedEventHandler,
-            InitializedHelperObjects,
-            Running = 1000
-        }
-
         private const int OpsToPreAlloc = 2; // read, write (don't alloc buffer space for accepts)
         private static readonly ILog Logger = LogManager.GetLogger(typeof (NetworkManager));
         private readonly int _backlog;
         // the maximum number of connections the sample is designed to handle simultaneously  
 
-        private BufferManager _bufferManager;
         // represents a large reusable set of buffers for all socket operations 
 
         private readonly IPEndPoint _ipEndpoint;
 
-        private Socket _listenSocket; // the socket used to listen for incoming connection requests 
-        
         private readonly int _numConnections;
         private readonly int _receiveBufferSize;
         // pool of reusable SocketAsyncEventArgs objects for write, read and accept socket operations
-        private SocketAsyncEventArgsPool _readPool;
-        private SocketAsyncEventArgsPool _writePool;
         private SocketAsyncEventArgsPool _acceptPool;
-        
+        private BufferManager _bufferManager;
+        private Socket _listenSocket; // the socket used to listen for incoming connection requests 
+        private SocketAsyncEventArgsPool _readPool;
+
         private ManagerState _state = ManagerState.BeforeInitialized;
+        private SocketAsyncEventArgsPool _writePool;
 
         // Create an uninitialized server instance.   
         // To start the server listening for connection requests 
@@ -50,10 +40,10 @@ namespace Dragon.Server
             _receiveBufferSize = receiveBufferSize;
             _backlog = backlog;
             _ipEndpoint = ipEndpoint;
-            
+
             //
             OnAfterAccept += InitToken;
-            
+
             _state = ManagerState.InitializedFields;
         }
 
@@ -65,11 +55,11 @@ namespace Dragon.Server
 
         private void InitializeHelperObject()
         {
-            if ( ManagerState.InitializedEventHandler > _state)
+            if (ManagerState.InitializedEventHandler > _state)
             {
                 throw new InvalidOperationException("Not initialized.");
             }
-            
+
             //#2 initialize helper objects, 
             // event handlers should be initialized.
             // allocate buffers such that the maximum number of sockets can have one outstanding read and  
@@ -77,13 +67,15 @@ namespace Dragon.Server
             _bufferManager = new BufferManager(_receiveBufferSize*_numConnections*OpsToPreAlloc,
                 _receiveBufferSize);
 
-            _readPool = new SocketAsyncEventArgsPool(
-                _numConnections, OnAfterReceive, _bufferManager);
+            _readPool = new SocketAsyncEventArgsPool(_numConnections);
+            _readPool.Completed += OnAfterReceive;
+            _readPool.BufferManager = _bufferManager;
 
-            _writePool = new SocketAsyncEventArgsPool(
-                _numConnections, OnAfterSend);
+            _writePool = new SocketAsyncEventArgsPool(_numConnections);
+            _writePool.Completed += OnAfterSend;
 
-            _acceptPool = new SocketAsyncEventArgsPool(_numConnections, OnAfterAccept);
+            _acceptPool = new SocketAsyncEventArgsPool(_numConnections);
+            _acceptPool.Completed += OnAfterAccept;
 
             // create the socket which listens for incoming connections
             _listenSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
@@ -120,7 +112,7 @@ namespace Dragon.Server
             SocketAsyncEventArgs acceptEventArg
                 = _acceptPool.Count > 1
                     ? _acceptPool.Pop()
-                    : _acceptPool.CreateNew(OnAfterAccept);
+                    : _acceptPool.CreateNew();
 
             bool willRaiseEvent = _listenSocket.AcceptAsync(acceptEventArg);
             if (!willRaiseEvent)
@@ -128,6 +120,15 @@ namespace Dragon.Server
                 Logger.Debug("Direct run");
                 OnAfterAccept(_listenSocket, acceptEventArg);
             }
+        }
+
+        private enum ManagerState
+        {
+            BeforeInitialized = 0,
+            InitializedFields = 100,
+            InitializedEventHandler,
+            InitializedHelperObjects,
+            Running = 1000
         }
     }
 }

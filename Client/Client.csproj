@@ -32,9 +32,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DragonCommons">
-      <HintPath>..\packages\DragonCommons.0.0.0.1\lib\net35\DragonCommons.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
@@ -43,7 +40,10 @@
     <Compile Include="Unity3DNetworkManager.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <ProjectReference Include="..\Commons\Commons.csproj">
+      <Project>{6a94673f-ae42-4a0d-badc-83933c0976c1}</Project>
+      <Name>Commons</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
