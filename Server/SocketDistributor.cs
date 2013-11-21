@@ -128,7 +128,7 @@ namespace Dragon
             AcceptPool.Push(e);
 
             //check successfully accept
-            if (e.SocketError != SocketError.Success)
+            if (e.SocketError == SocketError.Success)
             {
                 //add connection number
                 Interlocked.Increment(ref _currentAcceptedConnections);
