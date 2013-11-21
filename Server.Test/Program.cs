@@ -6,12 +6,16 @@ using log4net.Config;
 
 namespace Server.Test
 {
+    /// <summary>
+    /// .Test for socket distributor
+    /// </summary>
     class Program
     {
         static void Main(string[] args)
         {
             BasicConfigurator.Configure();
             SocketAsyncEventArgsPool socketAsyncEventArgsPool = new SocketAsyncEventArgsPool();
+            socketAsyncEventArgsPool.Completed += (sender, e) => Console.WriteLine("Ftestsaefsd");
             SocketDistributor s = new SocketDistributor
             {
                 AcceptPool = socketAsyncEventArgsPool,
