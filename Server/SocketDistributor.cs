@@ -127,17 +127,21 @@ namespace Dragon
             //return used event args
             AcceptPool.Push(e);
 
-            //add connection number
-            Interlocked.Increment(ref _currentAcceptedConnections);
+            //check successfully accept
+            if (e.SocketError != SocketError.Success)
+            {
+                //add connection number
+                Interlocked.Increment(ref _currentAcceptedConnections);
+                
+                //check connection max number
+                CheckMaxNumber();
+            }
 
             if (Logger.IsDebugEnabled)
             {
                 Logger.DebugFormat("SocketError:{0}",e.SocketError);
                 Logger.DebugFormat("Current Connection:{0}", _currentAcceptedConnections);
             }
-
-            //check connection max number
-            CheckMaxNumber();
 
             if (_state < DistributorState.Acceptable)
             {
