@@ -9,7 +9,7 @@ namespace Server.Test
     /// <summary>
     /// .Test for socket distributor
     /// </summary>
-    class Program
+    public static class ServerTestProgram
     {
         static void Main(string[] args)
         {
@@ -23,6 +23,7 @@ namespace Server.Test
                 MaximumConnection = 5,
                 IpEndpoint = new IPEndPoint(IPAddress.Any, 10008)
             };
+            Console.ReadKey();
             s.Start();
             Console.ReadKey();
         }

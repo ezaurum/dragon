@@ -17,7 +17,7 @@ namespace Dragon
 
 	public class UnityLogger : ILogger
 	{
-		public void Debug(string message, object[] args)
+		public void Debug(string message,  params object[] args)
 		{
 			if ( Debug.isDebugBuild)
 			{
@@ -25,7 +25,7 @@ namespace Dragon
 			}
 		}
 		
-		public void Error(string message, object[] args)
+		public void Error(string message,  params object[] args)
 		{
 			if ( Debug.isDebugBuild)
 			{
@@ -33,7 +33,7 @@ namespace Dragon
 			}
 		}
 		
-		public void Info(string message, object[] args)
+		public void Info(string message,  params object[] args)
 		{
 			if ( Debug.isDebugBuild)
 			{
@@ -41,7 +41,7 @@ namespace Dragon
 			}
 		}
 		
-		public void Fatal(string message, object[] args)
+		public void Fatal(string message,  params object[] args)
 		{
 			if ( Debug.isDebugBuild)
 			{
@@ -49,7 +49,7 @@ namespace Dragon
 			}
 		}
 		
-		public void Warn(string message, object[] args)
+		public void Warn(string message,  params object[] args)
 		{
 			if ( Debug.isDebugBuild)
 			{
@@ -113,7 +113,7 @@ namespace Dragon
             _log = getLogger;
         }
 
-        public void Debug(string message, object[] args)
+        public void Debug(string message, params object[] args)
         {
             if (_log.IsDebugEnabled)
             {
@@ -121,7 +121,7 @@ namespace Dragon
             }
         }
 
-        public void Error(string message, object[] args)
+        public void Error(string message, params object[] args)
         {
             if (_log.IsErrorEnabled)
             {
@@ -129,7 +129,7 @@ namespace Dragon
             }
         }
 
-        public void Info(string message, object[] args)
+        public void Info(string message, params object[] args)
         {
             if (_log.IsInfoEnabled)
             {
@@ -137,7 +137,7 @@ namespace Dragon
             }
         }
 
-        public void Fatal(string message, object[] args)
+        public void Fatal(string message, params  object[] args)
         {
             if (_log.IsFatalEnabled)
             {
@@ -145,7 +145,7 @@ namespace Dragon
             }
         }
 
-        public void Warn(string message, object[] args)
+        public void Warn(string message, params object[] args)
         {
             if (_log.IsWarnEnabled)
             {
@@ -186,11 +186,11 @@ namespace Dragon
 {
     public interface ILogger
     {
-        void Debug(string message, object[] args);
-        void Error(string message, object[] args);
-        void Info(string message, object[] args);
-        void Fatal(string message, object[] args);
-        void Warn(string message, object[] args);
+        void Debug(string message, params object[] args);
+        void Error(string message, params object[] args);
+        void Info(string message, params object[] args);
+        void Fatal(string message, params object[] args);
+        void Warn(string message, params object[] args);
         void Debug(string message);
         void Error(string message);
         void Info(string message);
