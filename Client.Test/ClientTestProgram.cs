@@ -9,6 +9,7 @@ namespace Client.Test
         {
             SocketConnector c = new SocketConnector();
             c.Connect("127.0.0.1",10008);
+            
             Console.ReadKey();
         }
     }

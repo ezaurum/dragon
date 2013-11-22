@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using System.Threading;
 using Dragon;
 using Dragon.Server;
 using log4net.Config;
@@ -23,7 +24,7 @@ namespace Server.Test
                 MaximumConnection = 5,
                 IpEndpoint = new IPEndPoint(IPAddress.Any, 10008)
             };
-            Console.ReadKey();
+            Thread.Sleep(1000);
             s.Start();
             Console.ReadKey();
         }

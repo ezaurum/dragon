@@ -6,39 +6,35 @@ namespace Dragon.Client
 {
     public class SocketConnector
     {
-        private enum ConnectorState
-        {
-            BeforeInitialized
-        }
-        private Socket _socket;
-        private EndPoint _ipEndpoint;
-
         private const int DefaultListeningPortNumber = 10008;
-        public int RetryInterval { get; set; }
-        public int RetryLimit { get; set; }
-        private static readonly IPAddress DefaultConnectIpAddresss= IPAddress.Loopback;
-        private static readonly ILogger Logger = LoggerManager.GetLogger(typeof(SocketConnector));
+        private static readonly IPAddress DefaultConnectIpAddresss = IPAddress.Loopback;
+        private static readonly ILogger Logger = LoggerManager.GetLogger(typeof (SocketConnector));
 
-        private SocketAsyncEventArgs ConnectEventArgs { get; set; }
-        
-        private ConnectorState _state = ConnectorState.BeforeInitialized;
         private int _retryCount;
+        private ConnectorState _state = ConnectorState.BeforeInitialized;
 
         public SocketConnector()
         {
-            _socket = new Socket(AddressFamily.InterNetwork,
+            Socket = new Socket(AddressFamily.InterNetwork,
                 SocketType.Stream, ProtocolType.Tcp);
 
             ConnectEventArgs = new SocketAsyncEventArgs();
 
             ConnectEventArgs.Completed += ConnectEventArgsOnCompleted;
-            
+
             RetryInterval = 500;
             RetryLimit = 5;
 
-            _ipEndpoint = new IPEndPoint(DefaultConnectIpAddresss, DefaultListeningPortNumber);
-            ConnectEventArgs.RemoteEndPoint = _ipEndpoint;
+            IpEndpoint = new IPEndPoint(DefaultConnectIpAddresss, DefaultListeningPortNumber);
+            ConnectEventArgs.RemoteEndPoint = IpEndpoint;
         }
+
+        public Socket Socket { get; set; }
+
+        public EndPoint IpEndpoint { get; set; }
+        public int RetryInterval { get; set; }
+        public int RetryLimit { get; set; }
+        private SocketAsyncEventArgs ConnectEventArgs { get; set; }
 
         private void ConnectEventArgsOnCompleted(object sender, SocketAsyncEventArgs socketAsyncEventArgs)
         {
@@ -46,7 +42,8 @@ namespace Dragon.Client
             {
                 if (_retryCount < RetryLimit)
                 {
-                    Logger.Debug("Connectiton Failed. Because of {0}. Try reonnect {1}/{2} after {3}ms", socketAsyncEventArgs.SocketError, _retryCount, RetryLimit, RetryInterval);
+                    Logger.Debug("Connectiton Failed. Because of {0}. Try reonnect {1}/{2} after {3}ms",
+                        socketAsyncEventArgs.SocketError, _retryCount, RetryLimit, RetryInterval);
                     _retryCount++;
                     Thread.Sleep(RetryInterval);
                     Connect();
@@ -64,7 +61,7 @@ namespace Dragon.Client
 
         private void Connect()
         {
-            if (!_socket.ConnectAsync(ConnectEventArgs))
+            if (!Socket.ConnectAsync(ConnectEventArgs))
             {
                 ConnectEventArgsOnCompleted(null, ConnectEventArgs);
             }
@@ -72,9 +69,14 @@ namespace Dragon.Client
 
         public void Connect(string ipAddress, int port)
         {
-            _ipEndpoint = new IPEndPoint(IPAddress.Parse(ipAddress), port);
-            ConnectEventArgs.RemoteEndPoint = _ipEndpoint;
+            IpEndpoint = new IPEndPoint(IPAddress.Parse(ipAddress), port);
+            ConnectEventArgs.RemoteEndPoint = IpEndpoint;
             Connect();
+        }
+
+        private enum ConnectorState
+        {
+            BeforeInitialized
         }
     }
 }
