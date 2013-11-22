@@ -8,7 +8,7 @@ namespace Client.Test
         static void Main(string[] args)
         {
             SocketConnector c = new SocketConnector();
-            c.Connect();
+            c.Connect("127.0.0.1",10008);
             Console.ReadKey();
         }
     }

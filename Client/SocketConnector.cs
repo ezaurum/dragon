@@ -1,5 +1,4 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 
@@ -12,7 +11,7 @@ namespace Dragon.Client
             BeforeInitialized
         }
         private Socket _socket;
-        private readonly EndPoint _ipEndpoint;
+        private EndPoint _ipEndpoint;
 
         private const int DefaultListeningPortNumber = 10008;
         public int RetryInterval { get; set; }
@@ -32,14 +31,13 @@ namespace Dragon.Client
 
             ConnectEventArgs = new SocketAsyncEventArgs();
 
-            _ipEndpoint = new IPEndPoint(DefaultConnectIpAddresss, DefaultListeningPortNumber);
-
-            ConnectEventArgs.RemoteEndPoint = _ipEndpoint;
-
             ConnectEventArgs.Completed += ConnectEventArgsOnCompleted;
             
             RetryInterval = 500;
             RetryLimit = 5;
+
+            _ipEndpoint = new IPEndPoint(DefaultConnectIpAddresss, DefaultListeningPortNumber);
+            ConnectEventArgs.RemoteEndPoint = _ipEndpoint;
         }
 
         private void ConnectEventArgsOnCompleted(object sender, SocketAsyncEventArgs socketAsyncEventArgs)
@@ -63,18 +61,20 @@ namespace Dragon.Client
                 Logger.Debug("Connected.");
             }
         }
-        
-        public SocketConnector(string ipAddress, int port) : this()
-        {
-            _ipEndpoint = new IPEndPoint(IPAddress.Parse(ipAddress), port);
-        }
 
-        public void Connect()
+        private void Connect()
         {
             if (!_socket.ConnectAsync(ConnectEventArgs))
             {
                 ConnectEventArgsOnCompleted(null, ConnectEventArgs);
             }
+        }
+
+        public void Connect(string ipAddress, int port)
+        {
+            _ipEndpoint = new IPEndPoint(IPAddress.Parse(ipAddress), port);
+            ConnectEventArgs.RemoteEndPoint = _ipEndpoint;
+            Connect();
         }
     }
 }

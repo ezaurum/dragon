@@ -1,8 +1,6 @@
-﻿using System.Collections;
-using log4net.Config;
-#if UNITY_EDITOR || UNITY_IPHONE || UNITY_STANDALONE_OSX || UNITY_STANDALONE_WIN || UNITY_STANDALONE_WIN
-using UnityEngine;
+﻿#if UNITY_EDITOR || UNITY_IPHONE || UNITY_STANDALONE_OSX || UNITY_STANDALONE_WIN || UNITY_STANDALONE_WIN
 using System;
+using UnityEngine;
 
 namespace Dragon 
 {
@@ -88,6 +86,7 @@ namespace Dragon
 #else
 using System;
 using log4net;
+using log4net.Config;
 
 namespace Dragon
 {
