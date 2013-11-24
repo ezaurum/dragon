@@ -40,14 +40,21 @@ namespace Client.Test
 
     public class DummyClientSessionManager : ISessionManager
     {
+
         public void RequestSession(object sender, SocketAsyncEventArgs e)
         {
             if (e.SocketError != SocketError.Success) return;
             Console.WriteLine("request session");
-            SessionAcquired(sender, e);
+            CheckSuccess(sender, e);
         }
 
         public event EventHandler<SocketAsyncEventArgs> SessionAcquired;
+        
+        private void CheckSuccess(object sender, SocketAsyncEventArgs e)
+        {
+            Console.WriteLine("check success");
+            SessionAcquired(sender, e);
+        }
     }
 
     public class DummyClientAuthorizationManager : IAuthorizationManager
@@ -56,6 +63,13 @@ namespace Client.Test
         {
             if (e.SocketError != SocketError.Success) return;
             Console.WriteLine("login");
+            CheckSuccess(sender, e);
+            
+        }
+
+        private void CheckSuccess(object sender, SocketAsyncEventArgs e)
+        {
+            Console.WriteLine("check success");
             Authorized(sender, e);
         }
 

@@ -33,6 +33,13 @@ namespace Dragon
         T SendingMessage { set; }
     }
 
+    public interface IEventProcessor<T> where T : EventArgs
+    {
+        event EventHandler<T> Success;
+        event EventHandler<T> Fail;
+        void Trigger(object sender, T e);
+    }
+
     /// <summary>
     /// Authorization manager
     /// </summary>
