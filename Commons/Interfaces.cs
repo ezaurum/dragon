@@ -3,6 +3,9 @@ using System.Net.Sockets;
 
 namespace Dragon
 {
+    /// <summary>
+    /// Game message to be converted to bytestream
+    /// </summary>
     public interface IGameMessage
     {
         Int16 Length { get; }
@@ -11,10 +14,18 @@ namespace Dragon
         DateTime PacketTime { get; set; }
     }
 
+    /// <summary>
+    /// Session object
+    /// </summary>
     public interface IGameSession : IDisposable
     {
         Guid Id { get; set; }
     }
+
+    /// <summary>
+    /// message processor
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
 
     public interface IMessageProcessor<T> where T : IGameMessage
     {
@@ -22,6 +33,9 @@ namespace Dragon
         T SendingMessage { set; }
     }
 
+    /// <summary>
+    /// Authorization manager
+    /// </summary>
     public interface IAuthorizationManager
     {
         void Login(object sender, SocketAsyncEventArgs e);

@@ -2,6 +2,9 @@
 
 namespace Dragon
 {
+    /// <summary>
+    /// Circluar byte buffer
+    /// </summary>
     public class CircluarBuffer
     {
         private byte[] _container;
