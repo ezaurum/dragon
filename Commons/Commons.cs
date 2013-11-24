@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net.Sockets;
 
-namespace Dragon.Message
+namespace Dragon
 {
     public interface IGameMessage
     {
@@ -11,60 +11,60 @@ namespace Dragon.Message
         DateTime PacketTime { get; set; }
     }
 
+    public interface IGameSession : IDisposable
+    {
+        Guid Id { get; set; }
+    }
+
     public interface IMessageProcessor<T> where T : IGameMessage
     {
         T ReceivedMessage { get; set; }
         T SendingMessage { set; }
     }
-}
 
-namespace Dragon
-{
-    public interface IRajaProvider
-    {
-        IRaja NewInstance();
-    }
-
-    public interface IRaja : IDisposable
-    {
-        Socket Socket { get; set; }
-        SocketAsyncEventArgs ReadArgs { get; set; }
-        SocketAsyncEventArgs WriteArgs { get; set; }
-        INetworkManager NetworkManager { get; set; }
-        bool IsDisposed { get; set; }
-        bool AbleToSend { get; set; }
-        void ReceiveBytes(byte[] buffer, int offset, int bytesTransferred);
-    }
-
-    public interface INetworkManager
-    {
-        IRajaProvider RajaProvider { get; set; }
-        void SendBytes(Socket socket, SocketAsyncEventArgs e);
-    }
-
-
-    public interface ISessionManager
+    public interface IAuthorizationManager
     {
         void Login(object sender, SocketAsyncEventArgs e);
     }
 
+    public interface ISessionManager
+    {
+        void RequestSession(object sender, SocketAsyncEventArgs e);
+    }
+
+    public interface IActionController
+    {
+        void Init(object sender, SocketAsyncEventArgs e);
+    }
+
+    /// <summary>
+    /// A pool object for some Template inherit EventArgs
+    /// </summary>
+    /// <typeparam name="T">EventArgs</typeparam>
     public interface IEventArgsPool<T> where T : EventArgs
     {
+        /// <summary>
+        /// Retrun object to pool
+        /// </summary>
+        /// <param name="item"></param>
         void Push(T item);
+        
+        /// <summary>
+        /// Get an object from pool
+        /// </summary>
+        /// <returns></returns>
         T Pop();
+        
+        /// <summary>
+        /// EventHandler called when EventArgs Complete
+        /// </summary>
         event EventHandler<T> Completed;
+
+        /// <summary>
+        /// Make actual object in queue
+        /// </summary>
+        /// <param name="capacity"></param>
         void Prepare(int capacity);
     }
-}
 
-namespace Dragon.Session
-{
-    public class GameSession : IDisposable
-    {
-        public Guid Id { get; set; }
-        public virtual void Dispose()
-        {
-            Id = Guid.Empty;
-        }
-    }
 }
