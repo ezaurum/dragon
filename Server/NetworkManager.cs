@@ -5,7 +5,7 @@ using log4net;
 
 namespace Dragon.Server
 {
-    public partial class NetworkManager : INetworkManager
+    public partial class NetworkManager /*: INetworkManager*/
     {
         private const int OpsToPreAlloc = 2; // read, write (don't alloc buffer space for accepts)
         private static readonly ILog Logger = LogManager.GetLogger(typeof (NetworkManager));

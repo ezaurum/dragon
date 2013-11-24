@@ -5,7 +5,7 @@ namespace Dragon.Server
 {
     public partial class NetworkManager
     {
-        public IRajaProvider RajaProvider { get; set; }
+        //public IRajaProvider RajaProvider { get; set; }
 
         public void SendBytes(Socket socket, SocketAsyncEventArgs e)
         {
@@ -65,7 +65,7 @@ namespace Dragon.Server
                 Logger.DebugFormat("Lost connection : {0}", e.SocketError);
             }
             
-            IRaja token = (IRaja) e.UserToken;
+            /*IRaja token = (IRaja) e.UserToken;
 
             if (null == token)
                 return;
@@ -79,15 +79,15 @@ namespace Dragon.Server
 
             _writePool.Push(token.WriteArgs);
             _readPool.Push(token.ReadArgs);
-            token.Dispose();
+            token.Dispose();*/
         }
 
         //send doesn't need continuasly run
         private void DefaultAfterSend(object sender, SocketAsyncEventArgs e)
         {
             Logger.DebugFormat("Sended.");
-            IRaja userToken = (IRaja) e.UserToken;
-            userToken.AbleToSend = true;
+          /*  IRaja userToken = (IRaja) e.UserToken;
+            userToken.AbleToSend = true;*/
         }
 
         private void DefaultAfterReceive(object sender, SocketAsyncEventArgs e)
@@ -98,8 +98,8 @@ namespace Dragon.Server
                 {
                     Logger.DebugFormat("received {0} bytes",e.BytesTransferred);
                 }
-                IRaja token = (IRaja) e.UserToken;
-                token.ReceiveBytes(e.Buffer, e.Offset, e.BytesTransferred);
+             /*   IRaja token = (IRaja) e.UserToken;
+                token.ReceiveBytes(e.Buffer, e.Offset, e.BytesTransferred);*/
             }
             ReadAsyncRecursive((Socket) sender, e);
         }
@@ -119,15 +119,15 @@ namespace Dragon.Server
             }
 
             //set accepted socket in token
-            IRaja token = RajaProvider.NewInstance();
+           /* IRaja token = RajaProvider.NewInstance();
             token.Socket = e.AcceptSocket;
             token.NetworkManager = this;
 
-            e.UserToken = token;
+            e.UserToken = token;*/
 
             //set read write event args
             SocketAsyncEventArgs readArgs = _readPool.Pop();
-            readArgs.UserToken = token;
+           /* readArgs.UserToken = token;
             token.ReadArgs = readArgs;
 
             SocketAsyncEventArgs writeArgs = _writePool.Pop();
@@ -135,7 +135,7 @@ namespace Dragon.Server
             token.WriteArgs = writeArgs;
 
             //start read write
-            ReadAsyncRecursive(token.Socket, readArgs);
+            ReadAsyncRecursive(token.Socket, readArgs);*/
         }
 
         // This method is the callback method associated with Socket.AcceptAsync  
