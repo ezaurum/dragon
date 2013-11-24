@@ -39,11 +39,13 @@ namespace Dragon
     public interface IAuthorizationManager
     {
         void Login(object sender, SocketAsyncEventArgs e);
+        event EventHandler<SocketAsyncEventArgs> Authorized;
     }
 
     public interface ISessionManager
     {
         void RequestSession(object sender, SocketAsyncEventArgs e);
+        event EventHandler<SocketAsyncEventArgs> SessionAcquired;
     }
 
     public interface IActionController

@@ -15,8 +15,8 @@ namespace Client.Test
             IActionController ac = new DummyClientActionController();
 
             socketAsyncEventArgs.Completed += am.Login;
-            socketAsyncEventArgs.Completed += sm.RequestSession;
-            socketAsyncEventArgs.Completed += ac.Init;
+            am.Authorized += sm.RequestSession;
+            sm.SessionAcquired += ac.Init;
             
             SocketConnector c = new SocketConnector
             {
@@ -44,7 +44,10 @@ namespace Client.Test
         {
             if (e.SocketError != SocketError.Success) return;
             Console.WriteLine("request session");
+            SessionAcquired(sender, e);
         }
+
+        public event EventHandler<SocketAsyncEventArgs> SessionAcquired;
     }
 
     public class DummyClientAuthorizationManager : IAuthorizationManager
@@ -53,6 +56,9 @@ namespace Client.Test
         {
             if (e.SocketError != SocketError.Success) return;
             Console.WriteLine("login");
+            Authorized(sender, e);
         }
+
+        public event EventHandler<SocketAsyncEventArgs> Authorized;
     }
 }

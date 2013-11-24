@@ -43,8 +43,10 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ILogger.cs" />
     <Compile Include="NetworkManager.EventHandlers.cs" />
     <Compile Include="BufferManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
