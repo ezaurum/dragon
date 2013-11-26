@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -103,17 +105,101 @@ namespace Dragon.Client
         }
     }
 }
-/*
 
-using System;
-using System.Net;
-using System.Net.NetworkInformation;
-using System.Net.Sockets;
-using System.Threading;
 
+//TODO remove below
 namespace Dragon.Client
 {
-    public class Unity3DNetworkManager /*: INetworkManager#1#
+
+    public interface IRajaProvider
+    {
+        IRaja NewInstance();
+    }
+
+    public interface IRaja : IDisposable
+    {
+        Socket Socket { get; set; }
+        SocketAsyncEventArgs ReadArgs { get; set; }
+        SocketAsyncEventArgs WriteArgs { get; set; }
+        Unity3DNetworkManager NetworkManager { get; set; }
+        bool IsDisposed { get; set; }
+        bool AbleToSend { get; set; }
+        void ReceiveBytes(byte[] buffer, int offset, int bytesTransferred);
+    }
+
+    public class AsyncClientUserToken : IRaja 
+    {   
+        public Socket Socket { get; set; }
+        public SocketAsyncEventArgs ReadArgs { get; set; }
+        public SocketAsyncEventArgs WriteArgs { get; set; }
+        public Unity3DNetworkManager NetworkManager { get; set; }
+        public bool IsDisposed { get; set; }
+        public bool AbleToSend { get; set; }
+
+        public void ReceiveBytes(byte[] buffer, int offset, int bytesTransferred)
+        {
+
+            throw new NotImplementedException();
+        }
+
+        public void Dispose()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class SimpleAsyncClientUserToken : AsyncClientUserToken
+    {
+        public IGameMessage GameMessage { get; set; }
+    }
+
+    public class QueueAsyncClientUserToken : AsyncClientUserToken
+    {
+        private readonly Queue<IGameMessage> _messages = new Queue<IGameMessage>();
+
+        public QueueAsyncClientUserToken()
+        {
+            Buffer = new byte[1024];
+        }
+
+        public IGameMessage Message
+        {   
+            get
+            {
+                if (IsEmpty()) return null;
+                return _messages.Dequeue();
+            }
+            set
+            {
+                if (_messages.Count > 0 && _messages.Last() != value)
+                    _messages.Enqueue(value);
+            }
+        }
+
+        public short MessageLength { get; set; }
+        public byte[] Buffer { get; set; }
+        public int Offset { get; set; }
+
+        public bool IsEmpty()
+        {
+            return _messages.Count < 1;
+        }
+    }
+
+     public class ClientRajaProvider : IRajaProvider
+    {
+        public IRaja NewInstance()
+        {
+            return new QueueAsyncClientUserToken();
+        }
+
+        public IRaja NewWriteAsyncUserToken()
+        {
+            return new SimpleAsyncClientUserToken();
+        }
+    }
+
+    public class Unity3DNetworkManager 
     {
         private readonly Socket _socket;
         
@@ -140,7 +226,7 @@ namespace Dragon.Client
 
             _ipEndpoint = new IPEndPoint( IPAddress.Parse(ipAddress), port);
 
-            /*RajaProvider = new ClientRajaProvider();#1#
+            RajaProvider = new ClientRajaProvider();
         }
         
         public void SendMessage(IGameMessage gameMessage)
@@ -256,8 +342,8 @@ namespace Dragon.Client
             if (e.SocketError == SocketError.Success)
             {
                 if( null != OnAfterConnectOnce) OnAfterConnectOnce(sender, e);
-                /*_readEventArgs.UserToken = RajaProvider.NewInstance();
-                _writeEventArgs.UserToken = ((ClientRajaProvider)RajaProvider).NewWriteAsyncUserToken();#1#
+                _readEventArgs.UserToken = RajaProvider.NewInstance();
+                _writeEventArgs.UserToken = ((ClientRajaProvider)RajaProvider).NewWriteAsyncUserToken();
                 
                 Console.WriteLine("Start to read");
                 Read_Completed(this, _readEventArgs);
@@ -273,31 +359,10 @@ namespace Dragon.Client
             Connect();
         }
         
-        /*public IRajaProvider RajaProvider { get; set; }#1#
+        public IRajaProvider RajaProvider { get; set; }
         public void SendBytes(Socket socket, SocketAsyncEventArgs e)
         {
             throw new NotImplementedException();
         }
-
-        public static void DisplayTypeAndAddress()
-        {
-            IPGlobalProperties computerProperties = IPGlobalProperties.GetIPGlobalProperties();
-            NetworkInterface[] nics = NetworkInterface.GetAllNetworkInterfaces();
-            Console.WriteLine("Interface information for {0}.{1}     ",
-                    computerProperties.HostName, computerProperties.DomainName);
-            foreach (NetworkInterface adapter in nics)
-            {
-                PhysicalAddress physicalAddress = adapter.GetPhysicalAddress();
-                IPInterfaceProperties properties = adapter.GetIPProperties();
-                Console.WriteLine(adapter.Description);
-                Console.WriteLine(String.Empty.PadLeft(adapter.Description.Length, '='));
-                Console.WriteLine("  Interface type .......................... : {0}", adapter.NetworkInterfaceType);
-                Console.WriteLine("  Physical Address ........................ : {0}",
-                           physicalAddress.ToString());
-                Console.WriteLine("  Is receive only.......................... : {0}", adapter.IsReceiveOnly);
-                Console.WriteLine("  Multicast................................ : {0}", adapter.SupportsMulticast);
-                Console.WriteLine();
-            }
-        }
     }
-}*/
+}
