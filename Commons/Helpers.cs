@@ -234,4 +234,15 @@ namespace Dragon
         }
 
     }
+
+    /// <summary>
+    /// Message Async Event Args
+    /// </summary>
+    /// <typeparam name="T">Inherit IMessage</typeparam>
+    public class MessageAsyncEventArgs<T> : EventArgs where T : IMessage
+    {
+        //TODO Is this need?
+        public IMessageProcessor<T> Processor { get; set; }
+        public T Message { get; set; }
+    }
 }

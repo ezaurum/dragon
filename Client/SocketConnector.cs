@@ -104,6 +104,8 @@ namespace Dragon.Client
             BeforeInitialized
         }
     }
+
+    
 }
 
 
@@ -150,19 +152,19 @@ namespace Dragon.Client
 
     public class SimpleAsyncClientUserToken : AsyncClientUserToken
     {
-        public IGameMessage GameMessage { get; set; }
+        public IMessage Message { get; set; }
     }
 
     public class QueueAsyncClientUserToken : AsyncClientUserToken
     {
-        private readonly Queue<IGameMessage> _messages = new Queue<IGameMessage>();
+        private readonly Queue<IMessage> _messages = new Queue<IMessage>();
 
         public QueueAsyncClientUserToken()
         {
             Buffer = new byte[1024];
         }
 
-        public IGameMessage Message
+        public IMessage Message
         {   
             get
             {
@@ -212,9 +214,6 @@ namespace Dragon.Client
 
         public bool OnLine { get; set; }
 
-        //session key 
-        public IGameSession GameSession { get; set; }
-        
         public event EventHandler<SocketAsyncEventArgs> OnAfterMessageSend;
         public event EventHandler<SocketAsyncEventArgs> OnAfterMessageReceive;
         public event EventHandler<SocketAsyncEventArgs> OnAfterConnectOnce;
@@ -229,9 +228,9 @@ namespace Dragon.Client
             RajaProvider = new ClientRajaProvider();
         }
         
-        public void SendMessage(IGameMessage gameMessage)
+        public void SendMessage(IMessage message)
         {
-            byte[] byteArray = gameMessage.ToByteArray();
+            byte[] byteArray = message.ToByteArray();
             
             Console.WriteLine("send {0} bytes.", byteArray.Length);
             
