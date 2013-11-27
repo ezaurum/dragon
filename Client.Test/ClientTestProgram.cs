@@ -10,13 +10,7 @@ namespace Client.Test
         static void Main(string[] args)
         {
             SocketAsyncEventArgs socketAsyncEventArgs = new SocketAsyncEventArgs();
-            IAuthorizationManager am = new DummyClientAuthorizationManager();
-            ISessionManager sm = new DummyClientSessionManager();
-            IActionController ac = new DummyClientActionController();
-
-            socketAsyncEventArgs.Completed += am.Login;
-            am.Authorized += sm.RequestSession;
-            sm.SessionAcquired += ac.Init;
+            socketAsyncEventArgs.Completed += MakeSession;
             
             SocketConnector c = new SocketConnector
             {
@@ -27,9 +21,127 @@ namespace Client.Test
             
             Console.ReadKey();
         }
+
+        private static void MakeSession(object sender, SocketAsyncEventArgs e)
+        {
+            if (e.SocketError != SocketError.Success) return;
+
+            SocketAsyncEventArgs readEventArgs = new SocketAsyncEventArgs();
+            readEventArgs.Completed += (o, args) =>
+            {
+                if (args.BytesTransferred > 0 
+                    && args.SocketError == SocketError.Success)
+                {
+                    ((Socket)o).ReceiveAsync(args);
+                }
+            };
+            
+            SocketAsyncEventArgs writeEventArgs = new SocketAsyncEventArgs();
+            writeEventArgs.Completed += (o, args) =>
+            {
+                if (args.SocketError == SocketError.Success)
+                {
+                    
+                }
+            };
+            
+            DummySession ds = new DummySession
+            {
+                Socket = e.AcceptSocket,
+                ReadEventArgs = readEventArgs,
+                WriteEventArgs = writeEventArgs
+            };
+
+            //start read
+        }
     }
 
-    public class DummyClientActionController : IActionController
+    public class DummySession : ISession<DummyMessage>
+    {
+        public Socket Socket { get; set; }
+        public SocketAsyncEventArgs ReadEventArgs { get; set; }
+        public SocketAsyncEventArgs WriteEventArgs { get; set; }
+        public IMessageProcessor<DummyMessage> MessageProcessor { get; set; }
+        public event EventHandler<MessageAsyncEventArgs<DummyMessage>> OnMessageSent;
+        public event EventHandler<MessageAsyncEventArgs<DummyMessage>> OnMessageConverted;
+        public event EventHandler<SocketAsyncEventArgs> OnSendCompleted;
+        public event EventHandler<SocketAsyncEventArgs> OnReceiveCompleted;
+
+        
+
+
+
+        public void StartRead()
+        {
+            if (!Socket.ReceiveAsync(ReadEventArgs))
+            {
+                OnReceiveCompleted(Socket, ReadEventArgs);
+            }
+        }
+    }
+
+    public class SimpleSession<T> : ISession<T> where T : IMessage
+    {
+        public Socket Socket { get; set; }
+        public SocketAsyncEventArgs ReadEventArgs { get; set; }
+        public SocketAsyncEventArgs WriteEventArgs { get; set; }
+        public IMessageProcessor<T> MessageProcessor { get; set; }
+        public event EventHandler<MessageAsyncEventArgs<T>> OnMessageSent;
+        public event EventHandler<MessageAsyncEventArgs<T>> OnMessageConverted;
+        public event EventHandler<SocketAsyncEventArgs> OnSendCompleted;
+        public event EventHandler<SocketAsyncEventArgs> OnReceiveCompleted;
+
+        public SimpleSession(SocketAsyncEventArgs readArgs, SocketAsyncEventArgs writeArgs)
+        {
+            ReadEventArgs = readArgs;
+            WriteEventArgs = writeArgs;
+            OnReceiveCompleted += ReadCheck;
+            ReadEventArgs.Completed += OnReceiveCompleted;
+        }
+
+        private void ReadCheck(object sender, SocketAsyncEventArgs args)
+        {
+            if (args.BytesTransferred > 0 
+                && args.SocketError == SocketError.Success)
+            {
+                ReadAsyncContinually();
+
+                MessageAsyncEventArgs<T> messageAsyncEventArgs = new MessageAsyncEventArgs<T>();
+                //TODO some converting method
+                OnMessageConverted(this, messageAsyncEventArgs);
+            }
+        }
+
+        public void ReadAsyncContinually()
+        {
+            if (!Socket.ReceiveAsync(ReadEventArgs))
+            {
+                OnReceiveCompleted(Socket, ReadEventArgs);
+            }
+        }
+    }
+
+    public class DummyMessage : IMessage
+    {
+        public short Length
+        {
+            get { return 8; }
+        }
+
+        public byte[] ToByteArray()
+        {
+            return BitConverter.GetBytes(Int64.MaxValue);
+        }
+
+        public void FromByteArray(byte[] bytes)
+        {
+            
+        }
+
+        public DateTime PacketTime { get; set; }
+    }
+
+    /*public class DummyClientActionController
     {
         public void Init(object sender, SocketAsyncEventArgs e)
         {
@@ -38,7 +150,7 @@ namespace Client.Test
         }
     }
 
-    public class DummyClientSessionManager : ISessionManager
+    public class DummyClientSessionManager
     {
 
         public void RequestSession(object sender, SocketAsyncEventArgs e)
@@ -57,7 +169,7 @@ namespace Client.Test
         }
     }
 
-    public class DummyClientAuthorizationManager : IAuthorizationManager
+    public class DummyClientAuthorizationManager
     {
         public void Login(object sender, SocketAsyncEventArgs e)
         {
@@ -74,5 +186,5 @@ namespace Client.Test
         }
 
         public event EventHandler<SocketAsyncEventArgs> Authorized;
-    }
+    }*/
 }

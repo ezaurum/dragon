@@ -12,7 +12,6 @@ namespace Dragon.Client
     {
         private const int DefaultListeningPortNumber = 10008;
         private static readonly IPAddress DefaultConnectIpAddresss = IPAddress.Loopback;
-        private static readonly ILogger Logger = LoggerManager.GetLogger(typeof (SocketConnector));
 
         private int _retryCount;
         private ConnectorState _state = ConnectorState.BeforeInitialized;
@@ -28,8 +27,6 @@ namespace Dragon.Client
             _firstConnectTimer.Interval = 2000;
             _firstConnectTimer.Elapsed += (sender, e) =>
             {
-                Logger.Debug("connection in first time {0}", ConnectEventArgs.SocketError);
-
                 if (ConnectEventArgs.SocketError != SocketError.Success)
                 {
                     Connect();
@@ -67,19 +64,9 @@ namespace Dragon.Client
             {
                 if (_retryCount < RetryLimit)
                 {
-                    Logger.Debug("Connectiton Failed. Because of {0}. Try reonnect {1}/{2} after {3}ms",
-                        socketAsyncEventArgs.SocketError, _retryCount, RetryLimit, RetryInterval);
                     Thread.Sleep(RetryInterval);
                     Connect();
                 }
-                else
-                {
-                    Logger.Fatal("Connectiton Failed. {0}", socketAsyncEventArgs.SocketError);
-                }
-            }
-            else
-            {
-                Logger.Debug("Connected.");
             }
         }
 
