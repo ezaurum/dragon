@@ -25,6 +25,8 @@ namespace Dragon
             MaximumConnection = int.MaxValue;
         }
 
+        public event EventHandler<SocketAsyncEventArgs> OnSessionProvide;
+
         public int MaximumConnection { private get; set; }
         public IPEndPoint IpEndpoint { private get; set; }
         public IEventArgsPool<SocketAsyncEventArgs> AcceptPool { private get; set; }
@@ -76,7 +78,11 @@ namespace Dragon
             {
                 throw new InvalidOperationException("AcceptPool is null.");
             }
-            AcceptPool.Completed += OnAcceptPoolOnCompleted;
+            
+            if (null != OnSessionProvide )
+                AcceptPool.Completed += OnSessionProvide;
+
+            AcceptPool.Completed += ReturnToPool;
             AcceptPool.Prepare(Backlog);
 
             if (Backlog < 1)
@@ -119,7 +125,7 @@ namespace Dragon
             _state = DistributorState.Initialized;
         }
 
-        private void OnAcceptPoolOnCompleted(object sender, SocketAsyncEventArgs e)
+        private void ReturnToPool(object sender, SocketAsyncEventArgs e)
         {
             //set accept socket null for reuse
             e.AcceptSocket = null;
@@ -183,7 +189,7 @@ namespace Dragon
 
             if (!_listenSocket.AcceptAsync(socketAsyncEventArgs))
             {
-                OnAcceptPoolOnCompleted(null, socketAsyncEventArgs);
+                ReturnToPool(null, socketAsyncEventArgs);
             }
             
         }
