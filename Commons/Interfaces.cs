@@ -12,54 +12,28 @@ namespace Dragon
         byte[] ToByteArray();
         void FromByteArray(byte[] bytes);
         DateTime PacketTime { get; set; }
+    }   
+    
+    public interface IDragonSocket<T> where T : IMessage
+    {        
+        event MessageEventHandler<T> ReadCompleted;
+        event MessageEventHandler<T> WriteCompleted;
+        Socket Socket { set; }
+        SocketAsyncEventArgs WriteEventArgs { set; }
+        SocketAsyncEventArgs ReadEventArgs { set; }
+        void Send(T message);
     }
 
-    /// <summary>
-    /// message processor
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public interface IMessageProcessor<T> where T : IMessage
+    public interface IMessageConverter<T> where T : IMessage
     {
-        T ReceivedMessage { get; set; }
-        T SendingMessage { set; }
+        event MessageEventHandler<T> MessageConverted;
     }
 
-    /// <summary>
-    /// A pool object for some Template inherit EventArgs
-    /// </summary>
-    /// <typeparam name="T">EventArgs</typeparam>
-    public interface IEventArgsPool<T> where T : EventArgs
+    public interface IMessageFactory<T> where T : IMessage
     {
-        /// <summary>
-        /// Retrun object to pool
-        /// </summary>
-        /// <param name="item"></param>
-        void Push(T item);
-        
-        /// <summary>
-        /// Get an object from pool
-        /// </summary>
-        /// <returns></returns>
-        T Pop();
-        
-        /// <summary>
-        /// EventHandler called when EventArgs Complete
-        /// </summary>
-        event EventHandler<T> Completed;
-
-        /// <summary>
-        /// Make actual object in queue
-        /// </summary>
-        /// <param name="capacity"></param>
-        void Prepare(int capacity);
+        static T GetMessage(byte[] bytes);
+        static T GetMessage(byte[] bytes, int offset, int length);
     }
 
-    public interface ISession<T> where T : IMessage
-    {
-        Socket Socket { get; set; }
-        SocketAsyncEventArgs ReadEventArgs { get; set; }
-        SocketAsyncEventArgs WriteEventArgs { get; set; }
-        IMessageProcessor<T> MessageProcessor { get; set; }
-    }
-
+    public delegate void MessageEventHandler<T>(T message) where T : IMessage;
 }

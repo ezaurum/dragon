@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "Server\Server.csproj", "{EE7BCF44-88E4-48E6-A821-EF8243ABA197}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "Client\Client.csproj", "{E797A74B-09D9-4D8F-823B-42B532215BA0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Commons", "Commons\Commons.csproj", "{6A94673F-AE42-4A0D-BADC-83933C0976C1}"
 EndProject
@@ -21,10 +21,6 @@ Global
 		{EE7BCF44-88E4-48E6-A821-EF8243ABA197}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EE7BCF44-88E4-48E6-A821-EF8243ABA197}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EE7BCF44-88E4-48E6-A821-EF8243ABA197}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E797A74B-09D9-4D8F-823B-42B532215BA0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E797A74B-09D9-4D8F-823B-42B532215BA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E797A74B-09D9-4D8F-823B-42B532215BA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E797A74B-09D9-4D8F-823B-42B532215BA0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6A94673F-AE42-4A0D-BADC-83933C0976C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6A94673F-AE42-4A0D-BADC-83933C0976C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6A94673F-AE42-4A0D-BADC-83933C0976C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
