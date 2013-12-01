@@ -24,16 +24,20 @@ namespace Dragon
         void Send(T message);
     }
 
-    public interface IMessageConverter<T> where T : IMessage
+    public interface IMessageConverter<out T> where T : IMessage
     {
         event MessageEventHandler<T> MessageConverted;
     }
 
-    public interface IMessageFactory<T> where T : IMessage
+    /// <summary>
+    /// Need to be singleton
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public interface IMessageFactory<out T> where T : IMessage
     {
-        static T GetMessage(byte[] bytes);
-        static T GetMessage(byte[] bytes, int offset, int length);
+        T GetMessage(byte[] bytes);
+        T GetMessage(byte[] bytes, int offset, int length);
     }
 
-    public delegate void MessageEventHandler<T>(T message) where T : IMessage;
+    public delegate void MessageEventHandler<in T>(T message) where T : IMessage;
 }

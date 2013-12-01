@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using Dragon.Server;
 using log4net;
 
 namespace Dragon
@@ -29,7 +30,7 @@ namespace Dragon
 
         public int MaximumConnection { private get; set; }
         public IPEndPoint IpEndpoint { private get; set; }
-        public IEventArgsPool<SocketAsyncEventArgs> AcceptPool { private get; set; }
+        public SocketAsyncEventArgsPool AcceptPool { private get; set; }
         public int Backlog { private get; set; }
         public UInt16 ListeningPortNumber { get; set; }
         public IPAddress AcceptableIpAddress { get; set; }

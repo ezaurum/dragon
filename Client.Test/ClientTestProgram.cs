@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Net.Sockets;
 using Dragon;
-using Dragon.Client;
 
-namespace Dragon
+/*namespace Dragon
 {
     
 
-    public class ConnectSession<T> : ISession<T>
+    public class ConnectSession<T> 
     {
 
 
@@ -16,7 +15,7 @@ namespace Dragon
         /// </summary>
         public void Activate()
         {
-            MessageConverter.Session = this;
+            /*MessageConverter.Session = this;
 
             if (null != Provided)
             {
@@ -29,7 +28,7 @@ namespace Dragon
             MessageConverter.MessageConvertCompleted += InvokeReaction;
 
             //TODO allocate by buffer provider
-            ReadEventArgs.SetBuffer(new byte[1024], 0, 1024);
+            ReadEventArgs.SetBuffer(new byte[1024], 0, 1024);#1#
 
             //start read
             Read();
@@ -40,7 +39,7 @@ namespace Dragon
 
         }
 
-        private void InvokeReaction(DragonMarbleGameSession session, IDragonMarbleGameMessage message)
+      /*  private void InvokeReaction(DragonMarbleGameSession session, IDragonMarbleGameMessage message)
         {
             if (MessageReactions.ContainsKey(message.MessageType))
             {
@@ -51,19 +50,19 @@ namespace Dragon
             {
                 StageUnit.MessageProcessor.ReceivedMessage = message;
             }
-        }
+        }#1#
 
 
 
 
         //TODO can move?
-        private void Read()
+      /*  private void Read()
         {
             if (!Socket.ReceiveAsync(ReadEventArgs))
             {
                 OnReadEventArgsOnCompleted(Socket, ReadEventArgs);
             }
-        }
+        }#1#
 
     }
 }
@@ -74,7 +73,7 @@ namespace Dragon.Client
     {
         private SocketConnector _connector;
 
-        public ISession<T> Session { get; set; }
+       /* public ISession<T> Session { get; set; }#1#
         
         public SocketAsyncEventArgs ConnectionEventArgs { get; set; }
 
@@ -82,7 +81,7 @@ namespace Dragon.Client
         {
             _connector = new SocketConnector
             {
-                ConnectEventArgs = socketAsyncEventArgs
+                //ConnectEventArgs = socketAsyncEventArgs
             };
 
             SocketAsyncEventArgs socketAsyncEventArgs = new SocketAsyncEventArgs();
@@ -178,7 +177,7 @@ namespace Dragon.Client
 
 
     }    
-}
+}*/
 
 namespace Client.Test
 {
@@ -223,19 +222,12 @@ namespace Client.Test
                     
                 }
             };
-            
-            DummySession ds = new DummySession
-            {
-                Socket = e.AcceptSocket,
-                ReadEventArgs = readEventArgs,
-                WriteEventArgs = writeEventArgs
-            };
 
             //start read
         }
     }
 
-    public delegate void SessionEventHandler(DragonMarbleGameSession session);
+/*    public delegate void SessionEventHandler(DragonMarbleGameSession session);
 
     public class DragonMarbleGameSession : ISession<DummyMessage>
     {       
@@ -496,5 +488,5 @@ namespace Client.Test
         }
 
         public DateTime PacketTime { get; set; }
-    }    
+    }    */
 }

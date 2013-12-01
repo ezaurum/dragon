@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Dragon
 {
@@ -16,7 +13,7 @@ namespace Dragon
 
         private readonly IMessageFactory<T> _factory;
         
-        public MessageConverter(CircluarBuffer buffer, IMessageFactory<T> factory)
+        public MessageConverter(CircularBuffer buffer, IMessageFactory<T> factory)
         {
             _buffer = buffer;
             _factory = factory;

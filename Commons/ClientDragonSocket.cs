@@ -1,6 +1,4 @@
-﻿using System.Net;
-using System.Net.Sockets;
-using System.Collections.Generic;
+﻿using System.Net.Sockets;
 
 namespace Dragon
 {
@@ -8,7 +6,7 @@ namespace Dragon
     /// Client Socket. Able to connect remote host.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class ClientDragonSocket<T> : IDragonSocket<T> where T : IMessage
+    public class ClientDragonSocket<T> : DragonSocket<T> where T : IMessage
     {
         public void Connect() {
 
@@ -20,24 +18,6 @@ namespace Dragon
         }        
 
         private SocketConnector _connector;
-        public event MessageEventHandler<T> ReadCompleted;
-        public event MessageEventHandler<T> WriteCompleted;
-        public Socket Socket { set; }
-        public SocketAsyncEventArgs WriteEventArgs { set; }
-        public SocketAsyncEventArgs ReadEventArgs { set; }
-
-        private MessageConverter<T> _messageConverter;
-
-        public void Send(T message)
-        {
-            WriteEventArgs.SetBuffer(message.ToByteArray());
-
-            if (!Socket.SendAsync(Socket, WriteEventArgs))
-            {
-                //TODO
-                WriteCompleted(message);
-            }
-        }
     }
 
     /// <summary>
@@ -52,17 +32,17 @@ namespace Dragon
         //TODO event disconnected
         //TODO event connected
 
-        public Socket Socket { set; }
-        public SocketAsyncEventArgs WriteEventArgs { set; }
-        public SocketAsyncEventArgs ReadEventArgs { set; }
+        public Socket Socket { set; protected get; }
+        public SocketAsyncEventArgs WriteEventArgs { set; protected get; }
+        public SocketAsyncEventArgs ReadEventArgs { set; protected get; }
 
         private MessageConverter<T> _messageConverter;
 
         public void Send(T message)
         {
-            WriteEventArgs.SetBuffer(message.ToByteArray());
+            WriteEventArgs.SetBuffer(message.ToByteArray(), 0, message.Length);
 
-            if (!Socket.SendAsync(Socket, WriteEventArgs))
+            if (!Socket.SendAsync(WriteEventArgs))
             {
                 //TODO
                 WriteCompleted(message);
