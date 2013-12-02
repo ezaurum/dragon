@@ -17,7 +17,8 @@ namespace Dragon
         private int _retryCount;
         private ClientSocketState _state = ClientSocketState.BeforeInitialized;
 
-        public ClientDragonSocket()
+        public ClientDragonSocket(IMessageFactory<T> factory)
+            : base(factory)
         {
             Socket = new Socket(AddressFamily.InterNetwork,
                 SocketType.Stream, ProtocolType.Tcp)
@@ -31,20 +32,36 @@ namespace Dragon
             _connectTimer = new Timer {Interval = RetryInterval};
             _connectTimer.Elapsed += CheckReconnect;
 
-            ConnectEventArgs = new SocketAsyncEventArgs();
-            ConnectEventArgs.Completed += StopTimerOnConnected;
-
             IpEndpoint = new IPEndPoint(DefaultConnectIpAddresss, DefaultListeningPortNumber);
-            ConnectEventArgs.RemoteEndPoint = IpEndpoint;
         }
+
+        private void InitConnectEventArg()
+        {
+            ConnectEventArgs = new SocketAsyncEventArgs {RemoteEndPoint = IpEndpoint};
+            ConnectEventArgs.Completed += StopTimerOnConnected;
+            ConnectEventArgs.Completed += DefaultConnectSuccess;
+        }
+
+        /// <summary>
+        /// Default Event handler for connection success
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DefaultConnectSuccess(object sender, SocketAsyncEventArgs e)
+        {
+            if (e.SocketError != SocketError.Success) return;
+            ReadRepeat();
+            ConnectSuccess(sender, e);
+        }
+
 
         public EndPoint IpEndpoint { get; set; }
         public int RetryInterval { get; set; }
         public int RetryLimit { get; set; }
         private SocketAsyncEventArgs ConnectEventArgs { get; set; }
-
-        public event MessageEventHandler<T> Connected;
+        
         public event EventHandler<SocketAsyncEventArgs> ConnectFailed;
+        public event EventHandler<SocketAsyncEventArgs> ConnectSuccess;
 
         public void Disconnect()
         {
@@ -87,7 +104,7 @@ namespace Dragon
         public void Connect(string ipAddress, int port)
         {
             IpEndpoint = new IPEndPoint(IPAddress.Parse(ipAddress), port);
-            ConnectEventArgs.RemoteEndPoint = IpEndpoint;
+            InitConnectEventArg();
             Connect();
         }
 
@@ -106,36 +123,5 @@ namespace Dragon
         {
             BeforeInitialized
         }
-    }
-
-    /// <summary>
-    ///     Socket Wrapper
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public class DragonSocket<T> : IDragonSocket<T> where T : IMessage
-    {
-        private MessageConverter<T> _messageConverter;
-        public event MessageEventHandler<T> ReadCompleted;
-        public event MessageEventHandler<T> WriteCompleted;
-
-        //TODO event disconnected
-        //TODO event connected
-
-        public Socket Socket { set; protected get; }
-        public SocketAsyncEventArgs WriteEventArgs { set; protected get; }
-        public SocketAsyncEventArgs ReadEventArgs { set; protected get; }
-
-        public void Send(T message)
-        {
-            WriteEventArgs.SetBuffer(message.ToByteArray(), 0, message.Length);
-
-            if (!Socket.SendAsync(WriteEventArgs))
-            {
-                //TODO
-                WriteCompleted(message);
-            }
-        }
-
-        public event MessageEventHandler<T> Disconnected;
     }
 }
