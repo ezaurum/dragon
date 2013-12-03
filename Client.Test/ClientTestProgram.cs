@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Net.Sockets;
+using System.Runtime.Remoting.Channels;
+using System.Threading;
 using Dragon;
 
 namespace Client.Test
@@ -14,15 +16,16 @@ namespace Client.Test
                 Console.WriteLine("Connected");
 
                 c.Send(new SimpleMessage());
-                c.Send(new SimpleMessage());
-                c.Send(new SimpleMessage());
             };
 
             c.Disconnected += OnDisconnected;
 
             c.ReadCompleted += message =>
-            {
+            {                
                 Console.WriteLine("Read " +message);
+
+                Thread.Sleep(500);
+                c.Send(new SimpleMessage());
             };
 
             c.WriteCompleted += message =>
