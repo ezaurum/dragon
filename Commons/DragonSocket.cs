@@ -13,6 +13,7 @@ namespace Dragon
 
         protected DragonSocket(IMessageFactory<T> factory)
         {
+            //TODO buffer reallocated
             _messageConverter = new MessageConverter<T>(new CircularBuffer(new byte[1024]), factory);
             ReadEventArgs = new SocketAsyncEventArgs();
 
