@@ -45,11 +45,17 @@ namespace Dragon
         }
 
 
-        public void Disconnect()
+        public void Disconnect(object sender, SocketAsyncEventArgs e)
         {
             //TODO disconnect
 
+            //run once
+            if (State == SocketState.Inactive) return;
+
             State = SocketState.Inactive;
+
+            if (null != Disconnected)
+                Disconnected(sender, e);
         }
 
         public event MessageEventHandler<T> ReadCompleted
@@ -110,10 +116,7 @@ namespace Dragon
         {
             if (e.SocketError != SocketError.Success)
             {
-                if ( null != Disconnected)
-                    Disconnected(sender, e);
-
-                State = SocketState.Inactive;
+                Disconnect(sender, e);
                 return;
             }
 
@@ -152,13 +155,11 @@ namespace Dragon
             //TODO error process need
             if (args.SocketError != SocketError.Success)
             {
-                if ( null != Disconnected)
-                    Disconnected(sender, args);
-
-                State = SocketState.Inactive;
+                Disconnect(sender,args);
+                return;
             }
 
-            if (args.SocketError == SocketError.Success && args.BytesTransferred > 0)
+            if (SocketError.Success == args.SocketError && 0 < args.BytesTransferred && SocketState.Active == State)
             {
                 _messageConverter.ReceiveBytes(args.Buffer, args.Offset, args.BytesTransferred);
                 ReadRepeat();

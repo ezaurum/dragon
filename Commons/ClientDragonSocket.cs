@@ -20,11 +20,7 @@ namespace Dragon
             : base(factory)
         {
             Socket = new Socket(AddressFamily.InterNetwork,
-                SocketType.Stream, ProtocolType.Tcp)
-            {
-                SendTimeout = 1000,
-                ReceiveTimeout = 1000
-            };
+                SocketType.Stream, ProtocolType.Tcp);
 
             RetryInterval = 1500;
             RetryLimit = 5;

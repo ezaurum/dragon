@@ -9,13 +9,14 @@ namespace Dragon
     /// <typeparam name="T">Message</typeparam>
     public class MessageConverter<T> : IMessageConverter<T> where T:IMessage
     {
-        private readonly CircularBuffer _buffer;       
+        private readonly byte[] _buffer;
 
         private readonly IMessageFactory<T> _factory;
         
+
         public MessageConverter(CircularBuffer buffer, IMessageFactory<T> factory)
         {
-            _buffer = buffer;
+            _buffer = new byte[2048];
             _factory = factory;
         }
 
@@ -24,18 +25,28 @@ namespace Dragon
 
         public void ReceiveBytes(byte[] buffer, int offset, int bytesTransferred)
         {
-            _buffer.CopyFrom(buffer, offset, bytesTransferred);
+            Buffer.BlockCopy(buffer, offset, _buffer, _offset, bytesTransferred);
 
-            while (_buffer.BytesAbleToRead > 2)
+            //add offset
+            _offset += bytesTransferred;
+
+            while (_offset > 2)
             {
-                short messageLength = BitConverter.ToInt16(_buffer.PickBytes(2), 0);
+                short messageLength = BitConverter.ToInt16(_buffer, 0);
 
-                if (_buffer.BytesAbleToRead < messageLength) return;
+                if (_offset < messageLength) return;
 
-                T message = _factory.GetMessage(_buffer.GetBytes(messageLength));
+                T message = _factory.GetMessage(_buffer, 0, messageLength);
+
+                //after converted. pull buffer to front
+                Buffer.BlockCopy(_buffer, messageLength, _buffer, 0, _offset - messageLength);
+                _offset -= messageLength;
+
                 if (null != MessageConverted)
                     MessageConverted(message);
             }
         }
+
+        private int _offset;
     }
 }
