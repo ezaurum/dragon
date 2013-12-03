@@ -26,7 +26,7 @@ namespace Dragon
                 ReceiveTimeout = 1000
             };
 
-            RetryInterval = 500;
+            RetryInterval = 1500;
             RetryLimit = 5;
             _connectTimer = new Timer {Interval = RetryInterval};
             _connectTimer.Elapsed += CheckReconnect;

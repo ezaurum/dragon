@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Net.Sockets;
 
 namespace Dragon
@@ -10,6 +11,10 @@ namespace Dragon
     public class DragonSocket<T> : IDragonSocket<T> where T : IMessage
     {
         private readonly MessageConverter<T> _messageConverter;
+        private readonly Queue<T> _sendingQueue = new Queue<T>();
+        private readonly object _lock = new object();
+        private bool _sending;
+        private bool _leftToSend;
 
         public enum SocketState
         {
@@ -68,6 +73,30 @@ namespace Dragon
 
         public void Send(T message)
         {
+            lock (_lock)
+            {
+                _sendingQueue.Enqueue(message);
+            }
+
+            if (_sending)
+            {
+                return;
+            }
+            
+            lock (_lock)
+            {
+                SendAsync(_sendingQueue.Dequeue());
+            }
+        }
+
+        /// <summary>
+        /// Should Run in lock
+        /// </summary>
+        /// <param name="message"></param>
+        private void SendAsync(T message)
+        {
+            _sending = true;
+
             WriteEventArgs.SetBuffer(message.ToByteArray(), 0, message.Length);
             WriteEventArgs.UserToken = message;
 
@@ -79,7 +108,27 @@ namespace Dragon
 
         private void OnWriteEventArgsOnCompleted(object sender, SocketAsyncEventArgs e)
         {
-            WriteCompleted((T) e.UserToken);
+            if (e.SocketError != SocketError.Success)
+            {
+                if ( null != Disconnected)
+                    Disconnected(sender, e);
+
+                State = SocketState.Inactive;
+                return;
+            }
+
+            if ( null != WriteCompleted)
+                WriteCompleted((T) e.UserToken);
+
+            lock (_lock)
+            {
+                _sending = _sendingQueue.Count > 0;
+            }
+
+            if (_sending)
+            {
+                SendAsync(_sendingQueue.Dequeue());
+            }
         }
 
         /// <summary>
@@ -103,7 +152,10 @@ namespace Dragon
             //TODO error process need
             if (args.SocketError != SocketError.Success)
             {
-                Disconnected(sender, args);
+                if ( null != Disconnected)
+                    Disconnected(sender, args);
+
+                State = SocketState.Inactive;
             }
 
             if (args.SocketError == SocketError.Success && args.BytesTransferred > 0)
