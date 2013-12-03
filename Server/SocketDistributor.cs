@@ -73,8 +73,11 @@ namespace Dragon
                 throw new InvalidOperationException(string.Format("Accepted {0} Connections is exist.",
                     _currentAcceptedConnections));
             }
-
+            
             //check properties
+            if (null == MessageFactory)
+                throw new InvalidOperationException("Message Factory is null.");
+
             _acceptPool = new SocketAsyncEventArgsPool();
             //first sequence. 
             _acceptPool.Completed += DistributeDragonSocket;
