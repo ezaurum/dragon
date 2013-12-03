@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net.Sockets;
 using Dragon;
 
 namespace Client.Test
@@ -15,10 +16,7 @@ namespace Client.Test
                 c.Send(new SimpleMessage());
             };
 
-            c.Disconnected += message =>
-            {
-                Console.WriteLine("Disconnected");
-            };
+            c.Disconnected += OnDisconnected;
 
             c.WriteCompleted += message =>
             {
@@ -41,7 +39,10 @@ namespace Client.Test
             Console.ReadKey();
         }
 
-        
+        private static void OnDisconnected(object sender, SocketAsyncEventArgs socketAsyncEventArgs)
+        {
+            Console.WriteLine("Disconnected");
+        }
     }
 
     public class SimpleMessageFactory : IMessageFactory<SimpleMessage>

@@ -48,6 +48,7 @@
   <ItemGroup>
     <Compile Include="ILogger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SeverDragonSocket.cs" />
     <Compile Include="SocketAsyncEventArgsPool.cs" />
     <Compile Include="SocketDistributor.cs" />
   </ItemGroup>
