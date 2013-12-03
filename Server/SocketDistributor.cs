@@ -35,7 +35,7 @@ namespace Dragon
         public int Backlog { private get; set; }
         public UInt16 ListeningPortNumber { get; set; }
         public IPAddress AcceptableIpAddress { get; set; }
-
+        
         public void Start()
         {
             Init();
@@ -133,11 +133,8 @@ namespace Dragon
         /// <param name="e"></param>
         private void DistributeDragonSocket(object sender, SocketAsyncEventArgs e)
         {
-            //TODO something...
-            DragonSocket<T> dragonSocket = new ServerDragonSocket<T>(_messageFactory);
-
-
-
+            //TODO something... pool
+            DragonSocket<T> dragonSocket = new ServerDragonSocket<T>(MessageFactory);
             e.UserToken = dragonSocket;
         }
 
