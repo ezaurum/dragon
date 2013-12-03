@@ -137,7 +137,7 @@ namespace Dragon
         private void DistributeDragonSocket(object sender, SocketAsyncEventArgs e)
         {
             //TODO something... pool
-            var dragonSocket = new ServerDragonSocket<T>(MessageFactory);
+            var dragonSocket = new ServerDragonSocket<T>(e.AcceptSocket, MessageFactory);
             e.UserToken = dragonSocket;
         }
 

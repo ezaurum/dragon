@@ -18,7 +18,9 @@ namespace Server.Test
             {
                 Backlog = 20,
                 MaximumConnection = 5,
-                IpEndpoint = new IPEndPoint(IPAddress.Any, 10008)
+                IpEndpoint = new IPEndPoint(IPAddress.Any, 10008),
+                MessageFactory = new SimpleMessageFactory()
+
             };
             s.Accepted += (sender, eventArgs) =>
             {
@@ -29,6 +31,23 @@ namespace Server.Test
             Thread.Sleep(1000);
             s.Start();
             Console.ReadKey();
+        }
+    }
+
+    public class SimpleMessageFactory : IMessageFactory<SimpleMessage>
+    {
+        public SimpleMessage GetMessage(byte[] bytes)
+        {
+            return GetMessage(bytes, 0, bytes.Length);
+        }
+
+        public SimpleMessage GetMessage(byte[] bytes, int offset, int length)
+        {
+            var d = new byte[length];
+            Buffer.BlockCopy(bytes, offset, d, 0, length);
+            var simpleMessage = new SimpleMessage();
+            simpleMessage.FromByteArray(d);
+            return simpleMessage;
         }
     }
 
