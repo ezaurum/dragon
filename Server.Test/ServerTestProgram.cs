@@ -23,7 +23,7 @@ namespace Server.Test
             s.Accepted += (sender, eventArgs) =>
             {
                 //Something to test
-                SeverDragonSocket<SimpleMessage> userToken = (SeverDragonSocket<SimpleMessage>) eventArgs.UserToken;
+                var userToken = (ServerDragonSocket<SimpleMessage>) eventArgs.UserToken;
             };
 
             Thread.Sleep(1000);
