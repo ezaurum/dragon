@@ -1,4 +1,7 @@
-﻿namespace Dragon
+﻿using System;
+using System.Net.Sockets;
+
+namespace Dragon
 {
     /// <summary>
     /// Client Socket. Able to connect remote host.
@@ -8,8 +11,13 @@
     {
         public ServerDragonSocket(IMessageFactory<T> factory) : base(factory)
         {
+            if (null != Accepted)
+                Accepted(Socket, null);
+           
+            //start to read
+            ReadRepeat();
         }
-
-        public event MessageEventHandler<T> Accepted;
+        
+        public event EventHandler<SocketAsyncEventArgs> Accepted;
     }
 }
