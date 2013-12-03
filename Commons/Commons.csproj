@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Dragon</RootNamespace>
-    <AssemblyName>DragonCommons</AssemblyName>
+    <AssemblyName>Dragon.Commons</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -34,8 +34,12 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Helpers.cs" />
+    <Compile Include="CircularBuffer.cs" />
+    <Compile Include="CircularQueue.cs" />
+    <Compile Include="ClientDragonSocket.cs" />
+    <Compile Include="DragonSocket.cs" />
     <Compile Include="Interfaces.cs" />
+    <Compile Include="MessageConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

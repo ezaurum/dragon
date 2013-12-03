@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Net.Sockets;
 using Dragon;
-using Dragon.Client;
 
 namespace Client.Test
 {
@@ -9,12 +8,30 @@ namespace Client.Test
     {
         static void Main(string[] args)
         {
-            SocketAsyncEventArgs socketAsyncEventArgs = new SocketAsyncEventArgs();
-            socketAsyncEventArgs.Completed += MakeSession;
-            
-            SocketConnector c = new SocketConnector
+            var c = new ClientDragonSocket<SimpleMessage>(new SimpleMessageFactory());
+            c.ConnectSuccess += (sender, eventArgs) => 
             {
-                ConnectEventArgs = socketAsyncEventArgs
+                Console.WriteLine("Connected");
+
+                c.Send(new SimpleMessage());
+            };
+
+            c.Disconnected += OnDisconnected;
+
+            c.WriteCompleted += message =>
+            {
+                Console.WriteLine("Write c");
+            };
+
+            c.ReadCompleted += message =>
+            {
+                Console.WriteLine("Read");
+            };
+
+            c.WriteCompleted += message =>
+            {
+                Console.WriteLine("Sended "+message.ToString());
+
             };
 
             c.Connect("127.0.0.1",10008);
@@ -22,169 +39,77 @@ namespace Client.Test
             Console.ReadKey();
         }
 
-        private static void MakeSession(object sender, SocketAsyncEventArgs e)
+        private static void OnDisconnected(object sender, SocketAsyncEventArgs socketAsyncEventArgs)
         {
-            if (e.SocketError != SocketError.Success) return;
-
-            SocketAsyncEventArgs readEventArgs = new SocketAsyncEventArgs();
-            readEventArgs.Completed += (o, args) =>
-            {
-                if (args.BytesTransferred > 0 
-                    && args.SocketError == SocketError.Success)
-                {
-                    ((Socket)o).ReceiveAsync(args);
-                }
-            };
-            
-            SocketAsyncEventArgs writeEventArgs = new SocketAsyncEventArgs();
-            writeEventArgs.Completed += (o, args) =>
-            {
-                if (args.SocketError == SocketError.Success)
-                {
-                    
-                }
-            };
-            
-            DummySession ds = new DummySession
-            {
-                Socket = e.AcceptSocket,
-                ReadEventArgs = readEventArgs,
-                WriteEventArgs = writeEventArgs
-            };
-
-            //start read
+            Console.WriteLine("Disconnected");
         }
     }
 
-    public class DummySession : ISession<DummyMessage>
+    public class SimpleMessageFactory : IMessageFactory<SimpleMessage>
     {
-        public Socket Socket { get; set; }
-        public SocketAsyncEventArgs ReadEventArgs { get; set; }
-        public SocketAsyncEventArgs WriteEventArgs { get; set; }
-        public IMessageProcessor<DummyMessage> MessageProcessor { get; set; }
-        public event EventHandler<MessageAsyncEventArgs<DummyMessage>> OnMessageSent;
-        public event EventHandler<MessageAsyncEventArgs<DummyMessage>> OnMessageConverted;
-        public event EventHandler<SocketAsyncEventArgs> OnSendCompleted;
-        public event EventHandler<SocketAsyncEventArgs> OnReceiveCompleted;
-
-        
-
-
-
-        public void StartRead()
+        public SimpleMessage GetMessage(byte[] bytes)
         {
-            if (!Socket.ReceiveAsync(ReadEventArgs))
-            {
-                OnReceiveCompleted(Socket, ReadEventArgs);
-            }
+            return GetMessage(bytes, 0, bytes.Length);
+        }
+
+        public SimpleMessage GetMessage(byte[] bytes, int offset, int length)
+        {
+            var d = new byte[length];
+            Buffer.BlockCopy(bytes, offset, d, 0, length);
+            var simpleMessage = new SimpleMessage();
+            simpleMessage.FromByteArray(d);
+            return simpleMessage;
         }
     }
 
-    public class SimpleSession<T> : ISession<T> where T : IMessage
+    public class SimpleMessage : IMessage
     {
-        public Socket Socket { get; set; }
-        public SocketAsyncEventArgs ReadEventArgs { get; set; }
-        public SocketAsyncEventArgs WriteEventArgs { get; set; }
-        public IMessageProcessor<T> MessageProcessor { get; set; }
-        public event EventHandler<MessageAsyncEventArgs<T>> OnMessageSent;
-        public event EventHandler<MessageAsyncEventArgs<T>> OnMessageConverted;
-        public event EventHandler<SocketAsyncEventArgs> OnSendCompleted;
-        public event EventHandler<SocketAsyncEventArgs> OnReceiveCompleted;
-
-        public SimpleSession(SocketAsyncEventArgs readArgs, SocketAsyncEventArgs writeArgs)
-        {
-            ReadEventArgs = readArgs;
-            WriteEventArgs = writeArgs;
-            OnReceiveCompleted += ReadCheck;
-            ReadEventArgs.Completed += OnReceiveCompleted;
-        }
-
-        private void ReadCheck(object sender, SocketAsyncEventArgs args)
-        {
-            if (args.BytesTransferred > 0 
-                && args.SocketError == SocketError.Success)
-            {
-                ReadAsyncContinually();
-
-                MessageAsyncEventArgs<T> messageAsyncEventArgs = new MessageAsyncEventArgs<T>();
-                //TODO some converting method
-                OnMessageConverted(this, messageAsyncEventArgs);
-            }
-        }
-
-        public void ReadAsyncContinually()
-        {
-            if (!Socket.ReceiveAsync(ReadEventArgs))
-            {
-                OnReceiveCompleted(Socket, ReadEventArgs);
-            }
-        }
-    }
-
-    public class DummyMessage : IMessage
-    {
-        public short Length
-        {
-            get { return 8; }
-        }
+        public DateTime PacketTime { get; set; }
+        public Guid TurnOwner { get; set; }
+        public Int32 ResponseLimit;
 
         public byte[] ToByteArray()
         {
-            return BitConverter.GetBytes(Int64.MaxValue);
+            byte[] bytes = new byte[Length];
+            int index = 0;
+            BitConverter.GetBytes(Length)
+            .CopyTo(bytes, index);
+            index += sizeof(Int16);
+            BitConverter.GetBytes((Int64)PacketTime.ToBinary())
+            .CopyTo(bytes, index);
+            index += sizeof(Int64);
+            TurnOwner.ToByteArray()
+            .CopyTo(bytes, index);
+            index += 16;
+            BitConverter.GetBytes(ResponseLimit)
+            .CopyTo(bytes, index);
+            index += sizeof(Int32);
+            return bytes;
         }
 
         public void FromByteArray(byte[] bytes)
         {
-            
+            int index = 2;
+            PacketTime = DateTime.FromBinary(BitConverter.ToInt64(bytes, index));
+            index += sizeof(Int64);
+            byte[] tempTurnOwner = new byte[16];
+            Buffer.BlockCopy(bytes, index, tempTurnOwner, 0, 16);
+            TurnOwner = new Guid(tempTurnOwner);
+            index += 16;
+            ResponseLimit = BitConverter.ToInt32(bytes, index);
+            index += sizeof(Int32);
         }
 
-        public DateTime PacketTime { get; set; }
-    }
-
-    /*public class DummyClientActionController
-    {
-        public void Init(object sender, SocketAsyncEventArgs e)
+        public Int16 Length
         {
-            if (e.SocketError != SocketError.Success) return;
-             Console.WriteLine("Init");
+            get
+            {
+                return (Int16)(2 + sizeof(Int64) + 16 + sizeof(Int32));
+            }
         }
-    }
-
-    public class DummyClientSessionManager
-    {
-
-        public void RequestSession(object sender, SocketAsyncEventArgs e)
+        public override string ToString()
         {
-            if (e.SocketError != SocketError.Success) return;
-            Console.WriteLine("request session");
-            CheckSuccess(sender, e);
-        }
-
-        public event EventHandler<SocketAsyncEventArgs> SessionAcquired;
-        
-        private void CheckSuccess(object sender, SocketAsyncEventArgs e)
-        {
-            Console.WriteLine("check success");
-            SessionAcquired(sender, e);
+            return string.Format("PacketTime: {0}, TurnOwner: {1}, ResponseLimit: {2}, ", PacketTime, TurnOwner, ResponseLimit);
         }
     }
-
-    public class DummyClientAuthorizationManager
-    {
-        public void Login(object sender, SocketAsyncEventArgs e)
-        {
-            if (e.SocketError != SocketError.Success) return;
-            Console.WriteLine("login");
-            CheckSuccess(sender, e);
-            
-        }
-
-        private void CheckSuccess(object sender, SocketAsyncEventArgs e)
-        {
-            Console.WriteLine("check success");
-            Authorized(sender, e);
-        }
-
-        public event EventHandler<SocketAsyncEventArgs> Authorized;
-    }*/
 }

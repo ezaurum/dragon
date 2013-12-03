@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ClientNetworkManager.cs" />
     <Compile Include="ClientTestProgram.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -48,10 +49,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Client\Client.csproj">
-      <Project>{e797a74b-09d9-4d8f-823b-42b532215ba0}</Project>
-      <Name>Client</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Commons\Commons.csproj">
       <Project>{6a94673f-ae42-4a0d-badc-83933c0976c1}</Project>
       <Name>Commons</Name>

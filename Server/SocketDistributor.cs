@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using Dragon.Server;
 using log4net;
 
 namespace Dragon
@@ -10,11 +11,11 @@ namespace Dragon
     ///     Accept Connection and Distribute sockets
     ///     Set AccpetPool needed
     /// </summary>
-    public class SocketDistributor
+    public class SocketDistributor<T> where T : IMessage
     {
         private const int DefaultListeningPortNumber = 10008;
         private static readonly IPAddress DefaultAcceptableIpAddress = IPAddress.Any;
-        private static readonly ILog Logger = LogManager.GetLogger(typeof (SocketDistributor));
+        private static readonly ILog Logger = LogManager.GetLogger(typeof (SocketDistributor<T>));
 
         private int _currentAcceptedConnections;
         private Socket _listenSocket;
@@ -25,19 +26,19 @@ namespace Dragon
             MaximumConnection = int.MaxValue;
         }
 
-        public event EventHandler<SocketAsyncEventArgs> OnSessionProvide;
+        public event EventHandler<SocketAsyncEventArgs> Accepted;
 
         public int MaximumConnection { private get; set; }
         public IPEndPoint IpEndpoint { private get; set; }
-        public IEventArgsPool<SocketAsyncEventArgs> AcceptPool { private get; set; }
+        private SocketAsyncEventArgsPool _acceptPool;
+        public IMessageFactory<T> MessageFactory { get; set; }
         public int Backlog { private get; set; }
         public UInt16 ListeningPortNumber { get; set; }
         public IPAddress AcceptableIpAddress { get; set; }
-
+        
         public void Start()
         {
             Init();
-            
 
             try
             {
@@ -45,7 +46,7 @@ namespace Dragon
             }
             catch (SocketException e)
             {
-                Logger.DebugFormat("Port {0} is Binded already. Abort Starting.",IpEndpoint.Port);
+                Logger.FatalFormat("Port {0} is Binded already. Abort Starting.",IpEndpoint.Port);
                 return;
             }
             _state = DistributorState.NotAccpetable;
@@ -72,18 +73,21 @@ namespace Dragon
                 throw new InvalidOperationException(string.Format("Accepted {0} Connections is exist.",
                     _currentAcceptedConnections));
             }
-
-            //check properties
-            if (null == AcceptPool)
-            {
-                throw new InvalidOperationException("AcceptPool is null.");
-            }
             
-            if (null != OnSessionProvide )
-                AcceptPool.Completed += OnSessionProvide;
+            //check properties
+            if (null == MessageFactory)
+                throw new InvalidOperationException("Message Factory is null.");
 
-            AcceptPool.Completed += ReturnToPool;
-            AcceptPool.Prepare(Backlog);
+            _acceptPool = new SocketAsyncEventArgsPool();
+            //first sequence. 
+            _acceptPool.Completed += DistributeDragonSocket;
+
+            if (null != Accepted )
+                _acceptPool.Completed += Accepted;
+            
+            //last sequence
+            _acceptPool.Completed += ReturnToPool;
+            _acceptPool.Prepare(Backlog);
 
             if (Backlog < 1)
             {
@@ -125,13 +129,25 @@ namespace Dragon
             _state = DistributorState.Initialized;
         }
 
+        /// <summary>
+        /// Distribute Dragon Socket as UserToken
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DistributeDragonSocket(object sender, SocketAsyncEventArgs e)
+        {
+            //TODO something... pool
+            var dragonSocket = new ServerDragonSocket<T>(e.AcceptSocket, MessageFactory);
+            e.UserToken = dragonSocket;
+        }
+
         private void ReturnToPool(object sender, SocketAsyncEventArgs e)
         {
             //set accept socket null for reuse
             e.AcceptSocket = null;
             
             //return used event args
-            AcceptPool.Push(e);
+            _acceptPool.Push(e);
 
             //check successfully accept
             if (e.SocketError == SocketError.Success)
@@ -185,7 +201,7 @@ namespace Dragon
 
             Logger.Debug("Wait for Accpet");
 
-            SocketAsyncEventArgs socketAsyncEventArgs = AcceptPool.Pop();
+            SocketAsyncEventArgs socketAsyncEventArgs = _acceptPool.Pop();
 
             if (!_listenSocket.AcceptAsync(socketAsyncEventArgs))
             {
