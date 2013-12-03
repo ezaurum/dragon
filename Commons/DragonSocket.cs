@@ -1,3 +1,4 @@
+using System;
 using System.Net.Sockets;
 
 namespace Dragon
@@ -30,10 +31,7 @@ namespace Dragon
         }
 
         public event MessageEventHandler<T> WriteCompleted;
-        public event MessageEventHandler<T> Disconnected;
-
-        //TODO event disconnected
-        //TODO event connected
+        public event EventHandler<SocketAsyncEventArgs> Disconnected;
 
         public Socket Socket { set; protected get; }
         public SocketAsyncEventArgs WriteEventArgs { set; protected get; }
@@ -76,7 +74,7 @@ namespace Dragon
             //TODO error process need
             if (args.SocketError != SocketError.Success)
             {
-                Disconnected(default(T));
+                Disconnected(sender, args);
             }
 
             if (args.SocketError == SocketError.Success && args.BytesTransferred > 0)

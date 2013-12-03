@@ -33,7 +33,7 @@ namespace Dragon
     /// Need to be singleton
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public interface IMessageFactory<out T> where T : IMessage
+    public interface IMessageFactory<T> where T : IMessage
     {
         T GetMessage(byte[] bytes);
         T GetMessage(byte[] bytes, int offset, int length);
