@@ -15,9 +15,6 @@ namespace Dragon
 
             if (null != Accepted)
                 Accepted(Socket, null);
-           
-            //start to read
-            ReadRepeat();
         }
         
         public event EventHandler<SocketAsyncEventArgs> Accepted;

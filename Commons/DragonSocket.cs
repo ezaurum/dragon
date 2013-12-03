@@ -11,8 +11,20 @@ namespace Dragon
     {
         private readonly MessageConverter<T> _messageConverter;
 
+        public enum SocketState
+        {
+            BeforeInitialized,
+            Initialized,
+            Active,
+            Inactive
+        }
+
+        public SocketState State { get; set; }
+
         protected DragonSocket(IMessageFactory<T> factory)
         {
+            State = SocketState.BeforeInitialized;
+
             //TODO buffer reallocated
             _messageConverter = new MessageConverter<T>(new CircularBuffer(new byte[1024]), factory);
             ReadEventArgs = new SocketAsyncEventArgs();
@@ -23,6 +35,16 @@ namespace Dragon
 
             WriteEventArgs = new SocketAsyncEventArgs();
             WriteEventArgs.Completed += OnWriteEventArgsOnCompleted;
+
+            State = SocketState.Initialized;
+        }
+
+
+        public void Disconnect()
+        {
+            //TODO disconnect
+
+            State = SocketState.Inactive;
         }
 
         public event MessageEventHandler<T> ReadCompleted
@@ -37,6 +59,12 @@ namespace Dragon
         public Socket Socket { set; protected get; }
         public SocketAsyncEventArgs WriteEventArgs { set; protected get; }
         public SocketAsyncEventArgs ReadEventArgs { set; protected get; }
+
+        public void Activate()
+        {
+            State = SocketState.Active;
+            ReadRepeat();
+        }
 
         public void Send(T message)
         {

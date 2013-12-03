@@ -15,7 +15,6 @@ namespace Dragon
         private static readonly IPAddress DefaultConnectIpAddresss = IPAddress.Loopback;
         private readonly Timer _connectTimer;
         private int _retryCount;
-        private ClientSocketState _state = ClientSocketState.BeforeInitialized;
 
         public ClientDragonSocket(IMessageFactory<T> factory)
             : base(factory)
@@ -43,15 +42,16 @@ namespace Dragon
         }
 
         /// <summary>
-        /// Default Event handler for connection success
+        /// Default Event handler for connection success.
+        /// Activate socket
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void DefaultConnectSuccess(object sender, SocketAsyncEventArgs e)
         {
             if (e.SocketError != SocketError.Success) return;
-            ReadRepeat();
             ConnectSuccess(sender, e);
+            Activate();
         }
 
 
@@ -63,10 +63,6 @@ namespace Dragon
         public event EventHandler<SocketAsyncEventArgs> ConnectFailed;
         public event EventHandler<SocketAsyncEventArgs> ConnectSuccess;
 
-        public void Disconnect()
-        {
-            //TODO disconnect
-        }
 
         /// <summary>
         /// Default handler for connect timer
@@ -116,12 +112,6 @@ namespace Dragon
             {
                 StopTimerOnConnected(null, ConnectEventArgs);
             }
-        }
-
-
-        private enum ClientSocketState
-        {
-            BeforeInitialized
         }
     }
 }
