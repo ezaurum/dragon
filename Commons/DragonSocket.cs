@@ -67,9 +67,9 @@ namespace Dragon
         public event MessageEventHandler<T> WriteCompleted;
         public event EventHandler<SocketAsyncEventArgs> Disconnected;
 
-        public Socket Socket { set; protected get; }
-        public SocketAsyncEventArgs WriteEventArgs { set; protected get; }
-        public SocketAsyncEventArgs ReadEventArgs { set; protected get; }
+        protected Socket Socket { set; get; }
+        private SocketAsyncEventArgs WriteEventArgs { set; get; }
+        private SocketAsyncEventArgs ReadEventArgs { set; get; }
 
         public void Activate()
         {
@@ -137,7 +137,7 @@ namespace Dragon
         /// <summary>
         ///     Read repeat
         /// </summary>
-        protected void ReadRepeat()
+        private void ReadRepeat()
         {
             if (!Socket.ReceiveAsync(ReadEventArgs))
             {

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Net.Sockets;
 
 namespace Dragon
 {
@@ -18,9 +17,6 @@ namespace Dragon
     {        
         event MessageEventHandler<T> ReadCompleted;
         event MessageEventHandler<T> WriteCompleted;
-        Socket Socket { set; }
-        SocketAsyncEventArgs WriteEventArgs { set; }
-        SocketAsyncEventArgs ReadEventArgs { set; }
         void Send(T message);
     }
 
