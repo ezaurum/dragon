@@ -14,7 +14,7 @@ namespace Dragon
         private readonly IMessageFactory<T> _factory;
         
 
-        public MessageConverter(CircularBuffer buffer, IMessageFactory<T> factory)
+        public MessageConverter(IMessageFactory<T> factory)
         {
             _buffer = new byte[2048];
             _factory = factory;

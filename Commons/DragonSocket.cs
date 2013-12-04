@@ -31,7 +31,7 @@ namespace Dragon
             State = SocketState.BeforeInitialized;
 
             //TODO buffer reallocated
-            _messageConverter = new MessageConverter<T>(new CircularBuffer(new byte[1024]), factory);
+            _messageConverter = new MessageConverter<T>(factory);
             ReadEventArgs = new SocketAsyncEventArgs();
 
             //TODO is this need pool?
