@@ -18,6 +18,8 @@ namespace Dragon
         event MessageEventHandler<T> ReadCompleted;
         event MessageEventHandler<T> WriteCompleted;
         void Send(T message);
+        void Activate();
+        void Deactivate();
     }
 
     public interface IMessageConverter<out T> where T : IMessage

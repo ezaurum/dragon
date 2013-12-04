@@ -77,6 +77,11 @@ namespace Dragon
             ReadRepeat();
         }
 
+        public void Deactivate()
+        {
+            Disconnect(Socket,null);
+        }
+
         public void Send(T message)
         {
             lock (_lock)
