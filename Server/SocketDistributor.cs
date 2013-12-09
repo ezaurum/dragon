@@ -65,13 +65,17 @@ namespace Dragon
             //check states
             if (_state > DistributorState.BeforeInitialized)
             {
-                throw new InvalidOperationException(string.Format("Initialized already. Current state is {0}.", _state));
+                string message = string.Format("Initialized already. Current state is {0}.", _state);
+                Logger.Fatal(message);
+                throw new InvalidOperationException(message);
             }
 
             if (_currentAcceptedConnections > 0)
             {
-                throw new InvalidOperationException(string.Format("Accepted {0} Connections is exist.",
-                    _currentAcceptedConnections));
+                
+                string message = string.Format("Accepted {0} Connections is exist.",_currentAcceptedConnections);
+                Logger.Fatal(message);
+                throw new InvalidOperationException(message);
             }
             
             //check properties
@@ -91,8 +95,9 @@ namespace Dragon
 
             if (Backlog < 1)
             {
-                throw new InvalidOperationException(
-                    string.Format("Backlog must be greater than 0. Current value is {0},", Backlog));
+                var message = string.Format("Backlog must be greater than 0. Current value is {0},", Backlog);
+                Logger.Fatal(message);
+                throw new InvalidOperationException(message);
             }
 
             if (MaximumConnection < 2)
@@ -167,7 +172,9 @@ namespace Dragon
 
             if (_state < DistributorState.Acceptable)
             {
-                throw new InvalidOperationException(string.Format("Not initialized. Current State is {0}", _state));
+                string message = string.Format("Not initialized. Current State is {0}", _state);
+                Logger.Fatal(message);
+                throw new InvalidOperationException(message);
             }
 
             WaitForAccept();
