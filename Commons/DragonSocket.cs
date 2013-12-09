@@ -45,9 +45,11 @@ namespace Dragon
         }
 
 
-        public void Disconnect(object sender, SocketAsyncEventArgs e)
+        private void Disconnect(object sender, SocketAsyncEventArgs e)
         {
-            //TODO disconnect
+            ReadEventArgs.Dispose();
+            WriteEventArgs.Dispose();
+            Socket.Close();
 
             //run once
             if (State == SocketState.Inactive) return;
@@ -144,9 +146,16 @@ namespace Dragon
         /// </summary>
         private void ReadRepeat()
         {
-            if (!Socket.ReceiveAsync(ReadEventArgs))
+            try
             {
-                OnReadEventArgsOnCompleted(Socket, ReadEventArgs);
+                if (!Socket.ReceiveAsync(ReadEventArgs))
+                {
+                    OnReadEventArgsOnCompleted(Socket, ReadEventArgs);
+                }
+            }
+            catch (ObjectDisposedException e)
+            {
+                //Nothing to do
             }
         }
 
