@@ -15,12 +15,43 @@ namespace Dragon
         private static readonly IPAddress DefaultConnectIpAddresss = IPAddress.Loopback;
         private readonly Timer _connectTimer;
         private int _retryCount;
+        private readonly bool _heartbeat;
+        private readonly SocketAsyncEventArgs _heartbeatEventArgs;
+        private Timer _heartbeatTimer;
 
-        public ClientDragonSocket(IMessageFactory<T> factory)
+        protected override void Disconnect(object sender, SocketAsyncEventArgs e)
+        {
+            if (null != _heartbeatEventArgs) _heartbeatEventArgs.Dispose();
+            base.Disconnect(sender,e);
+        }
+
+        public override void Activate()
+        {
+            base.Activate();
+            if (_heartbeat)
+            {
+                _heartbeatTimer.Start();
+            }
+        }
+        
+
+
+        private void Beat(object sender, ElapsedEventArgs elapsedEventArgs)
+        {
+            _heartbeatEventArgs.SetBuffer(0, sizeof(Int16));
+            if (!Socket.SendAsync(_heartbeatEventArgs))
+            {
+                OnHeartbeat(Socket, _heartbeatEventArgs);
+            }
+        }
+
+        public ClientDragonSocket(IMessageFactory<T> factory, bool heartbeat)
             : base(factory)
         {
             Socket = new Socket(AddressFamily.InterNetwork,
                 SocketType.Stream, ProtocolType.Tcp);
+
+            _heartbeat = heartbeat;
 
             RetryInterval = 1500;
             RetryLimit = 5;
@@ -28,6 +59,16 @@ namespace Dragon
             _connectTimer.Elapsed += CheckReconnect;
 
             IpEndpoint = new IPEndPoint(DefaultConnectIpAddresss, DefaultListeningPortNumber);
+
+
+            //set heartbeats
+            if (!_heartbeat) return;
+            _heartbeatEventArgs = new SocketAsyncEventArgs();
+            _heartbeatEventArgs.Completed += OnHeartbeat;
+            byte[] heartbeatBuffer = BitConverter.GetBytes((Int16)sizeof(Int16));
+            _heartbeatEventArgs.SetBuffer(heartbeatBuffer, 0, sizeof(Int16));
+            _heartbeatTimer = new Timer { Interval = 500 };
+            _heartbeatTimer.Elapsed += Beat;
         }
 
         private void InitConnectEventArg()
@@ -108,6 +149,15 @@ namespace Dragon
             {
                 StopTimerOnConnected(null, ConnectEventArgs);
             }
+        }
+
+        private void OnHeartbeat(object sender, SocketAsyncEventArgs e)
+        {
+            if (e.SocketError != SocketError.Success)
+            {
+                Disconnect(sender, e);
+            }
+            Console.WriteLine("pitapat pitapat");
         }
     }
 }

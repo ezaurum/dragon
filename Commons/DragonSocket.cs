@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
+using Timer = System.Timers.Timer;
 
 namespace Dragon
 {
@@ -10,7 +11,7 @@ namespace Dragon
     /// <typeparam name="T"></typeparam>
     public class DragonSocket<T> : IDragonSocket<T> where T : IMessage
     {
-        private readonly MessageConverter<T> _messageConverter;
+        protected readonly MessageConverter<T> _messageConverter;
         private readonly Queue<T> _sendingQueue = new Queue<T>();
         private readonly object _lock = new object();
         private bool _sending;
@@ -32,23 +33,23 @@ namespace Dragon
 
             //TODO buffer reallocated
             _messageConverter = new MessageConverter<T>(factory);
-            ReadEventArgs = new SocketAsyncEventArgs();
+            _readEventArgs = new SocketAsyncEventArgs();
 
             //TODO is this need pool?
-            ReadEventArgs.SetBuffer(new byte[1024], 0, 1024);
-            ReadEventArgs.Completed += OnReadEventArgsOnCompleted;
+            _readEventArgs.SetBuffer(new byte[1024], 0, 1024);
+            _readEventArgs.Completed += OnReadEventArgsOnCompleted;
 
-            WriteEventArgs = new SocketAsyncEventArgs();
-            WriteEventArgs.Completed += OnWriteEventArgsOnCompleted;
+            _writeEventArgs = new SocketAsyncEventArgs();
+            _writeEventArgs.Completed += OnWriteEventArgsOnCompleted;
 
             State = SocketState.Initialized;
         }
 
 
-        private void Disconnect(object sender, SocketAsyncEventArgs e)
+        protected virtual void Disconnect(object sender, SocketAsyncEventArgs e)
         {
-            ReadEventArgs.Dispose();
-            WriteEventArgs.Dispose();
+            _readEventArgs.Dispose();
+            _writeEventArgs.Dispose();
             Socket.Close();
 
             //run once
@@ -70,10 +71,10 @@ namespace Dragon
         public event EventHandler<SocketAsyncEventArgs> Disconnected;
 
         protected Socket Socket { set; get; }
-        private SocketAsyncEventArgs WriteEventArgs { set; get; }
-        private SocketAsyncEventArgs ReadEventArgs { set; get; }
+        private readonly SocketAsyncEventArgs _writeEventArgs;
+        private readonly SocketAsyncEventArgs _readEventArgs;
 
-        public void Activate()
+        public virtual void Activate()
         {
             State = SocketState.Active;
             ReadRepeat();
@@ -110,12 +111,12 @@ namespace Dragon
         {
             _sending = true;
 
-            WriteEventArgs.SetBuffer(message.ToByteArray(), 0, message.Length);
-            WriteEventArgs.UserToken = message;
+            _writeEventArgs.SetBuffer(message.ToByteArray(), 0, message.Length);
+            _writeEventArgs.UserToken = message;
 
-            if (!Socket.SendAsync(WriteEventArgs))
+            if (!Socket.SendAsync(_writeEventArgs))
             {
-                OnWriteEventArgsOnCompleted(null, WriteEventArgs);
+                OnWriteEventArgsOnCompleted(null, _writeEventArgs);
             }
         }
 
@@ -148,9 +149,9 @@ namespace Dragon
         {
             try
             {
-                if (!Socket.ReceiveAsync(ReadEventArgs))
+                if (!Socket.ReceiveAsync(_readEventArgs))
                 {
-                    OnReadEventArgsOnCompleted(Socket, ReadEventArgs);
+                    OnReadEventArgsOnCompleted(Socket, _readEventArgs);
                 }
             }
             catch (ObjectDisposedException e)

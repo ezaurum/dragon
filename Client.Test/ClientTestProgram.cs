@@ -9,7 +9,7 @@ namespace Client.Test
     {
         static void Main(string[] args)
         {
-            var c = new ClientDragonSocket<SimpleMessage>(new SimpleMessageFactory());
+            var c = new ClientDragonSocket<SimpleMessage>(new SimpleMessageFactory(), true);
             c.ConnectSuccess += (sender, eventArgs) => 
             {
                 Console.WriteLine("Connected");

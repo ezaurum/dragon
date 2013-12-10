@@ -43,7 +43,6 @@ namespace Dragon
                 {
                     //after converted. pull buffer to front
                     PullBufferToFront(messageLength);
-
                     HeartbeatedHeard();
                 }
                 else
@@ -51,9 +50,7 @@ namespace Dragon
                     T message = _factory.GetMessage(_buffer, 0, messageLength);
 
                     PullBufferToFront(messageLength);
-
-                    if (null != MessageConverted)
-                        MessageConverted(message);
+                    MessageConverted(message);
                 }
             }
         }

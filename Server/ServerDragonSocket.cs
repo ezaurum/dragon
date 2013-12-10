@@ -15,8 +15,23 @@ namespace Dragon
 
             if (null != Accepted)
                 Accepted(Socket, null);
+
+            _messageConverter.HeartbeatedHeard += OnMessageConverterOnHeartbeatedHeard;
         }
+
+        private void OnMessageConverterOnHeartbeatedHeard()
+        {
+            _last2Heartbeat = _lastHeartbeat;
+            _lastHeartbeat = DateTime.Now;
+
+            if (null != HeartbeatHeard)
+                HeartbeatHeard();
+        }
+
+        private DateTime _lastHeartbeat;
+        private DateTime _last2Heartbeat;
         
         public event EventHandler<SocketAsyncEventArgs> Accepted;
+        public event VoidMessageEventHandler HeartbeatHeard;
     }
 }
