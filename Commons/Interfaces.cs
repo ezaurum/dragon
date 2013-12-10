@@ -17,6 +17,7 @@ namespace Dragon
     {        
         event MessageEventHandler<T> ReadCompleted;
         event MessageEventHandler<T> WriteCompleted;
+        event VoidMessageEventHandler Disconnected;
         void Send(T message);
         void Activate();
         void Deactivate();

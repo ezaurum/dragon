@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Net.Sockets;
 using System.Threading;
 using Dragon;
 
@@ -38,7 +37,7 @@ namespace Client.Test
             Console.ReadKey();
         }
 
-        private static void OnDisconnected(object sender, SocketAsyncEventArgs socketAsyncEventArgs)
+        private static void OnDisconnected()
         {
             Console.WriteLine("Disconnected");
         }

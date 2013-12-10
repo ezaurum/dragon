@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
-using Timer = System.Timers.Timer;
 
 namespace Dragon
 {
@@ -44,9 +43,8 @@ namespace Dragon
 
             State = SocketState.Initialized;
         }
-
-
-        protected virtual void Disconnect(object sender, SocketAsyncEventArgs e)
+        
+        public virtual void Disconnect()
         {
             _readEventArgs.Dispose();
             _writeEventArgs.Dispose();
@@ -58,7 +56,7 @@ namespace Dragon
             State = SocketState.Inactive;
 
             if (null != Disconnected)
-                Disconnected(sender, e);
+                Disconnected();
         }
 
         public event MessageEventHandler<T> ReadCompleted
@@ -68,7 +66,7 @@ namespace Dragon
         }
 
         public event MessageEventHandler<T> WriteCompleted;
-        public event EventHandler<SocketAsyncEventArgs> Disconnected;
+        public event VoidMessageEventHandler Disconnected;
 
         protected Socket Socket { set; get; }
         private readonly SocketAsyncEventArgs _writeEventArgs;
@@ -82,7 +80,7 @@ namespace Dragon
 
         public void Deactivate()
         {
-            Disconnect(Socket,null);
+            Disconnect();
         }
 
         public void Send(T message)
@@ -124,7 +122,7 @@ namespace Dragon
         {
             if (e.SocketError != SocketError.Success)
             {
-                Disconnect(sender, e);
+                Disconnect();
                 return;
             }
 
@@ -170,7 +168,7 @@ namespace Dragon
             //TODO error process need
             if (args.SocketError != SocketError.Success)
             {
-                Disconnect(sender,args);
+                Disconnect();
                 return;
             }
 

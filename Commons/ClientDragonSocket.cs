@@ -19,10 +19,10 @@ namespace Dragon
         private readonly SocketAsyncEventArgs _heartbeatEventArgs;
         private Timer _heartbeatTimer;
 
-        protected override void Disconnect(object sender, SocketAsyncEventArgs e)
+        public override void Disconnect()
         {
             if (null != _heartbeatEventArgs) _heartbeatEventArgs.Dispose();
-            base.Disconnect(sender,e);
+            base.Disconnect();
         }
 
         public override void Activate()
@@ -155,7 +155,7 @@ namespace Dragon
         {
             if (e.SocketError != SocketError.Success)
             {
-                Disconnect(sender, e);
+                Disconnect();
             }
             Console.WriteLine("pitapat pitapat");
         }
