@@ -3,16 +3,16 @@
 namespace Dragon
 {
     /// <summary>
-    /// Generic message converter.
-    /// Need factory and CircularBuffer
+    ///     Generic message converter.
+    ///     Need factory and CircularBuffer
     /// </summary>
     /// <typeparam name="T">Message</typeparam>
-    public class MessageConverter<T> : IMessageConverter<T> where T:IMessage
+    public class MessageConverter<T> : IMessageConverter<T> where T : IMessage
     {
         private readonly byte[] _buffer;
 
         private readonly IMessageFactory<T> _factory;
-        
+        private int _offset;
 
         public MessageConverter(IMessageFactory<T> factory)
         {
@@ -22,6 +22,8 @@ namespace Dragon
 
         // Not to be null.
         public event MessageEventHandler<T> MessageConverted;
+        // Not to be null.
+        public event VoidMessageEventHandler HeartbeatedHeard;
 
         public void ReceiveBytes(byte[] buffer, int offset, int bytesTransferred)
         {
@@ -36,17 +38,30 @@ namespace Dragon
 
                 if (_offset < messageLength) return;
 
-                T message = _factory.GetMessage(_buffer, 0, messageLength);
+                //check heartbeat
+                if (messageLength == sizeof (short))
+                {
+                    //after converted. pull buffer to front
+                    PullBufferToFront(messageLength);
 
-                //after converted. pull buffer to front
-                Buffer.BlockCopy(_buffer, messageLength, _buffer, 0, _offset - messageLength);
-                _offset -= messageLength;
+                    HeartbeatedHeard();
+                }
+                else
+                {
+                    T message = _factory.GetMessage(_buffer, 0, messageLength);
 
-                if (null != MessageConverted)
-                    MessageConverted(message);
+                    PullBufferToFront(messageLength);
+
+                    if (null != MessageConverted)
+                        MessageConverted(message);
+                }
             }
         }
 
-        private int _offset;
+        private void PullBufferToFront(short messageLength)
+        {
+            Buffer.BlockCopy(_buffer, messageLength, _buffer, 0, _offset - messageLength);
+            _offset -= messageLength;
+        }
     }
 }
