@@ -19,10 +19,10 @@ namespace Dragon
         private readonly SocketAsyncEventArgs _heartbeatEventArgs;
         private Timer _heartbeatTimer;
 
-        public override void Disconnect()
+        public override void Dispose()
         {
             if (null != _heartbeatEventArgs) _heartbeatEventArgs.Dispose();
-            base.Disconnect();
+            base.Dispose();
         }
 
         public override void Activate()
@@ -33,8 +33,6 @@ namespace Dragon
                 _heartbeatTimer.Start();
             }
         }
-        
-
 
         private void Beat(object sender, ElapsedEventArgs elapsedEventArgs)
         {
@@ -155,6 +153,7 @@ namespace Dragon
         {
             if (e.SocketError != SocketError.Success)
             {
+                _heartbeatTimer.Stop();
                 Disconnect();
             }
             Console.WriteLine("pitapat pitapat");

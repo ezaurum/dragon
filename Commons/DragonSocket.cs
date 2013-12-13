@@ -18,10 +18,11 @@ namespace Dragon
 
         public enum SocketState
         {
-            BeforeInitialized,
+            BeforeInitialized = 0,
             Initialized,
-            Active,
-            Inactive
+            Active=10,
+            Inactive=100,
+            Disconnected
         }
 
         public SocketState State { get; set; }
@@ -44,16 +45,17 @@ namespace Dragon
             State = SocketState.Initialized;
         }
         
+        /// <summary>
+        /// For reuse, Socket and eventargs are not disposed.
+        /// </summary>
         public virtual void Disconnect()
         {
-            _readEventArgs.Dispose();
-            _writeEventArgs.Dispose();
-            Socket.Close();
+            Socket.Disconnect(true);
 
             //run once
-            if (State == SocketState.Inactive) return;
+            if (State >= SocketState.Disconnected) return;
 
-            State = SocketState.Inactive;
+            State = SocketState.Disconnected;
 
             if (null != Disconnected)
                 Disconnected();
@@ -80,6 +82,7 @@ namespace Dragon
 
         public void Deactivate()
         {
+            State = SocketState.Inactive;
             Disconnect();
         }
 
@@ -107,10 +110,13 @@ namespace Dragon
         /// <param name="message"></param>
         private void SendAsync(T message)
         {
-            _sending = true;
+            lock (_lock)
+            {
+                _sending = true;
 
-            _writeEventArgs.SetBuffer(message.ToByteArray(), 0, message.Length);
-            _writeEventArgs.UserToken = message;
+                _writeEventArgs.SetBuffer(message.ToByteArray(), 0, message.Length);
+                _writeEventArgs.UserToken = message;
+            }
 
             if (!Socket.SendAsync(_writeEventArgs))
             {
@@ -177,6 +183,18 @@ namespace Dragon
                 _messageConverter.ReceiveBytes(args.Buffer, args.Offset, args.BytesTransferred);
                 ReadRepeat();
             }
+        }
+
+        public virtual void Dispose()
+        {
+            if (State < SocketState.Inactive)
+            {
+                Deactivate();
+            }
+
+            _writeEventArgs.Dispose();
+            _readEventArgs.Dispose();
+            Socket.Disconnect(false);
         }
     }
 }

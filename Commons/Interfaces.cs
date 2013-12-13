@@ -13,7 +13,7 @@ namespace Dragon
         DateTime PacketTime { get; set; }
     }   
     
-    public interface IDragonSocket<T> where T : IMessage
+    public interface IDragonSocket<T> :IDisposable where T : IMessage 
     {        
         event MessageEventHandler<T> ReadCompleted;
         event MessageEventHandler<T> WriteCompleted;
