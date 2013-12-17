@@ -10,7 +10,6 @@ namespace Dragon
         Int16 Length { get; }
         byte[] ToByteArray();
         void FromByteArray(byte[] bytes);
-        DateTime PacketTime { get; set; }
     }   
     
     public interface IDragonSocket<T> :IDisposable where T : IMessage 
