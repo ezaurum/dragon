@@ -50,7 +50,7 @@ namespace Dragon
         /// </summary>
         public virtual void Disconnect()
         {
-            Socket.Disconnect(true);
+            Socket.Close(1000);
 
             //run once
             if (State >= SocketState.Disconnected) return;
@@ -187,14 +187,12 @@ namespace Dragon
 
         public virtual void Dispose()
         {
-            if (State < SocketState.Inactive)
-            {
-                Deactivate();
-            }
-
+            if (State >= SocketState.Inactive) return;
+            
             _writeEventArgs.Dispose();
             _readEventArgs.Dispose();
-            Socket.Disconnect(false);
+
+            Deactivate();
         }
     }
 }
