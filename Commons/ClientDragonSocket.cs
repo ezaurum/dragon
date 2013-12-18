@@ -11,13 +11,11 @@ namespace Dragon
     /// <typeparam name="T"></typeparam>
     public class ClientDragonSocket<T> : DragonSocket<T> where T : IMessage
     {
-        private const int DefaultListeningPortNumber = 10008;
-        private static readonly IPAddress DefaultConnectIpAddresss = IPAddress.Loopback;
         private readonly Timer _connectTimer;
         private int _retryCount;
         private readonly bool _heartbeat;
         private readonly SocketAsyncEventArgs _heartbeatEventArgs;
-        private Timer _heartbeatTimer;
+        private readonly Timer _heartbeatTimer;
 
         public override void Dispose()
         {
@@ -56,9 +54,6 @@ namespace Dragon
             _connectTimer = new Timer {Interval = RetryInterval,AutoReset = false};
             _connectTimer.Elapsed += CheckReconnect;
 
-            IpEndpoint = new IPEndPoint(DefaultConnectIpAddresss, DefaultListeningPortNumber);
-
-
             //set heartbeats
             if (!_heartbeat) return;
             _heartbeatEventArgs = new SocketAsyncEventArgs();
@@ -71,6 +66,8 @@ namespace Dragon
 
         private void InitConnectEventArg()
         {
+            if ( null == IpEndpoint ) IpEndpoint = DefaultDestination;
+
             ConnectEventArgs = new SocketAsyncEventArgs {RemoteEndPoint = IpEndpoint};
             ConnectEventArgs.Completed += StopTimerOnConnected;
             ConnectEventArgs.Completed += DefaultConnectSuccess;
@@ -132,15 +129,22 @@ namespace Dragon
             }
         }
 
+        public void Connect(IPEndPoint endPoint)
+        {
+            IpEndpoint = endPoint;
+            Connect();
+        }
+
         public void Connect(string ipAddress, int port)
         {
             IpEndpoint = new IPEndPoint(IPAddress.Parse(ipAddress), port);
-            InitConnectEventArg();
             Connect();
         }
 
         private void Connect()
         {
+            InitConnectEventArg();
+
             // timer set
             _connectTimer.Start();
             if (!Socket.ConnectAsync(ConnectEventArgs))
@@ -151,12 +155,9 @@ namespace Dragon
 
         private void OnHeartbeat(object sender, SocketAsyncEventArgs e)
         {
-            if (e.SocketError != SocketError.Success)
-            {
-                _heartbeatTimer.Stop();
-                Disconnect();
-            }
-            Console.WriteLine("pitapat pitapat");
+            if (e.SocketError == SocketError.Success) return;
+            _heartbeatTimer.Stop();
+            Disconnect();
         }
     }
 }

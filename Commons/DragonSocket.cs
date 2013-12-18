@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Sockets;
 
 namespace Dragon
@@ -8,7 +9,7 @@ namespace Dragon
     ///     Socket Wrapper
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class DragonSocket<T> : IDragonSocket<T> where T : IMessage
+    public class DragonSocket<T> : EndPointStorage, IDragonSocket<T> where T : IMessage
     {
         protected readonly MessageConverter<T> _messageConverter;
         private readonly Queue<T> _sendingQueue = new Queue<T>();
@@ -194,5 +195,11 @@ namespace Dragon
 
             Deactivate();
         }
+    }
+
+    public abstract class EndPointStorage
+    {
+        protected static readonly IPEndPoint DefaultDestination = new IPEndPoint(IPAddress.Loopback, 10008);
+        protected static readonly IPEndPoint DefaultAcceptable = new IPEndPoint(IPAddress.Any, 10008);
     }
 }
