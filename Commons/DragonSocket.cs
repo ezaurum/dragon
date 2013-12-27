@@ -92,15 +92,11 @@ namespace Dragon
             lock (_lock)
             {
                 _sendingQueue.Enqueue(message);
-            }
 
             if (_sending)
             {
                 return;
             }
-            
-            lock (_lock)
-            {
                 SendAsync(_sendingQueue.Dequeue());
             }
         }
@@ -118,11 +114,21 @@ namespace Dragon
                 _writeEventArgs.SetBuffer(message.ToByteArray(), 0, message.Length);
                 _writeEventArgs.UserToken = message;
             }
-
-            if (!Socket.SendAsync(_writeEventArgs))
+            try
             {
-                OnWriteEventArgsOnCompleted(null, _writeEventArgs);
+                if (!Socket.SendAsync(_writeEventArgs))
+                {
+                    OnWriteEventArgsOnCompleted(null, _writeEventArgs);
+                }
             }
+            catch (ObjectDisposedException e)
+            {
+                if (State == SocketState.Active)
+                {
+                    throw new InvalidOperationException("Socket State is Active. But socket disposed.",e);
+                }
+            }
+            
         }
 
         private void OnWriteEventArgsOnCompleted(object sender, SocketAsyncEventArgs e)
