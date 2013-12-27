@@ -55,7 +55,7 @@ namespace Dragon
 
             RetryInterval = 1500;
             RetryLimit = 5;
-            _connectTimer = new Timer {Interval = RetryInterval};
+            _connectTimer = new Timer {Interval = RetryInterval,AutoReset = false};
             _connectTimer.Elapsed += CheckReconnect;
 
             IpEndpoint = new IPEndPoint(DefaultConnectIpAddresss, DefaultListeningPortNumber);
