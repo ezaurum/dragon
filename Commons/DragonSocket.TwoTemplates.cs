@@ -5,13 +5,14 @@ using System.Net.Sockets;
 namespace Dragon
 {
     /// <summary>
-    ///     Socket Wrapper
+    ///     Socket Wrapper, Request, Acknowledge packet devided. not inherit IMessage
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public class DragonSocket<T> : EndPointStorage, IDragonSocket<T> where T : IMessage
+    /// <typeparam name="TReq"></typeparam>
+    /// <typeparam name="TAck"></typeparam>
+    public class DragonSocket<TReq, TAck> : EndPointStorage, IDragonSocket<TReq, TAck>
     {
-        protected readonly MessageConverter<T> MessageConverter;
-        private readonly Queue<T> _sendingQueue = new Queue<T>();
+        private readonly IMessageFactory<TReq, TAck> _factory;
+        private readonly Queue<TReq> _sendingQueue = new Queue<TReq>();
         private readonly object _lock = new object();
         private bool _sending;
         private bool _leftToSend;
@@ -27,12 +28,13 @@ namespace Dragon
 
         public SocketState State { get; set; }
 
-        protected DragonSocket(IMessageFactory<T> factory)
+        protected DragonSocket(IMessageFactory<TReq, TAck> factory)
         {
+            _factory = factory;
             State = SocketState.BeforeInitialized;
 
             //TODO buffer reallocated
-            MessageConverter = new MessageConverter<T>(factory);
+            
             _readEventArgs = new SocketAsyncEventArgs();
 
             //TODO is this need pool?
@@ -61,18 +63,16 @@ namespace Dragon
                 Disconnected();
         }
 
-        public event MessageEventHandler<T> ReadCompleted
-        {
-            add { MessageConverter.MessageConverted += value; }
-            remove { MessageConverter.MessageConverted -= value; }
-        }
+        public event MessageHandler<TReq> WriteCompleted;
 
-        public event MessageEventHandler<T> WriteCompleted;
+        public event MessageHandler<TAck> ReadCompleted;
+        
         public event VoidMessageEventHandler Disconnected;
 
         protected Socket Socket { set; get; }
         private readonly SocketAsyncEventArgs _writeEventArgs;
         private readonly SocketAsyncEventArgs _readEventArgs;
+        private byte[] _sendingBytes;
 
         public virtual void Activate()
         {
@@ -86,7 +86,7 @@ namespace Dragon
             Disconnect();
         }
 
-        public void Send(T message)
+        public void Send(TReq message)
         {
             lock (_lock)
             {
@@ -96,7 +96,8 @@ namespace Dragon
                 {
                     return;
                 }
-                SendAsync(_sendingQueue.Dequeue());
+                _factory.GetByte(_sendingQueue.Dequeue(), out _sendingBytes);
+                SendAsync(_sendingBytes);
             }
         }
 
@@ -104,13 +105,12 @@ namespace Dragon
         /// Should Run in lock
         /// </summary>
         /// <param name="message"></param>
-        private void SendAsync(T message)
+        private void SendAsync(byte[] message)
         {
             lock (_lock)
             {
                 _sending = true;
-
-                _writeEventArgs.SetBuffer(message.ToByteArray(), 0, message.Length);
+                _writeEventArgs.SetBuffer(message, 0, message.Length);
                 _writeEventArgs.UserToken = message;
             }
             try
@@ -139,7 +139,7 @@ namespace Dragon
             }
 
             if (null != WriteCompleted)
-                WriteCompleted((T) e.UserToken);
+                WriteCompleted((TReq)e.UserToken);
 
             lock (_lock)
             {
@@ -148,7 +148,8 @@ namespace Dragon
 
             if (_sending)
             {
-                SendAsync(_sendingQueue.Dequeue());
+                _factory.GetByte(_sendingQueue.Dequeue(), out _sendingBytes);
+                SendAsync(_sendingBytes);
             }
         }
 
@@ -186,7 +187,7 @@ namespace Dragon
 
             if (SocketError.Success == args.SocketError && 0 < args.BytesTransferred && SocketState.Active == State)
             {
-                MessageConverter.ReceiveBytes(args.Buffer, args.Offset, args.BytesTransferred);
+                //                _messageConverter.ReceiveBytes(args.Buffer, args.Offset, args.BytesTransferred);
                 ReadRepeat();
             }
         }

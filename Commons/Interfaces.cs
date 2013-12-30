@@ -10,8 +10,8 @@ namespace Dragon
         Int16 Length { get; }
         byte[] ToByteArray();
         void FromByteArray(byte[] bytes);
-    }   
-    
+    }
+
     public interface IDragonSocket<T> :IDisposable where T : IMessage 
     {        
         event MessageEventHandler<T> ReadCompleted;
@@ -38,6 +38,6 @@ namespace Dragon
     }
 
     public delegate void MessageEventHandler<in T>(T message) where T : IMessage;
-
+    public delegate void MessageHandler<T>(T message);
     public delegate void VoidMessageEventHandler();
 }

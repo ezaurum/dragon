@@ -16,7 +16,7 @@ namespace Dragon
             if (null != Accepted)
                 Accepted(Socket, null);
 
-            _messageConverter.HeartbeatedHeard += OnMessageConverterOnHeartbeatedHeard;
+            MessageConverter.HeartbeatedHeard += OnMessageConverterOnHeartbeatedHeard;
         }
 
         private void OnMessageConverterOnHeartbeatedHeard()
