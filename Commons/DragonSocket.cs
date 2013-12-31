@@ -14,7 +14,6 @@ namespace Dragon
         private readonly Queue<T> _sendingQueue = new Queue<T>();
         private readonly object _lock = new object();
         private bool _sending;
-        private bool _leftToSend;
 
         public enum SocketState
         {
