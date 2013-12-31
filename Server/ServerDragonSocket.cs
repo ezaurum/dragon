@@ -9,14 +9,26 @@ namespace Dragon
     /// <typeparam name="T"></typeparam>
     public class ServerDragonSocket<T> : DragonSocket<T> where T : IMessage
     {
+        private readonly HeartBeatMaker _heartBeatMaker;
+
         public ServerDragonSocket(Socket acceptSocket, IMessageFactory<T> factory) : base(factory)
         {
             Socket = acceptSocket;
+            _heartBeatMaker = new HeartBeatMaker(Socket);
 
             if (null != Accepted)
+            {
                 Accepted(Socket, null);
-
+            }
+            
             MessageConverter.HeartbeatedHeard += OnMessageConverterOnHeartbeatedHeard;
+        }
+
+        public override void Activate()
+        {
+            base.Activate();
+            _heartBeatMaker.OnSocketError += (sender, args) => HeartbeatNotHeard();
+            _heartBeatMaker.Start();
         }
 
         private void OnMessageConverterOnHeartbeatedHeard()
@@ -33,5 +45,6 @@ namespace Dragon
         
         public event EventHandler<SocketAsyncEventArgs> Accepted;
         public event VoidMessageEventHandler HeartbeatHeard;
+        public event VoidMessageEventHandler HeartbeatNotHeard;
     }
 }

@@ -32,12 +32,26 @@ namespace Dragon
         {
             _connector.Connect(endPoint);
             Socket = _connector.Socket;
+            Socket.ReceiveTimeout = 2000;
+            Socket.SendTimeout = 2000;
         }
 
         public void Connect(string ipAddress, int port)
         {
             _connector.Connect(ipAddress, port);
             Socket = _connector.Socket;
+            Socket.ReceiveTimeout = 2000;
+            Socket.SendTimeout = 2000;
+        }
+
+        /// <summary>
+        /// Client socket need disposed because of event args stop
+        /// </summary>
+        public override void Disconnect()
+        {
+            if(null != _heartbeatTimer) _heartbeatTimer.Stop();
+            Dispose();
+            base.Disconnect();
         }
 
         public override void Dispose()
@@ -58,9 +72,14 @@ namespace Dragon
         private void Beat(object sender, ElapsedEventArgs elapsedEventArgs)
         {
             _heartbeatEventArgs.SetBuffer(0, sizeof(Int16));
-            if (!Socket.SendAsync(_heartbeatEventArgs))
+            try
             {
+                if (Socket.SendAsync(_heartbeatEventArgs)) return;
                 OnHeartbeat(Socket, _heartbeatEventArgs);
+            }
+            catch (ObjectDisposedException e)
+            {
+                if (State < SocketState.Inactive) throw new InvalidOperationException("socket not inactive",e);
             }
         }
 

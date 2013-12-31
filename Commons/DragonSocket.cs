@@ -42,19 +42,19 @@ namespace Dragon
             _writeEventArgs.Completed += OnWriteEventArgsOnCompleted;
 
             State = SocketState.Initialized;
+
         }
 
         /// <summary>
         /// For reuse, Socket and eventargs are not disposed.
         /// </summary>
         public virtual void Disconnect()
-        {
-            Socket.Close(1000);
-
+        { 
             //run once
             if (State >= SocketState.Disconnected) return;
-
             State = SocketState.Disconnected;
+            Socket.Shutdown(SocketShutdown.Both);
+            Socket.Disconnect(true);
 
             if (null != Disconnected)
                 Disconnected();
@@ -82,6 +82,7 @@ namespace Dragon
         public void Deactivate()
         {
             State = SocketState.Inactive;
+            
             Disconnect();
         }
 
@@ -90,13 +91,14 @@ namespace Dragon
             lock (_lock)
             {
                 _sendingQueue.Enqueue(message);
-
-                if (_sending)
-                {
-                    return;
-                }
-                SendAsync(_sendingQueue.Dequeue());
             }
+
+            if (_sending)
+            {
+                return;
+            }
+            SendAsync(_sendingQueue.Dequeue());
+            
         }
 
         /// <summary>
@@ -105,19 +107,14 @@ namespace Dragon
         /// <param name="message"></param>
         private void SendAsync(T message)
         {
-            lock (_lock)
-            {
-                _sending = true;
-
-                _writeEventArgs.SetBuffer(message.ToByteArray(), 0, message.Length);
-                _writeEventArgs.UserToken = message;
-            }
+            _sending = true;
+            _writeEventArgs.UserToken = message;
             try
             {
-                if (!Socket.SendAsync(_writeEventArgs))
-                {
-                    OnWriteEventArgsOnCompleted(null, _writeEventArgs);
-                }
+                _writeEventArgs.SetBuffer(message.ToByteArray(), 0, message.Length);
+                
+                if (Socket.SendAsync(_writeEventArgs)) return;
+                OnWriteEventArgsOnCompleted(null, _writeEventArgs);
             }
             catch (ObjectDisposedException e)
             {
@@ -158,14 +155,16 @@ namespace Dragon
         {
             try
             {
-                if (!Socket.ReceiveAsync(_readEventArgs))
-                {
-                    OnReadEventArgsOnCompleted(Socket, _readEventArgs);
-                }
+                if (Socket.ReceiveAsync(_readEventArgs)) return;
+                OnReadEventArgsOnCompleted(Socket, _readEventArgs);
             }
             catch (ObjectDisposedException e)
             {
-                //Nothing to do
+                Disconnect();
+                if (State == SocketState.Active)
+                {
+                    throw new InvalidOperationException("Socket State is Active. But socket disposed.", e);
+                }
             }
         }
 
@@ -176,18 +175,15 @@ namespace Dragon
         /// <param name="args"></param>
         private void OnReadEventArgsOnCompleted(object sender, SocketAsyncEventArgs args)
         {
-            //TODO error process need
             if (args.SocketError != SocketError.Success)
             {
                 Disconnect();
                 return;
             }
-
-            if (SocketError.Success == args.SocketError && 0 < args.BytesTransferred && SocketState.Active == State)
-            {
-                MessageConverter.ReceiveBytes(args.Buffer, args.Offset, args.BytesTransferred);
-                ReadRepeat();
-            }
+            if (SocketError.Success != args.SocketError || 0 >= args.BytesTransferred || SocketState.Active != State)
+                return;
+            MessageConverter.ReceiveBytes(args.Buffer, args.Offset, args.BytesTransferred);
+            ReadRepeat();
         }
 
         public virtual void Dispose()

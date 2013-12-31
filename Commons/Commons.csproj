@@ -41,6 +41,7 @@
     <Compile Include="DragonSocket.TwoTemplates.cs" />
     <Compile Include="DragonSocket.cs" />
     <Compile Include="EndPointStorage.cs" />
+    <Compile Include="HeartBeatMaker.cs" />
     <Compile Include="Interfaces.TwoTemplates.cs" />
     <Compile Include="Interfaces.cs" />
     <Compile Include="MessageConverter.cs" />

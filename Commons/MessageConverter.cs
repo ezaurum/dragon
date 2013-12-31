@@ -43,7 +43,6 @@ namespace Dragon
                 {
                     //after converted. pull buffer to front
                     PullBufferToFront(messageLength);
-                    HeartbeatedHeard();
                 }
                 else
                 {

@@ -177,11 +177,13 @@ namespace Dragon
             switch (args.SocketError)
             {
                 case SocketError.Success:
-                    if (SocketError.Success == args.SocketError && 0 < args.BytesTransferred && SocketState.Active == State)
+                    if (SocketError.Success == args.SocketError 
+                        && 0 < args.BytesTransferred 
+                        && SocketState.Active == State)
                     {
                         ReadRepeat();
                     }
-                    break; 
+                    break;
                 default:
                     Disconnect();
                     return;

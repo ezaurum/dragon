@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Net;
+using System.Net.Sockets;
+using System.Text;
 using System.Threading;
 using Dragon;
 
@@ -8,7 +11,7 @@ namespace Client.Test
     {
         static void Main(string[] args)
         {
-            var c = new ClientDragonSocket<SimpleMessage>(new SimpleMessageFactory(), true);
+            var c = new ClientDragonSocket<SimpleMessage>(new SimpleMessageFactory(), false);
             c.ConnectSuccess += (sender, eventArgs) => 
             {
                 Console.WriteLine("Connected");
@@ -25,7 +28,7 @@ namespace Client.Test
                 Console.WriteLine("Read " +message);
 
                 Thread.Sleep(500);
-                c.Send(new SimpleMessage());
+                if(c.State < DragonSocket<SimpleMessage>.SocketState.Inactive) c.Send(new SimpleMessage());
             };
 
             c.WriteCompleted += message =>
@@ -37,6 +40,14 @@ namespace Client.Test
             c.Connect("127.0.0.1",10008);
             
             Console.ReadKey();
+            c.Disconnect();
+
+            Console.ReadKey();
+            Console.WriteLine("We're connecting.........");
+            c.Connect("127.0.0.1", 10008);
+
+            Console.ReadKey();
+
         }
 
         private static void OnDisconnected()
