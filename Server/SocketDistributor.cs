@@ -11,7 +11,7 @@ namespace Dragon
     ///     Accept Connection and Distribute sockets
     ///     Set AccpetPool needed
     /// </summary>
-    public class SocketDistributor<T> :EndPointStorage where T : IMessage
+    public class SocketDistributor<T> where T : IMessage
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof (SocketDistributor<T>));
 
@@ -108,15 +108,15 @@ namespace Dragon
                 if (ListeningPortNumber < 1)
                 {
                     Logger.DebugFormat("ListeningPortNumber {0} is not acceptable. Set to default. {1}",
-                        ListeningPortNumber, DefaultAcceptable.Port);
-                    ListeningPortNumber = (ushort) DefaultAcceptable.Port;
+                        ListeningPortNumber, EndPointStorage.DefaultAcceptable.Port);
+                    ListeningPortNumber = (ushort) EndPointStorage.DefaultAcceptable.Port;
                 }
 
                 if (null == AcceptableIpAddress)
                 {
                     Logger.DebugFormat("AcceptableIpAddress {0} is not acceptable. Set to default. {1}",
-                        AcceptableIpAddress, DefaultAcceptable.Address);
-                    AcceptableIpAddress = DefaultAcceptable.Address;
+                        AcceptableIpAddress, EndPointStorage.DefaultAcceptable.Address);
+                    AcceptableIpAddress = EndPointStorage.DefaultAcceptable.Address;
                 }
 
                 IpEndpoint = new IPEndPoint(AcceptableIpAddress, ListeningPortNumber);

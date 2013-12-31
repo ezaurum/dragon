@@ -8,7 +8,7 @@ namespace Dragon
     ///     Socket Wrapper
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class DragonSocket<T> : EndPointStorage, IDragonSocket<T> where T : IMessage
+    public class DragonSocket<T> : IDragonSocket<T> where T : IMessage
     {
         protected readonly MessageConverter<T> MessageConverter;
         private readonly Queue<T> _sendingQueue = new Queue<T>();

@@ -9,13 +9,12 @@ namespace Dragon
     /// </summary>
     /// <typeparam name="TReq"></typeparam>
     /// <typeparam name="TAck"></typeparam>
-    public class DragonSocket<TReq, TAck> : EndPointStorage, IDragonSocket<TReq, TAck>
+    public class DragonSocket<TReq, TAck> : IDragonSocket<TReq, TAck>
     {
         private readonly IMessageFactory<TReq, TAck> _factory;
         private readonly Queue<TReq> _sendingQueue = new Queue<TReq>();
         private readonly object _lock = new object();
         private bool _sending;
-        private bool _leftToSend;
 
         public enum SocketState
         {
@@ -28,7 +27,7 @@ namespace Dragon
 
         public SocketState State { get; set; }
 
-        protected DragonSocket(IMessageFactory<TReq, TAck> factory)
+        protected DragonSocket(IMessageFactory<TReq, TAck> factory, byte[] buffer, int index, int length)
         {
             _factory = factory;
             State = SocketState.BeforeInitialized;
@@ -36,9 +35,8 @@ namespace Dragon
             //TODO buffer reallocated
             
             _readEventArgs = new SocketAsyncEventArgs();
-
-            //TODO is this need pool?
-            _readEventArgs.SetBuffer(new byte[1024], 0, 1024);
+            
+            _readEventArgs.SetBuffer(buffer, index, length);
             _readEventArgs.Completed += OnReadEventArgsOnCompleted;
 
             _writeEventArgs = new SocketAsyncEventArgs();
@@ -115,10 +113,8 @@ namespace Dragon
             }
             try
             {
-                if (!Socket.SendAsync(_writeEventArgs))
-                {
-                    OnWriteEventArgsOnCompleted(null, _writeEventArgs);
-                }
+                if (Socket.SendAsync(_writeEventArgs)) return;
+                OnWriteEventArgsOnCompleted(null, _writeEventArgs);
             }
             catch (ObjectDisposedException e)
             {
@@ -146,11 +142,10 @@ namespace Dragon
                 _sending = _sendingQueue.Count > 0;
             }
 
-            if (_sending)
-            {
-                _factory.GetByte(_sendingQueue.Dequeue(), out _sendingBytes);
-                SendAsync(_sendingBytes);
-            }
+            if (!_sending) return;
+
+            _factory.GetByte(_sendingQueue.Dequeue(), out _sendingBytes);
+            SendAsync(_sendingBytes);
         }
 
         /// <summary>
@@ -160,14 +155,15 @@ namespace Dragon
         {
             try
             {
-                if (!Socket.ReceiveAsync(_readEventArgs))
-                {
-                    OnReadEventArgsOnCompleted(Socket, _readEventArgs);
-                }
+                if (Socket.ReceiveAsync(_readEventArgs)) return;
+                OnReadEventArgsOnCompleted(Socket, _readEventArgs);
             }
             catch (ObjectDisposedException e)
-            {
-                //Nothing to do
+            { 
+                if (State == SocketState.Active)
+                {
+                    throw new InvalidOperationException("Socket State is Active. But socket disposed.", e);
+                }
             }
         }
 
@@ -178,17 +174,17 @@ namespace Dragon
         /// <param name="args"></param>
         private void OnReadEventArgsOnCompleted(object sender, SocketAsyncEventArgs args)
         {
-            //TODO error process need
-            if (args.SocketError != SocketError.Success)
+            switch (args.SocketError)
             {
-                Disconnect();
-                return;
-            }
-
-            if (SocketError.Success == args.SocketError && 0 < args.BytesTransferred && SocketState.Active == State)
-            {
-                //                _messageConverter.ReceiveBytes(args.Buffer, args.Offset, args.BytesTransferred);
-                ReadRepeat();
+                case SocketError.Success:
+                    if (SocketError.Success == args.SocketError && 0 < args.BytesTransferred && SocketState.Active == State)
+                    {
+                        ReadRepeat();
+                    }
+                    break; 
+                default:
+                    Disconnect();
+                    return;
             }
         }
 

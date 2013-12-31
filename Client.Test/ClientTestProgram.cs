@@ -16,6 +16,8 @@ namespace Client.Test
                 c.Send(new SimpleMessage());
             };
 
+//            var c2 = new ClientDragonSocket<SimpleMessage, SimpleMessage2>(new SimpleMessageFactory2());
+
             c.Disconnected += OnDisconnected;
 
             c.ReadCompleted += message =>
@@ -40,6 +42,39 @@ namespace Client.Test
         private static void OnDisconnected()
         {
             Console.WriteLine("Disconnected");
+        }
+    }
+
+    internal class SimpleMessageFactory2 : IMessageFactory<SimpleMessage, SimpleMessage2>
+    {
+        public void GetMessage(byte[] bytes, out SimpleMessage req)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void GetMessage(byte[] bytes, out SimpleMessage2 ack)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void GetMessage(byte[] bytes, int offset, int length, out SimpleMessage req)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void GetMessage(byte[] bytes, int offset, int length, out SimpleMessage2 ack)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void GetByte(SimpleMessage req, out byte[] bytes)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void GetByte(SimpleMessage2 ack, out byte[] bytes)
+        {
+            throw new NotImplementedException();
         }
     }
 

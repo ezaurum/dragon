@@ -11,11 +11,34 @@ namespace Dragon
     /// <typeparam name="T"></typeparam>
     public class ClientDragonSocket<T> : DragonSocket<T> where T : IMessage
     {
-        private readonly Timer _connectTimer;
-        private int _retryCount;
         private readonly bool _heartbeat;
         private readonly SocketAsyncEventArgs _heartbeatEventArgs;
         private readonly Timer _heartbeatTimer;
+
+        private readonly Connector _connector;
+        public event EventHandler<SocketAsyncEventArgs> ConnectFailed
+        {
+            add { _connector.ConnectFailed += value; }
+            remove { _connector.ConnectFailed -= value; }
+        }
+
+        public event EventHandler<SocketAsyncEventArgs> ConnectSuccess
+        {
+            add { _connector.ConnectSuccess += value; }
+            remove { _connector.ConnectSuccess -= value; }
+        }
+
+        public void Connect(IPEndPoint endPoint)
+        {
+            _connector.Connect(endPoint);
+            Socket = _connector.Socket;
+        }
+
+        public void Connect(string ipAddress, int port)
+        {
+            _connector.Connect(ipAddress, port);
+            Socket = _connector.Socket;
+        }
 
         public override void Dispose()
         {
@@ -44,15 +67,9 @@ namespace Dragon
         public ClientDragonSocket(IMessageFactory<T> factory, bool heartbeat)
             : base(factory)
         {
-            Socket = new Socket(AddressFamily.InterNetwork,
-                SocketType.Stream, ProtocolType.Tcp);
-
+            _connector = new Connector();
+            _connector.ConnectSuccess += (sender, args) => Activate();
             _heartbeat = heartbeat;
-
-            RetryInterval = 1500;
-            RetryLimit = 5;
-            _connectTimer = new Timer {Interval = RetryInterval,AutoReset = false};
-            _connectTimer.Elapsed += CheckReconnect;
 
             //set heartbeats
             if (!_heartbeat) return;
@@ -63,96 +80,7 @@ namespace Dragon
             _heartbeatTimer = new Timer { Interval = 500 };
             _heartbeatTimer.Elapsed += Beat;
         }
-
-        private void InitConnectEventArg()
-        {
-            if ( null == IpEndpoint ) IpEndpoint = DefaultDestination;
-
-            ConnectEventArgs = new SocketAsyncEventArgs {RemoteEndPoint = IpEndpoint};
-            ConnectEventArgs.Completed += StopTimerOnConnected;
-            ConnectEventArgs.Completed += DefaultConnectSuccess;
-        }
-
-        /// <summary>
-        /// Default Event handler for connection success.
-        /// Activate socket
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void DefaultConnectSuccess(object sender, SocketAsyncEventArgs e)
-        {
-            if (e.SocketError != SocketError.Success) return;
-            ConnectSuccess(sender, e);
-            Activate();
-        }
-
-
-        public EndPoint IpEndpoint { get; set; }
-        public int RetryInterval { get; set; }
-        public int RetryLimit { get; set; }
-        private SocketAsyncEventArgs ConnectEventArgs { get; set; }
         
-        public event EventHandler<SocketAsyncEventArgs> ConnectFailed;
-        public event EventHandler<SocketAsyncEventArgs> ConnectSuccess;
-
-
-        /// <summary>
-        /// Default handler for connect timer
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void CheckReconnect(object sender, ElapsedEventArgs e)
-        {
-            if (ConnectEventArgs.SocketError == SocketError.Success) return;
-
-            if (_retryCount < RetryLimit)
-            {
-                _retryCount++;
-                Connect();
-            }
-            else if (ConnectFailed != null)
-            {
-                ConnectFailed(sender, ConnectEventArgs);
-            }
-        }
-
-        /// <summary>
-        /// Default event handler for connected event.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="socketAsyncEventArgs"></param>
-        private void StopTimerOnConnected(object sender, SocketAsyncEventArgs socketAsyncEventArgs)
-        {
-            if (ConnectEventArgs.SocketError == SocketError.Success)
-            {
-                _connectTimer.Stop();
-            }
-        }
-
-        public void Connect(IPEndPoint endPoint)
-        {
-            IpEndpoint = endPoint;
-            Connect();
-        }
-
-        public void Connect(string ipAddress, int port)
-        {
-            IpEndpoint = new IPEndPoint(IPAddress.Parse(ipAddress), port);
-            Connect();
-        }
-
-        private void Connect()
-        {
-            InitConnectEventArg();
-
-            // timer set
-            _connectTimer.Start();
-            if (!Socket.ConnectAsync(ConnectEventArgs))
-            {
-                StopTimerOnConnected(null, ConnectEventArgs);
-            }
-        }
-
         private void OnHeartbeat(object sender, SocketAsyncEventArgs e)
         {
             if (e.SocketError == SocketError.Success) return;
