@@ -50,7 +50,6 @@ namespace Dragon
         public override void Disconnect()
         {
             if(null != _heartbeatTimer) _heartbeatTimer.Stop();
-            Dispose();
             base.Disconnect();
         }
 
