@@ -84,6 +84,20 @@ namespace Dragon
             Disconnect();
         }
 
+        public TAck SendRequest(TReq message)
+        {
+            byte[] send;
+            _factory.GetByte(message, out send);
+            
+            Socket.Send(send);
+            
+            TAck tack;
+            byte[] bytes = new byte[1024];
+            Socket.Receive(bytes);
+            _factory.GetMessage(bytes, out tack);
+            return tack;
+        }
+
         public void Send(TReq message)
         {
             lock (_lock)
@@ -94,8 +108,7 @@ namespace Dragon
                 {
                     return;
                 }
-                _factory.GetByte(_sendingQueue.Dequeue(), out _sendingBytes);
-                SendAsync(_sendingBytes);
+                SendAsync(_sendingQueue.Dequeue());
             }
         }
 
@@ -103,12 +116,14 @@ namespace Dragon
         /// Should Run in lock
         /// </summary>
         /// <param name="message"></param>
-        private void SendAsync(byte[] message)
+        private void SendAsync(TReq message)
         {
             lock (_lock)
             {
                 _sending = true;
-                _writeEventArgs.SetBuffer(message, 0, message.Length);
+                byte[] messageBytes;
+                _factory.GetByte(message, out messageBytes);
+                _writeEventArgs.SetBuffer(messageBytes, 0, messageBytes.Length);
                 _writeEventArgs.UserToken = message;
             }
             try
@@ -135,7 +150,7 @@ namespace Dragon
             }
 
             if (null != WriteCompleted)
-                WriteCompleted((TReq)e.UserToken);
+                WriteCompleted((TReq) e.UserToken);
 
             lock (_lock)
             {
@@ -143,9 +158,8 @@ namespace Dragon
             }
 
             if (!_sending) return;
-
-            _factory.GetByte(_sendingQueue.Dequeue(), out _sendingBytes);
-            SendAsync(_sendingBytes);
+            
+            SendAsync(_sendingQueue.Dequeue());
         }
 
         /// <summary>
@@ -181,6 +195,10 @@ namespace Dragon
                         && 0 < args.BytesTransferred 
                         && SocketState.Active == State)
                     {
+                        TAck tack;
+                        _factory.GetMessage(args.Buffer,0,args.BytesTransferred, out tack);
+                        args.UserToken = tack;
+                        ReadCompleted(tack);
                         ReadRepeat();
                     }
                     break;
