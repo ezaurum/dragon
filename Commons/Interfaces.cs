@@ -39,5 +39,6 @@ namespace Dragon
 
     public delegate void MessageEventHandler<in T>(T message) where T : IMessage;
     public delegate void MessageHandler<T>(T message);
+    public delegate void MessageHandler<TMessage, TCode>(TMessage message, TCode code);
     public delegate void VoidMessageEventHandler();
 }

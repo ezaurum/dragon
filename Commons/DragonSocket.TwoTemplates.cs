@@ -63,7 +63,7 @@ namespace Dragon
 
         public event MessageHandler<TReq> WriteCompleted;
 
-        public event MessageHandler<TAck> ReadCompleted;
+        public event MessageHandler<TAck,int> ReadCompleted;
         
         public event VoidMessageEventHandler Disconnected;
 
@@ -196,9 +196,10 @@ namespace Dragon
                         && SocketState.Active == State)
                     {
                         TAck tack;
-                        _factory.GetMessage(args.Buffer,0,args.BytesTransferred, out tack);
+                        int errorCode = 0;
+                        _factory.GetMessage(args.Buffer,0,args.BytesTransferred, out tack, out errorCode);
                         args.UserToken = tack;
-                        ReadCompleted(tack);
+                        ReadCompleted(tack, errorCode);
                         ReadRepeat();
                     }
                     break;
