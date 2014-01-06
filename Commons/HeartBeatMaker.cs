@@ -24,7 +24,7 @@ namespace Dragon
             _heartbeatEventArgs.Completed += OnHeartbeat;
             _heartbeatEventArgs.SetBuffer(heartbeatBuffer, 0, sizeof(Int16));
             _heartbeatTimer = new Timer { Interval = 1000 };
-            _heartbeatTimer.Elapsed += Start;
+            _heartbeatTimer.Elapsed += Beat;
         }
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace Dragon
             _heartbeatTimer.Stop();
         }
 
-        private void Start(object sender, ElapsedEventArgs elapsedEventArgs)
+        private void Beat(object sender, ElapsedEventArgs elapsedEventArgs)
         {
             _heartbeatEventArgs.SetBuffer(0, sizeof(Int16));
             if (_socket.SendAsync(_heartbeatEventArgs)) return;
@@ -53,7 +53,7 @@ namespace Dragon
         private void OnHeartbeat(object sender, SocketAsyncEventArgs e)
         {
             if (e.SocketError == SocketError.Success) return;
-            _heartbeatTimer.Stop();
+            if (_heartbeatTimer.Enabled) _heartbeatTimer.Stop();
             if (null == OnSocketError) return;
             OnSocketError(sender, e);
         }

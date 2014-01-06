@@ -53,8 +53,12 @@ namespace Dragon
             //run once
             if (State >= SocketState.Disconnected) return;
             State = SocketState.Disconnected;
-            Socket.Shutdown(SocketShutdown.Both);
-            Socket.Disconnect(true);
+            
+            if (Socket.Connected)
+            {
+                Socket.Shutdown(SocketShutdown.Both);
+                Socket.Disconnect(true);
+            }
 
             if (null != Disconnected)
                 Disconnected();
@@ -81,6 +85,8 @@ namespace Dragon
 
         public void Deactivate()
         {
+            if (State >= SocketState.Inactive) return;
+
             State = SocketState.Inactive;
             
             Disconnect();

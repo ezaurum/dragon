@@ -22,8 +22,6 @@ namespace Dragon
 
         // Not to be null.
         public event MessageEventHandler<T> MessageConverted;
-        // Not to be null.
-        public event VoidMessageEventHandler HeartbeatedHeard;
 
         public void ReceiveBytes(byte[] buffer, int offset, int bytesTransferred)
         {

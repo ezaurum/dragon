@@ -21,7 +21,6 @@ namespace Dragon
                 Accepted(Socket, null);
             }
             
-            MessageConverter.HeartbeatedHeard += OnMessageConverterOnHeartbeatedHeard;
             HeartbeatNotHeard += Disconnect;
         }
 
