@@ -22,6 +22,7 @@ namespace Dragon
             }
             
             MessageConverter.HeartbeatedHeard += OnMessageConverterOnHeartbeatedHeard;
+            HeartbeatNotHeard += Disconnect;
         }
 
         public override void Activate()
