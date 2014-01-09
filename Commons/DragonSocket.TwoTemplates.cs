@@ -33,6 +33,8 @@ namespace Dragon
             State = SocketState.BeforeInitialized;
 
             //TODO buffer reallocated
+
+            _buffer = new byte[2048];
             
             _readEventArgs = new SocketAsyncEventArgs();
             
@@ -82,20 +84,6 @@ namespace Dragon
         {
             State = SocketState.Inactive;
             Disconnect();
-        }
-
-        public TAck SendRequest(TReq message)
-        {
-            byte[] send;
-            _factory.GetByte(message, out send);
-            
-            Socket.Send(send);
-            
-            TAck tack;
-            byte[] bytes = new byte[1024];
-            Socket.Receive(bytes);
-            _factory.GetMessage(bytes, out tack);
-            return tack;
         }
 
         public void Send(TReq message)
@@ -181,6 +169,47 @@ namespace Dragon
             }
         }
 
+        private readonly byte[] _buffer;
+
+        private int _offset;
+
+
+        private void PullBufferToFront(short messageLength)
+        {
+            Buffer.BlockCopy(_buffer, messageLength, _buffer, 0, _offset - messageLength);
+            _offset -= messageLength;
+        }
+
+        private void ReceiveBytes(byte[] buffer, int offset, int bytesTransferred)
+        {
+            Buffer.BlockCopy(buffer, offset, _buffer, _offset, bytesTransferred);
+
+            //add offset
+            _offset += bytesTransferred;
+
+            while (_offset > 2)
+            {
+                if (IsHeartBeat()) continue;
+                
+                short messageLength = BitConverter.ToInt16(_buffer, 0);
+
+                if (_offset < messageLength) return;
+                
+                TAck tack;
+                int errorCode;
+                _factory.GetMessage(_buffer, 0, messageLength, out tack, out errorCode);
+                PullBufferToFront(messageLength);
+                ReadCompleted(tack, errorCode);
+            }
+        }
+
+        private bool IsHeartBeat()
+        {
+            if (_buffer[1] != 2) return false;
+            PullBufferToFront(2);
+            return true;
+        }
+
         /// <summary>
         ///     Default receive arg complete event handler
         /// </summary>
@@ -195,11 +224,7 @@ namespace Dragon
                         && 0 < args.BytesTransferred 
                         && SocketState.Active == State)
                     {
-                        TAck tack;
-                        int errorCode = 0;
-                        _factory.GetMessage(args.Buffer,0,args.BytesTransferred, out tack, out errorCode);
-                        args.UserToken = tack;
-                        ReadCompleted(tack, errorCode);
+                        ReceiveBytes(args.Buffer, 0, args.BytesTransferred); 
                         ReadRepeat();
                     }
                     break;

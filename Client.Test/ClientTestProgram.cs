@@ -55,6 +55,11 @@ namespace Client.Test
             throw new NotImplementedException();
         }
 
+        public void GetMessage(byte[] bytes, int offset, int length, out SimpleMessage req, out int errorCode)
+        {
+            throw new NotImplementedException();
+        }
+
         public void GetMessage(byte[] bytes, int offset, int length, out SimpleMessage req)
         {
             throw new NotImplementedException();
@@ -71,6 +76,11 @@ namespace Client.Test
         }
 
         public void GetByte(SimpleMessage2 ack, out byte[] bytes)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool IsRequest(byte[] buffer, int offset)
         {
             throw new NotImplementedException();
         }

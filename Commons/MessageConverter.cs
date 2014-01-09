@@ -44,8 +44,7 @@ namespace Dragon
                 }
                 else
                 {
-                    T message = _factory.GetMessage(_buffer, 0, messageLength);
-
+                    T message = _factory.GetMessage(_buffer, 0, messageLength); 
                     PullBufferToFront(messageLength);
                     MessageConverted(message);
                 }
@@ -58,4 +57,5 @@ namespace Dragon
             _offset -= messageLength;
         }
     }
+
 }

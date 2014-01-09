@@ -62,6 +62,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>call nugetbuild $(ProjectDir)$(ProjectFileName) $(TargetDir)</PostBuildEvent>
+    <PostBuildEvent>call c:\tools\nugetbuild $(ProjectDir)$(ProjectFileName) $(TargetDir)</PostBuildEvent>
   </PropertyGroup>
 </Project>
