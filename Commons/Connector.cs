@@ -1,6 +1,8 @@
 ﻿using System;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Text.RegularExpressions;
 using System.Timers;
 
 namespace Dragon
@@ -98,7 +100,19 @@ namespace Dragon
 
         public void Connect(string ipAddress, int port)
         {
-            IpEndpoint = new IPEndPoint(IPAddress.Parse(ipAddress), port);
+            if (Regex.IsMatch(ipAddress, @"^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}"))
+            {
+                IpEndpoint = new IPEndPoint(IPAddress.Parse(ipAddress), port);
+            }
+            else if (Dns.GetHostAddresses(ipAddress).Length > 0)
+            {
+                IpEndpoint = new IPEndPoint(Dns.GetHostAddresses(ipAddress)[0], port);
+            }
+            else
+            {
+                throw new InvalidDataException(string.Format("address {0} is not suitable.", ipAddress));
+            }
+            
             Connect();
         }
 
