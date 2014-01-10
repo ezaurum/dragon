@@ -26,7 +26,7 @@ namespace Dragon
                 SocketType.Stream, ProtocolType.Tcp);
 
             IpEndpoint = EndPointStorage.DefaultDestination; 
-            _retryLimit = 5;
+            _retryLimit = 10;
             _connectTimer = new Timer { Interval = 1500, AutoReset = true };
             _connectTimer.Elapsed += CheckReconnect;
         }
@@ -86,7 +86,7 @@ namespace Dragon
             //connection retry exceed retry limit
             _connectTimer.Stop();
 
-            if (_connectEventArgs.SocketError != SocketError.Success || ConnectFailed == null) return;
+            if (_connectEventArgs.SocketError == SocketError.Success || ConnectFailed == null) return;
             ConnectFailed(sender, _connectEventArgs);
         }
 
