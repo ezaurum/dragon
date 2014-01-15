@@ -43,49 +43,6 @@ namespace Client.Test
         }
     }
 
-    internal class SimpleMessageFactory2 : IMessageFactory<SimpleMessage, SimpleMessage2>
-    {
-        public void GetMessage(byte[] bytes, out SimpleMessage2 ack)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void GetMessage(byte[] bytes, int offset, int length, out SimpleMessage2 ack, out int errorCode)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void GetMessage(byte[] bytes, int offset, int length, out SimpleMessage req, out int errorCode)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void GetMessage(byte[] bytes, int offset, int length, out SimpleMessage req)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void GetMessage(byte[] bytes, int offset, int length, out SimpleMessage2 ack)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void GetByte(SimpleMessage req, out byte[] bytes)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void GetByte(SimpleMessage2 ack, out byte[] bytes)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool IsRequest(byte[] buffer, int offset)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
     // 게임 대기방 생성 요청 (client->server)	
     public class SimpleMessage : IMessage
     {

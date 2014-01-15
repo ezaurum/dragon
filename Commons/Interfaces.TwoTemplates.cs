@@ -8,10 +8,10 @@ namespace Dragon
     /// </summary>
     /// <typeparam name="TReq"></typeparam>
     /// <typeparam name="TAck"></typeparam>
-    public interface IMessageFactory<TReq,TAck>
+    public interface IMessageFactory<in TReq,TAck>
     {
         void GetMessage(byte[] bytes, int offset, int length, out TAck ack, out int errorCode);
-        void GetByte(TReq req, out byte[] bytes);
+        void GetByte(TReq req, out byte[] bytes, out int errorCode);
     }
 
     public interface IDragonSocket<TReq, TAck> :IDisposable

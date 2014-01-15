@@ -110,7 +110,9 @@ namespace Dragon
             {
                 _sending = true;
                 byte[] messageBytes;
-                _factory.GetByte(message, out messageBytes);
+                int errorCode;
+                _factory.GetByte(message, out messageBytes, out errorCode);
+                if (0 != errorCode) throw new InvalidOperationException(string.Format("error code : {0}",errorCode));
                 _writeEventArgs.SetBuffer(messageBytes, 0, messageBytes.Length);
                 _writeEventArgs.UserToken = message;
             }
