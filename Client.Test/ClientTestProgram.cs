@@ -8,15 +8,13 @@ namespace Client.Test
     {
         static void Main(string[] args)
         {
-            var c = new ClientDragonSocket<SimpleMessage>(new SimpleMessageFactory(), false);
+            var c = new ClientDragonSocket<SimpleMessage>(new SimpleMessageFactory());
             c.ConnectSuccess += (sender, eventArgs) => 
             {
                 Console.WriteLine("Connected");
 
                 c.Send(new SimpleMessage());
-            };
-
-            c.Disconnected += OnDisconnected;
+            }; 
 
             c.ReadCompleted += message =>
             {                
@@ -25,8 +23,6 @@ namespace Client.Test
                 Thread.Sleep(500);
                 if(c.State < DragonSocket<SimpleMessage>.SocketState.Inactive) c.Send(new SimpleMessage());
             };
-
-            c.WriteCompleted += message => Console.WriteLine("Sended "+message.ToString());
 
             c.Connect("127.0.0.1",10008); 
             Console.ReadKey();

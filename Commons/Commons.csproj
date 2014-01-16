@@ -35,15 +35,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CircularQueue.cs" />
-    <Compile Include="ClientDragonSocket.TwoTemplates.cs" />
     <Compile Include="ClientDragonSocket.cs" />
     <Compile Include="Connector.cs" />
-    <Compile Include="DragonSocket.TwoTemplates.cs" />
     <Compile Include="DragonSocket.cs" />
     <Compile Include="EndPointStorage.cs" />
     <Compile Include="HeartBeatMaker.cs" />
-    <Compile Include="Interfaces.TwoTemplates.cs" />
-    <Compile Include="Interfaces.cs" />
+    <Compile Include="IDragonSocket.cs" />
+    <Compile Include="IMessage.cs" />
+    <Compile Include="IMessageConverter.cs" />
+    <Compile Include="IMessageFactory.cs" />
     <Compile Include="MessageConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

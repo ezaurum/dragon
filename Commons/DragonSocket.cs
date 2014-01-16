@@ -10,7 +10,7 @@ namespace Dragon
     /// <typeparam name="T"></typeparam>
     public class DragonSocket<T> : IDragonSocket<T> where T : IMessage
     {
-        protected readonly MessageConverter<T> MessageConverter;
+        private readonly MessageConverter<T> MessageConverter;
         private readonly Queue<T> _sendingQueue = new Queue<T>();
         private readonly object _lock = new object();
         private bool _sending;
@@ -48,30 +48,37 @@ namespace Dragon
         /// <summary>
         /// For reuse, Socket and eventargs are not disposed.
         /// </summary>
-        public virtual void Disconnect()
-        { 
+        public void Disconnect()
+        {
+            Disconnect(null); 
+        }
+
+        /// <summary>
+        /// For reuse, Socket and eventargs are not disposed.
+        /// </summary>
+        public void Disconnect(SocketAsyncEventArgs e)
+        {
             //run once
             if (State >= SocketState.Disconnected) return;
             State = SocketState.Disconnected;
-            
+
             if (Socket.Connected)
             {
                 Socket.Shutdown(SocketShutdown.Both);
                 Socket.Disconnect(true);
             }
 
-            if (null != Disconnected)
-                Disconnected();
+            if (null != OnDisconnected)
+                OnDisconnected(this,e);
         }
 
-        public event MessageEventHandler<T> ReadCompleted
+        public event Action<T> ReadCompleted
         {
             add { MessageConverter.MessageConverted += value; }
             remove { MessageConverter.MessageConverted -= value; }
         }
 
-        public event MessageEventHandler<T> WriteCompleted;
-        public event VoidMessageEventHandler Disconnected;
+        public event Action WriteCompleted; 
 
         protected Socket Socket { set; get; }
         private readonly SocketAsyncEventArgs _writeEventArgs;
@@ -91,6 +98,8 @@ namespace Dragon
             
             Disconnect();
         }
+
+        public event EventHandler<SocketAsyncEventArgs> OnDisconnected;
 
         public void Send(T message)
         {
@@ -136,12 +145,12 @@ namespace Dragon
         {
             if (e.SocketError != SocketError.Success)
             {
-                Disconnect();
+                Disconnect(e);
                 return;
             }
 
             if (null != WriteCompleted)
-                WriteCompleted((T) e.UserToken);
+                WriteCompleted();
 
             lock (_lock)
             {
@@ -183,13 +192,269 @@ namespace Dragon
         {
             if (args.SocketError != SocketError.Success)
             {
-                Disconnect();
+                Disconnect(args);
                 return;
             }
             if (SocketError.Success != args.SocketError || 0 >= args.BytesTransferred || SocketState.Active != State)
                 return;
             MessageConverter.ReceiveBytes(args.Buffer, args.Offset, args.BytesTransferred);
             ReadRepeat();
+        }
+
+        public virtual void Dispose()
+        {
+            if (State >= SocketState.Inactive) return;
+
+            _writeEventArgs.Dispose();
+            _readEventArgs.Dispose();
+
+            Deactivate();
+        }
+    }
+
+    /// <summary>
+    ///     Socket Wrapper, Request, Acknowledge packet devided. not inherit IMessage
+    /// </summary>
+    /// <typeparam name="TReq"></typeparam>
+    /// <typeparam name="TAck"></typeparam>
+    public class DragonSocket<TReq, TAck> : IDragonSocket<TReq, TAck>
+    {
+        private readonly IMessageFactory<TReq, TAck> _factory;
+        private readonly Queue<TReq> _sendingQueue = new Queue<TReq>();
+        private readonly object _lock = new object();
+        private bool _sending;
+
+        public enum SocketState
+        {
+            BeforeInitialized = 0,
+            Initialized,
+            Active = 10,
+            Inactive = 100,
+            Disconnected
+        }
+
+        public SocketState State { get; set; }
+
+        protected DragonSocket(IMessageFactory<TReq, TAck> factory, byte[] buffer, int index, int length)
+        {
+            _factory = factory;
+            State = SocketState.BeforeInitialized;
+
+            //TODO buffer reallocated
+
+            _buffer = new byte[2048];
+
+            _readEventArgs = new SocketAsyncEventArgs();
+
+            _readEventArgs.SetBuffer(buffer, index, length);
+            _readEventArgs.Completed += OnReadEventArgsOnCompleted;
+
+            _writeEventArgs = new SocketAsyncEventArgs();
+            _writeEventArgs.Completed += OnWriteEventArgsOnCompleted;
+
+            State = SocketState.Initialized;
+        }
+
+        /// <summary>
+        /// For reuse, Socket and eventargs are not disposed.
+        /// </summary>
+        public virtual void Disconnect()
+        {
+            Disconnect(null);
+        }
+
+        /// <summary>
+        /// For reuse, Socket and eventargs are not disposed.
+        /// </summary>
+        public virtual void Disconnect(SocketAsyncEventArgs e)
+        {
+            Socket.Close(1000);
+
+            //run once
+            if (State >= SocketState.Disconnected) return;
+
+            State = SocketState.Disconnected;
+
+            if (null != OnDisconnected)
+            {
+                OnDisconnected(this,e);
+            }
+        }
+
+        public event EventHandler<SocketAsyncEventArgs> OnDisconnected;
+
+        protected Socket Socket { set; get; }
+        private readonly SocketAsyncEventArgs _writeEventArgs;
+        private readonly SocketAsyncEventArgs _readEventArgs;
+        private byte[] _sendingBytes;
+
+        public virtual void Activate()
+        {
+            State = SocketState.Active;
+            ReadRepeat();
+        }
+
+        public void Deactivate()
+        {
+            State = SocketState.Inactive;
+            Disconnect();
+        }
+
+        public event Action<TAck, int> ReadCompleted;
+        public event Action<int> WriteCompleted;
+
+        public void Send(TReq message)
+        {
+            lock (_lock)
+            {
+                _sendingQueue.Enqueue(message);
+
+                if (_sending)
+                {
+                    return;
+                }
+                SendAsync(_sendingQueue.Dequeue());
+            }
+        }
+
+        /// <summary>
+        /// Should Run in lock 
+        /// </summary>
+        /// <param name="message"></param>
+        private void SendAsync(TReq message)
+        {
+            lock (_lock)
+            {
+                _sending = true;
+                byte[] messageBytes;
+                int errorCode;
+                _factory.GetByte(message, out messageBytes, out errorCode);
+                _writeEventArgs.UserToken = errorCode;
+                if (0 != errorCode)
+                {
+                    OnWriteEventArgsOnCompleted(message, _writeEventArgs);
+                }
+
+                _writeEventArgs.SetBuffer(messageBytes, 0, messageBytes.Length);
+            }
+            try
+            {
+                if (Socket.SendAsync(_writeEventArgs)) return;
+                OnWriteEventArgsOnCompleted(message, _writeEventArgs);
+            }
+            catch (ObjectDisposedException e)
+            {
+                if (State == SocketState.Active)
+                {
+                    throw new InvalidOperationException("Socket State is Active. But socket disposed.", e);
+                }
+            }
+
+        }
+
+        private void OnWriteEventArgsOnCompleted(object sender, SocketAsyncEventArgs e)
+        {
+            if (e.SocketError != SocketError.Success)
+            {
+                Disconnect(e);
+                return;
+            }
+
+            if (null != WriteCompleted)
+                WriteCompleted((int)e.UserToken);
+
+            lock (_lock)
+            {
+                _sending = _sendingQueue.Count > 0;
+            }
+
+            if (!_sending) return;
+
+            SendAsync(_sendingQueue.Dequeue());
+        }
+
+        /// <summary>
+        ///     Read repeat
+        /// </summary>
+        private void ReadRepeat()
+        {
+            try
+            {
+                if (Socket.ReceiveAsync(_readEventArgs)) return;
+                OnReadEventArgsOnCompleted(Socket, _readEventArgs);
+            }
+            catch (ObjectDisposedException e)
+            {
+                if (State == SocketState.Active)
+                {
+                    throw new InvalidOperationException("Socket State is Active. But socket disposed.", e);
+                }
+            }
+        }
+
+        private readonly byte[] _buffer;
+
+        private int _offset;
+
+
+        private void PullBufferToFront(short messageLength)
+        {
+            Buffer.BlockCopy(_buffer, messageLength, _buffer, 0, _offset - messageLength);
+            _offset -= messageLength;
+        }
+
+        private void ReceiveBytes(byte[] buffer, int offset, int bytesTransferred)
+        {
+            Buffer.BlockCopy(buffer, offset, _buffer, _offset, bytesTransferred);
+
+            //add offset
+            _offset += bytesTransferred;
+
+            while (_offset > 2)
+            {
+                if (IsHeartBeat()) continue;
+
+                short messageLength = BitConverter.ToInt16(_buffer, 0);
+
+                if (_offset < messageLength) return;
+
+                TAck tack;
+                int errorCode;
+                _factory.GetMessage(_buffer, 0, messageLength, out tack, out errorCode);
+                PullBufferToFront(messageLength);
+                ReadCompleted(tack, errorCode);
+            }
+        }
+
+        private bool IsHeartBeat()
+        {
+            if (_buffer[1] != 2) return false;
+            PullBufferToFront(2);
+            return true;
+        }
+
+        /// <summary>
+        ///     Default receive arg complete event handler
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
+        private void OnReadEventArgsOnCompleted(object sender, SocketAsyncEventArgs args)
+        {
+            switch (args.SocketError)
+            {
+                case SocketError.Success:
+                    if (SocketError.Success == args.SocketError
+                        && 0 < args.BytesTransferred
+                        && SocketState.Active == State)
+                    {
+                        ReceiveBytes(args.Buffer, 0, args.BytesTransferred);
+                        ReadRepeat();
+                    }
+                    break;
+                default:
+                    Disconnect(args);
+                    return;
+            }
         }
 
         public virtual void Dispose()

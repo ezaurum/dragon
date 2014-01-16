@@ -27,7 +27,7 @@ namespace Server.Test
                 //Something to test
                 var userToken = (ServerDragonSocket<SimpleMessage>) eventArgs.UserToken;
 
-                userToken.Disconnected += () => Console.WriteLine("Disconnected.");
+
 
                 userToken.ReadCompleted += message =>
                 {
@@ -36,7 +36,7 @@ namespace Server.Test
                     Console.WriteLine("echo " + message);
                 };
 
-                userToken.HeartbeatNotHeard += userToken.Disconnect;
+                userToken.HeartbeatNotHeard += () => userToken.Disconnect();
 
                 userToken.Activate();
             };

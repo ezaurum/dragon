@@ -44,7 +44,7 @@ namespace Dragon
         private DateTime _last2Heartbeat;
         
         public event EventHandler<SocketAsyncEventArgs> Accepted;
-        public event VoidMessageEventHandler HeartbeatHeard;
-        public event VoidMessageEventHandler HeartbeatNotHeard;
+        public event Action HeartbeatHeard;
+        public event Action HeartbeatNotHeard;
     }
 }
