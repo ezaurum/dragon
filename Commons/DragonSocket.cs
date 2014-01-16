@@ -333,6 +333,7 @@ namespace Dragon
                 if (0 != errorCode)
                 {
                     OnWriteEventArgsOnCompleted(message, _writeEventArgs);
+                    return;
                 }
 
                 _writeEventArgs.SetBuffer(messageBytes, 0, messageBytes.Length);
