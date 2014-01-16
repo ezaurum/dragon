@@ -129,7 +129,7 @@ namespace Dragon
                 _writeEventArgs.SetBuffer(message.ToByteArray(), 0, message.Length);
                 
                 if (Socket.SendAsync(_writeEventArgs)) return;
-                OnWriteEventArgsOnCompleted(null, _writeEventArgs);
+                OnWriteEventArgsOnCompleted(Socket, _writeEventArgs);
             }
             catch (ObjectDisposedException e)
             {
@@ -332,7 +332,7 @@ namespace Dragon
                 _writeEventArgs.UserToken = errorCode;
                 if (0 != errorCode)
                 {
-                    OnWriteEventArgsOnCompleted(message, _writeEventArgs);
+                    OnWriteEventArgsOnCompleted(Socket, _writeEventArgs);
                     return;
                 }
 
@@ -341,7 +341,7 @@ namespace Dragon
             try
             {
                 if (Socket.SendAsync(_writeEventArgs)) return;
-                OnWriteEventArgsOnCompleted(message, _writeEventArgs);
+                OnWriteEventArgsOnCompleted(Socket, _writeEventArgs);
             }
             catch (ObjectDisposedException e)
             {
