@@ -413,8 +413,6 @@ namespace Dragon
 
             while (_offset > 2)
             {
-                if (IsHeartBeat()) continue;
-
                 short messageLength = BitConverter.ToInt16(_buffer, 0);
 
                 if (_offset < messageLength) return;
@@ -425,13 +423,6 @@ namespace Dragon
                 PullBufferToFront(messageLength);
                 ReadCompleted(tack, errorCode);
             }
-        }
-
-        private bool IsHeartBeat()
-        {
-            if (_buffer[1] != 2) return false;
-            PullBufferToFront(2);
-            return true;
         }
 
         /// <summary>
