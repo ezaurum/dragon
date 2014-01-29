@@ -4,6 +4,7 @@ using System.Net.Sockets;
 
 namespace Dragon
 {
+    #region one type message
     /// <summary>
     ///     Client Socket. Able to connect remote host.
     /// </summary>
@@ -43,6 +44,9 @@ namespace Dragon
         }
     }
 
+    #endregion
+    
+    #region two type message
     /// <summary>
     /// Client Socket. 
     /// Has Request, Acknowlege templates
@@ -80,4 +84,5 @@ namespace Dragon
             ConnectSuccess += (sender, args) => Activate();
         }
     }
+    #endregion
 }

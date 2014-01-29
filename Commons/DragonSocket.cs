@@ -4,6 +4,7 @@ using System.Net.Sockets;
 
 namespace Dragon
 {
+    #region one type socket
     /// <summary>
     ///     Socket Wrapper
     /// </summary>
@@ -205,6 +206,9 @@ namespace Dragon
             _readEventArgs.Dispose(); 
         }
     }
+    #endregion
+
+    #region req/ack separated type message
 
     /// <summary>
     ///     Socket Wrapper, Request, Acknowledge packet devided. not inherit IMessage
@@ -272,8 +276,7 @@ namespace Dragon
         protected Socket Socket { set; get; }
         private readonly SocketAsyncEventArgs _writeEventArgs;
         private readonly SocketAsyncEventArgs _readEventArgs;
-        private byte[] _sendingBytes;
-
+        
         public virtual void Activate()
         {
             State = SocketState.Active;
@@ -293,8 +296,13 @@ namespace Dragon
                 {
                     return;
                 }
-                SendAsync(_sendingQueue.Dequeue());
+                SendAsyncFromQueue();
             }
+        }
+
+        private void SendAsyncFromQueue()
+        {
+            SendAsync(_sendingQueue.Dequeue());
         }
 
         /// <summary>
@@ -351,7 +359,7 @@ namespace Dragon
 
             if (!_sending) return;
 
-            SendAsync(_sendingQueue.Dequeue());
+            SendAsyncFromQueue();
         }
 
         /// <summary>
@@ -441,4 +449,5 @@ namespace Dragon
             _readEventArgs.Dispose();
         }
     }
+    #endregion
 }
