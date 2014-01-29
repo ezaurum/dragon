@@ -90,14 +90,6 @@ namespace Dragon
             ReadRepeat();
         }
 
-        public void Deactivate()
-        {
-            if (State >= SocketState.Inactive) return;
-
-            State = SocketState.Inactive;
-            
-            Disconnect();
-        }
 
         public event EventHandler<SocketAsyncEventArgs> OnDisconnected;
 
@@ -205,10 +197,12 @@ namespace Dragon
         {
             if (State >= SocketState.Inactive) return;
 
-            _writeEventArgs.Dispose();
-            _readEventArgs.Dispose();
+            Disconnect();
 
-            Deactivate();
+            State = SocketState.Inactive;
+
+            _writeEventArgs.Dispose();
+            _readEventArgs.Dispose(); 
         }
     }
 
@@ -258,15 +252,7 @@ namespace Dragon
         /// <summary>
         /// For reuse, Socket and eventargs are not disposed.
         /// </summary>
-        public virtual void Disconnect()
-        {
-            Disconnect(null);
-        }
-
-        /// <summary>
-        /// For reuse, Socket and eventargs are not disposed.
-        /// </summary>
-        public virtual void Disconnect(SocketAsyncEventArgs e)
+        public void Disconnect(SocketAsyncEventArgs e = null)
         {
             Socket.Close(1000);
 
@@ -292,12 +278,6 @@ namespace Dragon
         {
             State = SocketState.Active;
             ReadRepeat();
-        }
-
-        public void Deactivate()
-        {
-            State = SocketState.Inactive;
-            Disconnect();
         }
 
         public event Action<TAck, int> ReadCompleted;
@@ -453,10 +433,12 @@ namespace Dragon
         {
             if (State >= SocketState.Inactive) return;
 
+            Disconnect();
+
+            State = SocketState.Inactive;
+
             _writeEventArgs.Dispose();
             _readEventArgs.Dispose();
-
-            Deactivate();
         }
     }
 }

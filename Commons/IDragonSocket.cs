@@ -20,6 +20,9 @@ namespace Dragon
         event EventHandler<SocketAsyncEventArgs> OnDisconnected;
         void Send(TReq message);
         void Activate();
-        void Deactivate();
+        /// <summary>
+        /// For reuse, Socket and eventargs are not disposed.
+        /// </summary>
+        void Disconnect(SocketAsyncEventArgs e = null);
     }
 }
