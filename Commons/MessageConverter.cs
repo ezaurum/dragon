@@ -20,7 +20,6 @@ namespace Dragon
             _factory = factory;
         }
 
-        // Not to be null.
         public event Action<T> MessageConverted;
 
         public void ReceiveBytes(byte[] buffer, int offset, int bytesTransferred)
@@ -34,20 +33,11 @@ namespace Dragon
             {
                 short messageLength = BitConverter.ToInt16(_buffer, 0);
 
-                if (_offset < messageLength) return;
-
-                //check heartbeat
-                if (messageLength == sizeof (short))
-                {
-                    //after converted. pull buffer to front
-                    PullBufferToFront(messageLength);
-                }
-                else
-                {
-                    T message = _factory.GetMessage(_buffer, 0, messageLength); 
-                    PullBufferToFront(messageLength);
-                    MessageConverted(message);
-                }
+                if (_offset < messageLength) return; 
+                
+                T message = _factory.GetMessage(_buffer, 0, messageLength); 
+                PullBufferToFront(messageLength);
+                if ( null != MessageConverted) MessageConverted(message);
             }
         }
 

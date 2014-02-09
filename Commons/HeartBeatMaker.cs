@@ -64,24 +64,18 @@ namespace Dragon
     /// Heart beat maker
     /// </summary>
     public class HeartBeatMaker<T> where T : IMessage
-    {
-        private readonly SocketAsyncEventArgs _heartbeatEventArgs;
+    { 
         private readonly Timer _heartbeatTimer;
         private readonly IDragonSocket<T> _socket;
-        private T _message;
-        public event EventHandler<SocketAsyncEventArgs> OnSocketError;
+        private readonly T _message;
+
         public event Action<T> UpdateMessage;
 
         public HeartBeatMaker(IDragonSocket<T> socket, T message)
         {
             _socket = socket;
-            _message = message;
+            _message = message; 
 
-            //set heartbeats
-            byte[] heartbeatBuffer = BitConverter.GetBytes((Int16)sizeof(Int16));
-            _heartbeatEventArgs = new SocketAsyncEventArgs();
-            _heartbeatEventArgs.Completed += OnHeartbeat;
-            _heartbeatEventArgs.SetBuffer(heartbeatBuffer, 0, sizeof(Int16));
             _heartbeatTimer = new Timer { Interval = 1000 };
             _heartbeatTimer.Elapsed += Beat;
         }
@@ -104,14 +98,8 @@ namespace Dragon
 
         private void Beat(object sender, ElapsedEventArgs elapsedEventArgs)
         {
+            UpdateMessage(_message);
             _socket.Send(_message); 
         }
-
-        private void OnHeartbeat(object sender, SocketAsyncEventArgs e)
-        {
-            UpdateMessage(_message);
-        }
-    }
-
-    
+    } 
 }
