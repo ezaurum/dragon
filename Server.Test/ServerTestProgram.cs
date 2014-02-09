@@ -34,9 +34,7 @@ namespace Server.Test
                     Console.WriteLine("READ " + message);
                     userToken.Send(message);
                     Console.WriteLine("echo " + message);
-                };
-
-                userToken.HeartbeatNotHeard += () => userToken.Disconnect();
+                }; 
 
                 userToken.Activate();
             };
