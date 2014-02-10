@@ -18,8 +18,21 @@ namespace Dragon
                 Accepted(Socket, null);
             } 
         }
+
+        private long _lastBeat;
         
         public event EventHandler<SocketAsyncEventArgs> Accepted;
+
+        public void CheckBeat(HeartBeatChecker checker, long obj)
+        {
+            if (_lastBeat >= obj - 2)
+            {
+                if (_lastBeat > obj) _lastBeat = obj;
+                return;
+            }
+            checker.OnBeat -= CheckBeat;
+            Disconnect();
+        }
         
     }
 }
