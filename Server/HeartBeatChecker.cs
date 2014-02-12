@@ -9,6 +9,8 @@ namespace Dragon
     {
         private long _beat;
 
+        public long Beat { get { return _beat; } }
+
         public HeartBeatChecker()
         {
             var timer = new Timer { Interval = 1000 };
