@@ -28,13 +28,13 @@ namespace Dragon
 
         public void CheckBeat(HeartBeatChecker checker, long obj)
         {
-            if (Interlocked.Read(ref _lastBeat) > obj)
+            if (0 == _lastBeat) return;
+
+            if (Interlocked.Read(ref _lastBeat) >= obj - _threshold)
             {
                 Interlocked.Exchange(ref _lastBeat, obj);
                 return;
             }
-            
-            if (Interlocked.Read(ref _lastBeat) >= obj - _threshold) return;
 
             checker.OnBeat -= CheckBeat;
             if (null != OnBeatStop) OnBeatStop();
