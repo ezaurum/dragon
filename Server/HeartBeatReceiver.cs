@@ -6,6 +6,8 @@ namespace Dragon
     public class HeartBeatReceiver : IDisposable
     {
         private long _lastBeat;
+        private readonly int _threshold;
+        
 
         public long LastBeat
         {
@@ -19,6 +21,11 @@ namespace Dragon
             Interlocked.Increment(ref _lastBeat);
         }
 
+        public HeartBeatReceiver(int threshold = 5)
+        {
+            _threshold = threshold;
+        }
+
         public void CheckBeat(HeartBeatChecker checker, long obj)
         {
             if (Interlocked.Read(ref _lastBeat) > obj)
@@ -26,8 +33,8 @@ namespace Dragon
                 Interlocked.Exchange(ref _lastBeat, obj);
                 return;
             }
-
-            if (Interlocked.Read(ref _lastBeat) >= obj - 2) return;
+            
+            if (Interlocked.Read(ref _lastBeat) >= obj - _threshold) return;
 
             checker.OnBeat -= CheckBeat;
             if (null != OnBeatStop) OnBeatStop();

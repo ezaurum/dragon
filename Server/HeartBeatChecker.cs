@@ -9,11 +9,11 @@ namespace Dragon
     {
         private long _beat;
 
-        public long Beat { get { return _beat; } }
+        public long Beat { get { return _beat; } } 
 
-        public HeartBeatChecker()
+        public HeartBeatChecker(int interval= 1000)
         {
-            var timer = new Timer { Interval = 1000 };
+            var timer = new Timer { Interval = interval };
             timer.Elapsed += CheckBeat;
             OnBeat += AddLastBeat;
             timer.Start();
