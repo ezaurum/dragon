@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Threading;
 using System.Timers;
 using Timer = System.Timers.Timer;
 
 namespace Dragon
 {
     public class HeartBeatChecker
-    {
-        private long _beat;
-
-        public long Beat { get { return _beat; } } 
+    { 
+        private DateTime _time;
 
         public HeartBeatChecker(int interval= 1000)
         {
@@ -19,16 +16,21 @@ namespace Dragon
             timer.Start();
         }
 
-        public event Action<HeartBeatChecker, long> OnBeat;
+        public event Action<HeartBeatChecker, DateTime> OnBeat;
 
-        private void AddLastBeat(HeartBeatChecker checker, long l)
+        private void AddLastBeat(HeartBeatChecker checker, DateTime dateTime)
         {
-            Interlocked.Increment(ref _beat);
+            _time = DateTime.Now;
         }
 
         private void CheckBeat(object sender, ElapsedEventArgs e)
         {
-            OnBeat(this, _beat);
+            OnBeat(this, _time);
+        }
+
+        public override string ToString()
+        {
+            return string.Format("Time: {0}", _time);
         }
     }
 }

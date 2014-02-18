@@ -1,43 +1,34 @@
 using System;
-using System.Threading;
 
 namespace Dragon
 {
     public class HeartBeatReceiver : IDisposable
     {
-        private long _lastBeat;
-        private readonly int _threshold;
+        private readonly TimeSpan _threshold;
 
-        private int _failed;
+        private DateTime _lastTime;
 
-        public long LastBeat
+        public DateTime LastTime
         {
-            set { _lastBeat = value; }
+            set { _lastTime = value; }
         }
 
         public event Action OnBeatStop;
 
         public void Beat()
         {
-            Interlocked.Increment(ref _lastBeat);
+            _lastTime = DateTime.Now;
         }
 
         public HeartBeatReceiver(int threshold = 2)
         {
-            _threshold = threshold;
+            _threshold = TimeSpan.FromSeconds(threshold);
         }
 
-        public void CheckBeat(HeartBeatChecker checker, long obj)
+        public void CheckBeat(HeartBeatChecker checker, DateTime time)
         {
-            if (Interlocked.Read(ref _lastBeat) < obj)
-            {
-                Interlocked.Increment(ref _failed);
-            }            
-
-            if (_failed < _threshold) return;
-
-            Interlocked.Exchange(ref _lastBeat, obj);
-
+            if (_lastTime - time < _threshold) return;
+            
             checker.OnBeat -= CheckBeat;
             if (null != OnBeatStop) OnBeatStop();
         }
@@ -49,7 +40,7 @@ namespace Dragon
 
         public override string ToString()
         {
-            return string.Format("LastBeat: {0}, Threshold: {1}, Failed: {2}", _lastBeat, _threshold, _failed);
+            return string.Format("LastTime: {0}", _lastTime);
         }
     }
 }
