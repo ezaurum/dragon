@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Sockets;
 
 namespace Dragon
@@ -26,6 +27,16 @@ namespace Dragon
         }
 
         public SocketState State { get; set; }
+
+        public EndPoint RemoteEndPoint
+        {
+            get { return Socket.RemoteEndPoint; } 
+        }
+
+        public EndPoint LocalEndPoint
+        {
+            get { return Socket.LocalEndPoint; }
+        }
 
         protected DragonSocket(IMessageFactory<T> factory)
         {
