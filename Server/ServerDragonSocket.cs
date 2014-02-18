@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Net.Sockets;
-using System.Threading;
 
 namespace Dragon
 {
@@ -13,13 +12,13 @@ namespace Dragon
         public ServerDragonSocket(Socket acceptSocket, IMessageFactory<T> factory) : base(factory)
         {
             Socket = acceptSocket;
+            Socket.NoDelay = false;
 
             if (null != Accepted)
             {
                 Accepted(Socket, null);
             } 
         }
-
 
         public event EventHandler<SocketAsyncEventArgs> Accepted; 
     }
