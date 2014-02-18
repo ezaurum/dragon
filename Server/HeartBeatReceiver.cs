@@ -7,7 +7,8 @@ namespace Dragon
     {
         private long _lastBeat;
         private readonly int _threshold;
-        
+
+        private int _failed;
 
         public long LastBeat
         {
@@ -21,20 +22,21 @@ namespace Dragon
             Interlocked.Increment(ref _lastBeat);
         }
 
-        public HeartBeatReceiver(int threshold = 5)
+        public HeartBeatReceiver(int threshold = 2)
         {
             _threshold = threshold;
         }
 
         public void CheckBeat(HeartBeatChecker checker, long obj)
         {
-            if (0 == _lastBeat) return;
-
-            if (Interlocked.Read(ref _lastBeat) >= obj - _threshold)
+            if (Interlocked.Read(ref _lastBeat) < obj)
             {
-                Interlocked.Exchange(ref _lastBeat, obj);
-                return;
-            }
+                Interlocked.Increment(ref _failed);
+            }            
+
+            if (_failed < _threshold) return;
+
+            Interlocked.Exchange(ref _lastBeat, obj);
 
             checker.OnBeat -= CheckBeat;
             if (null != OnBeatStop) OnBeatStop();
@@ -43,6 +45,11 @@ namespace Dragon
         public void Dispose()
         {
             OnBeatStop = null;
+        }
+
+        public override string ToString()
+        {
+            return string.Format("LastBeat: {0}, Threshold: {1}, Failed: {2}", _lastBeat, _threshold, _failed);
         }
     }
 }
