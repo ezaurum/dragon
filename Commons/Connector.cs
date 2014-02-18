@@ -25,7 +25,7 @@ namespace Dragon
         public Connector()
         {
             _socket = new Socket(AddressFamily.InterNetwork,
-                SocketType.Stream, ProtocolType.Tcp);
+                SocketType.Stream, ProtocolType.Tcp) {NoDelay = true};
 
             IpEndpoint = EndPointStorage.DefaultDestination; 
             _retryLimit = 10;
