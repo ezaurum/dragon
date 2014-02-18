@@ -4,7 +4,7 @@ namespace Dragon
 {
     public class HeartBeatReceiver : IDisposable
     {
-        private readonly TimeSpan _threshold;
+        private static TimeSpan Threshold = TimeSpan.FromSeconds(2);
 
         private DateTime _lastTime;
 
@@ -20,14 +20,9 @@ namespace Dragon
             _lastTime = DateTime.Now;
         }
 
-        public HeartBeatReceiver(int threshold = 2)
-        {
-            _threshold = TimeSpan.FromSeconds(threshold);
-        }
-
         public void CheckBeat(HeartBeatChecker checker, DateTime time)
         {
-            if (_lastTime - time < _threshold) return;
+            if (time - _lastTime < Threshold) return;
             
             checker.OnBeat -= CheckBeat;
             if (null != OnBeatStop) OnBeatStop();
