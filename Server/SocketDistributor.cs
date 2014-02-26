@@ -42,7 +42,7 @@ namespace Dragon
             {
                 _listenSocket.Bind(IpEndpoint);
             }
-            catch (SocketException e)
+            catch (SocketException)
             {
                 Logger.FatalFormat("Port {0} is Binded already. Abort Starting.",IpEndpoint.Port);
                 return;

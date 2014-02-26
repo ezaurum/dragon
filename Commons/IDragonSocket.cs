@@ -3,6 +3,14 @@ using System.Net.Sockets;
 
 namespace Dragon
 {
+    public enum SocketState
+    { 
+        Disposed = 0,
+        Disconnected = 2,
+        Initialized = 4,
+        Active = 8, 
+    }
+
     public interface IDragonSocket<in TReq, TAck> : IDragonSocketMinimal<TReq>
     {        
         event Action<TAck, int> ReadCompleted; 
@@ -18,6 +26,7 @@ namespace Dragon
     public interface IDragonSocketMinimal<in TReq> : IDisposable
     {
         event EventHandler<SocketAsyncEventArgs> OnDisconnected;
+        SocketState State { get; set; }
         void Send(TReq message);
         void Activate();
         /// <summary>

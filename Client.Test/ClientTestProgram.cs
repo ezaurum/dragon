@@ -21,7 +21,7 @@ namespace Client.Test
                 Console.WriteLine("Read " +message);
 
                 Thread.Sleep(500);
-                if(c.State < DragonSocket<SimpleMessage>.SocketState.Inactive) c.Send(new SimpleMessage());
+                c.Send(new SimpleMessage());
             };
 
             c.Connect("127.0.0.1",10008); 

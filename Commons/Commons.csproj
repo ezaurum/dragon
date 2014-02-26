@@ -34,6 +34,7 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AbstractDragonSocket.cs" />
     <Compile Include="CircularQueue.cs" />
     <Compile Include="ClientDragonSocket.cs" />
     <Compile Include="Connector.cs" />
