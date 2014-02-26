@@ -423,6 +423,15 @@ namespace Dragon
                 ReadCompleted(tack, errorCode);
             }
         }
+        
+        /// <summary>
+        /// debug event args for log or something
+        /// </summary>
+        public event EventHandler<SocketAsyncEventArgs> DebugEvent
+        {
+            add { _readEventArgs.Completed += value; }
+            remove { _readEventArgs.Completed -= value; }
+        }
 
         /// <summary>
         ///     Default receive arg complete event handler
