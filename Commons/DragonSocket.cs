@@ -378,18 +378,8 @@ namespace Dragon
         /// </summary>
         private void ReadRepeat()
         {
-            try
-            {
-                if (Socket.ReceiveAsync(_readEventArgs)) return;
-                OnReadEventArgsOnCompleted(Socket, _readEventArgs);
-            }
-            catch (ObjectDisposedException e)
-            {
-                if (State == SocketState.Active)
-                {
-                    throw new InvalidOperationException("Socket State is Active. But socket disposed.", e);
-                }
-            }
+            if (Socket.ReceiveAsync(_readEventArgs)) return;
+            OnReadEventArgsOnCompleted(Socket, _readEventArgs);
         }
 
         private readonly byte[] _buffer;
