@@ -8,28 +8,25 @@ using System.Timers;
 namespace Dragon
 {
     /// <summary>
-    /// Connect class wrapping socket
+    ///     Connect class wrapping socket
     /// </summary>
-    public class Connector  
+    public class Connector
     {
         private readonly Timer _connectTimer;
-        private int _retryCount;
-
         private readonly Socket _socket;
-
         public Socket Socket
         {
             get { return _socket; }
         }
-
+        
         public Connector()
         {
             _socket = new Socket(AddressFamily.InterNetwork,
                 SocketType.Stream, ProtocolType.Tcp) {NoDelay = true};
 
-            IpEndpoint = EndPointStorage.DefaultDestination; 
-            _retryLimit = 10;
-            _connectTimer = new Timer { Interval = 1500, AutoReset = true };
+            IpEndpoint = EndPointStorage.DefaultDestination;
+            RetryLimit = 10;
+            _connectTimer = new Timer {Interval = 1500, AutoReset = true};
             _connectTimer.Elapsed += CheckReconnect;
         }
 
@@ -41,18 +38,18 @@ namespace Dragon
         public Connector(IPEndPoint ipEndPoint, int retryInterval, int retryLimit) : this(ipEndPoint)
         {
             _connectTimer.Interval = retryInterval;
-            _retryLimit = retryLimit;
+            RetryLimit = retryLimit;
         }
 
         private void InitConnectEventArg()
         {
-            _connectEventArgs = new SocketAsyncEventArgs { RemoteEndPoint = IpEndpoint };
+            _connectEventArgs = new SocketAsyncEventArgs {RemoteEndPoint = IpEndpoint};
             _connectEventArgs.Completed += DefaultConnectSuccess;
         }
 
         /// <summary>
-        /// Default Event handler for connection success.
-        /// Activate socket
+        ///     Default Event handler for connection success.
+        ///     Activate socket
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -64,23 +61,31 @@ namespace Dragon
         }
 
         private EndPoint IpEndpoint { get; set; }
-        private readonly int _retryLimit;
+
+        public int RetryLimit { get; set; }
+        public int RetryCount { get; private set; }
+        public double RetryInterval
+        {
+            get { return _connectTimer.Interval; }
+            set { _connectTimer.Interval = value; }
+        }
+
         private SocketAsyncEventArgs _connectEventArgs;
 
         public event EventHandler<SocketAsyncEventArgs> ConnectFailed;
         public event EventHandler<SocketAsyncEventArgs> ConnectSuccess;
 
         /// <summary>
-        /// Default handler for connect timer
+        ///     Default handler for connect timer
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void CheckReconnect(object sender, ElapsedEventArgs e)
         {
             //failed. retry
-            if (_connectEventArgs.SocketError != SocketError.Success && _retryCount < _retryLimit)
+            if (_connectEventArgs.SocketError != SocketError.Success && RetryCount < RetryLimit)
             {
-                _retryCount++;
+                RetryCount++;
                 ConnectAsync();
                 return;
             }
@@ -112,7 +117,7 @@ namespace Dragon
             {
                 throw new InvalidDataException(string.Format("address {0} is not suitable.", ipAddress));
             }
-            
+
             Connect();
         }
 
@@ -122,7 +127,7 @@ namespace Dragon
                 InitConnectEventArg();
 
             // timer set
-            _retryCount = 0;
+            RetryCount = 0;
             _connectTimer.Start();
             ConnectAsync();
         }
@@ -132,6 +137,5 @@ namespace Dragon
             if (_socket.ConnectAsync(_connectEventArgs)) return;
             DefaultConnectSuccess(null, _connectEventArgs);
         }
-        
     }
 }
