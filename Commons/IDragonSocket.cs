@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Net.Sockets;
 
 namespace Dragon
@@ -27,6 +28,8 @@ namespace Dragon
     {
         event EventHandler<SocketAsyncEventArgs> OnDisconnected;
         SocketState State { get; set; }
+        IPEndPoint RemoteEndPoint { get; }
+        IPEndPoint LocalEndPoint { get; }
         void Send(TReq message);
         void Activate();
         /// <summary>

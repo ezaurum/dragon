@@ -4,15 +4,17 @@ using System.Net.Sockets;
 
 namespace Dragon
 {
-    public abstract class AbstractDragonSocket
+    public abstract class AbstractDragonSocket<T> : IDragonSocketMinimal<T>
     {
-        public AbstractDragonSocket()
+        private const int BufferSize = 16 * 1024;
+
+        protected AbstractDragonSocket()
         {
-            ReadEventArgs = new SocketAsyncEventArgs();
+            _readEventArgs = new SocketAsyncEventArgs();
 
             //TODO is this need pool?
-            ReadEventArgs.SetBuffer(new byte[2048], 0, 2048);
-            ReadEventArgs.Completed += OnReadEventArgsOnCompleted;
+            _readEventArgs.SetBuffer(new byte[BufferSize], 0, BufferSize);
+            _readEventArgs.Completed += OnReadEventArgsOnCompleted;
 
             WriteEventArgs = new SocketAsyncEventArgs();
             WriteEventArgs.Completed += OnWriteEventArgsOnCompleted;
@@ -20,6 +22,7 @@ namespace Dragon
             State = SocketState.Initialized;
         }
 
+        
         public SocketState State { get; set; }
 
         public IPEndPoint RemoteEndPoint
@@ -30,28 +33,37 @@ namespace Dragon
         public IPEndPoint LocalEndPoint
         {
             get { return (IPEndPoint) Socket.LocalEndPoint; }
-        }
-
-        /// <summary>
-        ///     debug event args for log or something
-        /// </summary>
-        public event EventHandler<SocketAsyncEventArgs> DebugEvent
-        {
-            add { ReadEventArgs.Completed += value; }
-            remove { ReadEventArgs.Completed -= value; }
-        }
+        } 
 
         protected Socket Socket { set; get; }
-        protected SocketAsyncEventArgs WriteEventArgs;
-        protected SocketAsyncEventArgs ReadEventArgs;
+        
+        private readonly SocketAsyncEventArgs _readEventArgs;
+        protected abstract void OnReadEventArgsOnCompleted(object sender, SocketAsyncEventArgs readEventArgs);
 
-        protected event EventHandler<SocketAsyncEventArgs> OnAbstractDisconnected;
+        /// <summary>
+        ///     Read repeat
+        /// </summary>
+        protected void ReadRepeat()
+        {
+            if (Socket.ReceiveAsync(_readEventArgs)) return;
+            OnReadEventArgsOnCompleted(Socket, _readEventArgs);
+        }
 
+        protected readonly SocketAsyncEventArgs WriteEventArgs;
+        public abstract void Send(T message);
+        protected abstract void OnWriteEventArgsOnCompleted(object socket, SocketAsyncEventArgs readEventArgs);
+
+        public event EventHandler<SocketAsyncEventArgs> OnDisconnected;
+
+        public void Disconnect()
+        {
+            Disconnect(null);
+        }
 
         /// <summary>
         ///     For reuse, Socket and eventargs are not disposed.
         /// </summary>
-        public void Disconnect(SocketAsyncEventArgs e = null)
+        public void Disconnect(SocketAsyncEventArgs e)
         {
             //run once
             if (State <= SocketState.Disconnected) return;
@@ -61,33 +73,19 @@ namespace Dragon
                 Socket.Shutdown(SocketShutdown.Both);
                 Socket.Disconnect(true);
             }
-            catch (ObjectDisposedException)
+            catch (Exception)
             {
                 //ignore already disposed
-            }
-            catch (SocketException ex)
-            {
-                throw new InvalidOperationException("Exception in disconnect. " + ex.ErrorCode, ex);
+                //ignore already disconnected 
+                //ignore something else
             }
 
             State = SocketState.Disconnected;
 
-            if (null == OnAbstractDisconnected) return;
+            if (null == OnDisconnected) return;
 
-            OnAbstractDisconnected(this, e);
+            OnDisconnected(this, e);
         }
-
-        /// <summary>
-        ///     Read repeat
-        /// </summary>
-        protected void ReadRepeat()
-        {
-            if (Socket.ReceiveAsync(ReadEventArgs)) return;
-            OnReadEventArgsOnCompleted(Socket, ReadEventArgs);
-        }
-
-        protected abstract void OnReadEventArgsOnCompleted(object sender, SocketAsyncEventArgs readEventArgs);
-        protected abstract void OnWriteEventArgsOnCompleted(object socket, SocketAsyncEventArgs readEventArgs);
 
         public virtual void Dispose()
         {
@@ -95,8 +93,16 @@ namespace Dragon
 
             Disconnect();
 
-            WriteEventArgs.Dispose();
-            ReadEventArgs.Dispose();
+            try
+            {
+                WriteEventArgs.Dispose();
+                _readEventArgs.Dispose();
+            }
+            catch
+            {
+                //ignore some error
+            }
+            
             State = SocketState.Disposed;
         }
 
@@ -104,6 +110,16 @@ namespace Dragon
         {
             State = SocketState.Active;
             ReadRepeat();
+        }
+
+
+        /// <summary>
+        ///     debug event args for log or something
+        /// </summary>
+        public event EventHandler<SocketAsyncEventArgs> DebugEvent
+        {
+            add { _readEventArgs.Completed += value; }
+            remove { _readEventArgs.Completed -= value; }
         }
     }
 }

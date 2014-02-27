@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net.Sockets;
 
 namespace Dragon
@@ -11,18 +10,12 @@ namespace Dragon
     ///     Socket Wrapper
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class DragonSocket<T> : AbstractDragonSocket, IDragonSocket<T> where T : IMessage
+    public class DragonSocket<T> : AbstractDragonSocket<T>, IDragonSocket<T> where T : IMessage
     {
         private readonly MessageConverter<T> _messageConverter;
         private readonly Queue<T> _sendingQueue = new Queue<T>();
         private readonly object _lock = new object();
-        private bool _sending;
-
-        public event EventHandler<SocketAsyncEventArgs> OnDisconnected
-        {
-            add { OnAbstractDisconnected += value; }
-            remove { OnAbstractDisconnected -= value; }
-        }
+        private bool _sending; 
 
         public DragonSocket(IMessageFactory<T> factory)
         { 
@@ -35,7 +28,7 @@ namespace Dragon
             remove { _messageConverter.MessageConverted -= value; }
         } 
 
-        public void Send(T message)
+        public override void Send(T message)
         {
             lock (_lock)
             {
@@ -124,17 +117,20 @@ namespace Dragon
     /// </summary>
     /// <typeparam name="TReq"></typeparam>
     /// <typeparam name="TAck"></typeparam>
-    public class DragonSocket<TReq, TAck> : AbstractDragonSocket,IDragonSocket<TReq, TAck>
+    public class DragonSocket<TReq, TAck> : AbstractDragonSocket<TReq>,IDragonSocket<TReq, TAck>
     {
         private readonly IMessageFactory<TReq, TAck> _factory;
         private readonly Queue<TReq> _sendingQueue = new Queue<TReq>();
         private readonly object _lock = new object();
         private bool _sending;
 
-        public event EventHandler<SocketAsyncEventArgs> OnDisconnected
+        protected DragonSocket(IMessageFactory<TReq, TAck> factory, byte[] buffer, int index, int length)
         {
-            add { OnAbstractDisconnected += value; }
-            remove { OnAbstractDisconnected -= value; }
+            _factory = factory;
+            _buffer = buffer;
+            _offset = index;
+            _initialOffset = index;
+            _bufferLength = length;
         }
 
         protected DragonSocket(IMessageFactory<TReq, TAck> factory)
@@ -145,7 +141,7 @@ namespace Dragon
         public event Action<TAck, int> ReadCompleted;
         public event Action<int> WriteCompleted;
 
-        public void Send(TReq message)
+        public override void Send(TReq message)
         {
             lock (_lock)
             {
@@ -244,15 +240,6 @@ namespace Dragon
         private int _offset;
         private readonly int _bufferLength;
         private int _initialOffset;
-
-        protected DragonSocket(IMessageFactory<TReq, TAck> factory, byte[] buffer, int index, int length)
-        {
-            _factory = factory;
-            _buffer = buffer;
-            _offset = index;
-            _initialOffset = index;
-            _bufferLength = length;
-        }
 
         private void PullBufferToFront(short messageLength)
         {
