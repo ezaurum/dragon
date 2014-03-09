@@ -55,6 +55,7 @@ namespace Dragon
         /// <param name="e"></param>
         private void DefaultConnectSuccess(object sender, SocketAsyncEventArgs e)
         {
+            Console.WriteLine(e.SocketError);
             if (e.SocketError != SocketError.Success) return;
             ConnectSuccess(sender, e);
             _connectTimer.Stop();

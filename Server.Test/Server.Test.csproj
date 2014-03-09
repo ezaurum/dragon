@@ -57,6 +57,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Client.Test\Client.Test.csproj">
+      <Project>{DF35E8EC-27A7-43A5-923A-A9A936735BA7}</Project>
+      <Name>Client.Test</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Commons\Commons.csproj">
       <Project>{6a94673f-ae42-4a0d-badc-83933c0976c1}</Project>
       <Name>Commons</Name>

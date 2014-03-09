@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net.Sockets;
 using System.Timers;
 
 namespace Dragon
@@ -6,17 +7,17 @@ namespace Dragon
     /// <summary>
     /// Heart beat maker
     /// </summary>
-    public class HeartBeatMaker<T> where T : IMessage
+    public class HeartBeatMaker<T>
     { 
         private readonly Timer _heartbeatTimer;
-        private readonly IDragonSocket<T> _socket;
+        private readonly IMessageSender<T> _sender;
         private readonly T _message;
 
         public event Action<T> UpdateMessage;
 
-        public HeartBeatMaker(IDragonSocket<T> socket, T message, int interval = 1500)
+        public HeartBeatMaker(IMessageSender<T> socket, T message, int interval = 1500)
         {
-            _socket = socket;
+            _sender = socket;
             _message = message; 
 
             _heartbeatTimer = new Timer { Interval = interval };
@@ -28,6 +29,11 @@ namespace Dragon
         /// </summary>
         public void Start()
         {
+            if (null == UpdateMessage)
+            {
+                throw new InvalidOperationException("Update message is null.");
+            }
+
             _heartbeatTimer.Start();
         }
 
@@ -42,7 +48,17 @@ namespace Dragon
         private void Beat(object sender, ElapsedEventArgs elapsedEventArgs)
         {
             UpdateMessage(_message);
-            _socket.Send(_message); 
+            _sender.Send(_message); 
+        }
+
+        public void Stop(object sender, SocketAsyncEventArgs e)
+        {
+            Stop();
+        }
+
+        public void Start(object sender, SocketAsyncEventArgs e)
+        {
+            Start();
         }
     } 
 }

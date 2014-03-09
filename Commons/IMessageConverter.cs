@@ -1,9 +1,11 @@
-﻿using System;
+using System;
 
 namespace Dragon
 {
-    public interface IMessageConverter<T> where T : IMessage
+    public interface IMessageConverter<in TReq, TAck>
     {
-        event Action<T> MessageConverted;
+        event Action<TAck, int> ReadCompleted;
+        void Convert(byte[] buffer, int offset, int bytesTransferred);
+        void GetByte(TReq message, out byte[] messageBytes, out int errorCode);
     }
 }

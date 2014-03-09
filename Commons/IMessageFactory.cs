@@ -1,13 +1,12 @@
 ﻿namespace Dragon
 {
     /// <summary>
-    /// Need to be singleton
+    /// Request and Response is same type
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public interface IMessageFactory<out T> where T : IMessage
-    {
-        T GetMessage(byte[] bytes);
-        T GetMessage(byte[] bytes, int offset, int length);
+    public interface IMessageFactory<T> : IMessageFactory<T,T>
+    { 
+
     }
 
     /// <summary>
@@ -18,7 +17,7 @@
     /// <typeparam name="TAck"></typeparam>
     public interface IMessageFactory<in TReq, TAck>
     {
-        void GetMessage(byte[] bytes, int offset, int length, out TAck ack, out int errorCode);
         void GetByte(TReq req, out byte[] bytes, out int errorCode);
+        bool Read(byte[] bytes, int offset, int length, out TAck message, out int errorCode);
     }
 }

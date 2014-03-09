@@ -29,7 +29,7 @@ namespace Dragon
         public int MaximumConnection { private get; set; }
         public IPEndPoint IpEndpoint { private get; set; }
         private SocketAsyncEventArgsPool _acceptPool;
-        public IMessageFactory<T> MessageFactory { get; set; }
+        public IMessageConverter<T, T> MessageFactory { get; set; }
         public int Backlog { private get; set; }
         public UInt16 ListeningPortNumber { get; set; }
         public IPAddress AcceptableIpAddress { get; set; }

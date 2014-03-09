@@ -4,56 +4,35 @@ using System.Net.Sockets;
 
 namespace Dragon
 {
+
     #region one type message
+
     /// <summary>
     ///     Client Socket. Able to connect remote host.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class ClientDragonSocket<T> : DragonSocket<T> where T : IMessage
+    public class ClientDragonSocket<T> : ClientDragonSocket<T, T>
     {
-        private readonly Connector _connector;
-        public event EventHandler<SocketAsyncEventArgs> ConnectFailed
+        public ClientDragonSocket(IMessageConverter<T, T> converter)
+            : base(converter)
         {
-            add { _connector.ConnectFailed += value; }
-            remove { _connector.ConnectFailed -= value; }
-        }
-
-        public event EventHandler<SocketAsyncEventArgs> ConnectSuccess
-        {
-            add { _connector.ConnectSuccess += value; }
-            remove { _connector.ConnectSuccess -= value; }
-        }
-
-        public void Connect(IPEndPoint endPoint)
-        {
-            _connector.Connect(endPoint);
-            Socket = _connector.Socket;
-        }
-
-        public void Connect(string ipAddress, int port)
-        {
-            _connector.Connect(ipAddress, port);
-            Socket = _connector.Socket;
-        }
-        
-        public ClientDragonSocket(IMessageFactory<T> factory)
-            : base(factory)
-        {
-            _connector = new Connector();
-            ConnectSuccess += (sender, args) => Activate();
         }
     }
 
     #endregion
-    
+
     #region two type message
+
     /// <summary>
-    /// Client Socket. 
-    /// Has Request, Acknowlege templates
+    ///     Client Socket.
+    ///     Has Request, Acknowlege templates
     /// </summary>
-    public class ClientDragonSocket<TReq, TAck> : DragonSocket<TReq, TAck>
+    public class ClientDragonSocket<TReq, TAck> : DragonSocket<TReq, TAck>,
+        IConnectable, IBeatable<TReq>
     {
         private readonly Connector _connector;
+
+
         public event EventHandler<SocketAsyncEventArgs> ConnectFailed
         {
             add { _connector.ConnectFailed += value; }
@@ -66,10 +45,10 @@ namespace Dragon
             remove { _connector.ConnectSuccess -= value; }
         }
 
+
         public void Connect(IPEndPoint endPoint)
         {
-            _connector.Connect(endPoint);
-            Socket = _connector.Socket;
+            _connector.Connect(endPoint); 
         }
 
         public void Connect(string ipAddress, int port)
@@ -77,14 +56,39 @@ namespace Dragon
             _connector.Connect(ipAddress, port);
         }
 
-        public ClientDragonSocket(IMessageFactory<TReq, TAck> factory, byte[] buffer, int index, int length)
-            : base(factory, buffer, index, length)
+        public ClientDragonSocket(IMessageConverter<TReq, TAck> converter)
+            : base(converter)
         {
             _connector = new Connector();
-            ConnectSuccess += (sender, args) => Activate();
-            Socket.ReceiveTimeout = 1000;
-            Socket.SendTimeout = 1000;
+            Socket = _connector.Socket;
+            ConnectSuccess += ActivateOnConnectSuccess;
+        }
+
+        private readonly HeartBeatMaker<TReq> _heartBeatMaker;
+
+        public bool HeartBeatEnable { get; set; }
+        public TReq HeartBeatMessage { get; set; }
+
+        public ClientDragonSocket(IMessageConverter<TReq, TAck> converter,
+            TReq beatMessage) : this(converter)
+        {
+            HeartBeatEnable = true;
+            HeartBeatMessage = beatMessage;
+            _heartBeatMaker = new HeartBeatMaker<TReq>(this, HeartBeatMessage);
+            Disconnected += _heartBeatMaker.Stop;
+            ConnectSuccess += _heartBeatMaker.Start;
+        }
+
+
+        private void ActivateOnConnectSuccess(object sender,
+            SocketAsyncEventArgs e)
+        {
+            Activate();
+
+            if (!HeartBeatEnable) return;
+            _heartBeatMaker.Start();
         }
     }
+
     #endregion
 }
