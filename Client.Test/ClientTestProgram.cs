@@ -9,25 +9,19 @@ namespace Client.Test
     {
         static void Main(string[] args)
         {
-            var c = new ClientDragonSocket<SimpleMessage>(new SimpleMessageFactory());
-            c.ConnectSuccess += (sender, eventArgs) => 
-            {
-                Console.WriteLine("Connected");
+            var c = new ClientDragonSocket<SimpleMessage>(new SimpleMessageFactory(), new SimpleMessage());
 
-                c.Send(new SimpleMessage());
-            }; 
+            c.ConnectSuccess += (sender, eventArgs) => Console.WriteLine("Connected"); 
 
-            c.OnReadCompleted += (message, i) => 
-            {                
-                Console.WriteLine("Read " +message);
-
-                Thread.Sleep(500);
-                c.Send(new SimpleMessage());
-            };
+            c.OnReadCompleted += (message, i) => Console.WriteLine("Read " +message);
 
             c.Disconnected += Disconnected;
 
+            c.UpdateMessage += message => { };
+
             c.Connect("127.0.0.1", 10008); 
+
+            
             
             Console.ReadKey();
             c.Disconnect();

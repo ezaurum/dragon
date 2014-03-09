@@ -81,6 +81,8 @@ namespace Dragon
 
         int _errorCode;
 
+        //TODO remove something...
+        [Obsolete]
         private void PullBufferToFront(short messageLength)
         {
             Buffer.BlockCopy(_buffer, messageLength, _buffer, 0, _offset - messageLength);

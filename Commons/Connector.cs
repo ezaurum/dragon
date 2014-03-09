@@ -135,6 +135,11 @@ namespace Dragon
 
         private void ConnectAsync()
         {
+            if (_socket.Connected)
+            {
+                Console.WriteLine("fdslfkjds;flj");
+            }
+
             if (_socket.ConnectAsync(_connectEventArgs)) return;
             DefaultConnectSuccess(null, _connectEventArgs);
         }

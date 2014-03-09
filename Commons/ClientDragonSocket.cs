@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Reflection.Emit;
 
 namespace Dragon
 {
@@ -16,6 +17,12 @@ namespace Dragon
         public ClientDragonSocket(IMessageConverter<T, T> converter)
             : base(converter)
         {
+        }
+
+        public ClientDragonSocket(IMessageConverter<T, T> converter,
+            T hearbeatMessage) : base(converter, hearbeatMessage)
+        {
+            
         }
     }
 
@@ -68,7 +75,13 @@ namespace Dragon
 
         public bool HeartBeatEnable { get; set; }
         public TReq HeartBeatMessage { get; set; }
-
+        
+        public event Action<TReq> UpdateMessage
+        {
+            add { _heartBeatMaker.UpdateMessage += value; }
+            remove { _heartBeatMaker.UpdateMessage -= value; }
+        }
+    
         public ClientDragonSocket(IMessageConverter<TReq, TAck> converter,
             TReq beatMessage) : this(converter)
         {
@@ -78,7 +91,6 @@ namespace Dragon
             Disconnected += _heartBeatMaker.Stop;
             ConnectSuccess += _heartBeatMaker.Start;
         }
-
 
         private void ActivateOnConnectSuccess(object sender,
             SocketAsyncEventArgs e)
