@@ -1,6 +1,7 @@
 using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 
 namespace Dragon
 {
@@ -15,15 +16,21 @@ namespace Dragon
             //TODO is this need pool?
             _readEventArgs.SetBuffer(new byte[BufferSize], 0, BufferSize);
             _readEventArgs.Completed += OnReadEventArgsOnCompleted;
+            _readEventArgs.DisconnectReuseSocket = true;
 
             WriteEventArgs = new SocketAsyncEventArgs();
             WriteEventArgs.Completed += OnWriteEventArgsOnCompleted;
+            WriteEventArgs.DisconnectReuseSocket = true;
 
             State = SocketState.Initialized;
         }
 
-        
-        public SocketState State { get; set; }
+        private int _state;
+        public SocketState State
+        {
+            get { return (SocketState) _state; }
+            set { _state = (int) value; }
+        }
 
         public IPEndPoint RemoteEndPoint
         {
@@ -50,6 +57,8 @@ namespace Dragon
         }
 
         protected readonly SocketAsyncEventArgs WriteEventArgs;
+        private readonly object _lock = new object();
+        
         public abstract void Send(T message);
         protected abstract void OnWriteEventArgsOnCompleted(object socket, SocketAsyncEventArgs readEventArgs);
 
@@ -65,22 +74,29 @@ namespace Dragon
         /// </summary>
         public void Disconnect(SocketAsyncEventArgs e)
         {
+            SocketState exchange =
+                (SocketState)
+                    Interlocked.Exchange(ref _state,
+                        (byte) SocketState.Disconnected);
+
             //run once
-            if (State <= SocketState.Disconnected) return;
+            if (exchange <= SocketState.Disconnected) return;
 
             try
-            {
-                Socket.Shutdown(SocketShutdown.Both);
+            { 
+                Socket.Shutdown(SocketShutdown.Both); 
                 Socket.Disconnect(true);
             }
-            catch (Exception)
+            catch (SocketException ex)
             {
-                //ignore already disposed
                 //ignore already disconnected 
+
                 //ignore something else
             }
-
-            State = SocketState.Disconnected;
+            catch (ObjectDisposedException ex)
+            {
+                //ignore already disposed
+            } 
 
             if (null == OnDisconnected) return;
 
