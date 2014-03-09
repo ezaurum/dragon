@@ -16,7 +16,7 @@ namespace Dragon
 
         public MessageConverter(IMessageFactory<T> factory)
         {
-            _buffer = new byte[2048];
+            _buffer = new byte[102410];
             _factory = factory;
         }
 
