@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
-using System.Reflection.Emit;
 
 namespace Dragon
-{
-
+{ 
     #region one type message
 
     /// <summary>
@@ -37,8 +35,7 @@ namespace Dragon
     public class ClientDragonSocket<TReq, TAck> : DragonSocket<TReq, TAck>,
         IConnectable, IBeatable<TReq>
     {
-        private readonly Connector _connector;
-
+        private readonly Connector _connector; 
 
         public event EventHandler<SocketAsyncEventArgs> ConnectFailed
         {

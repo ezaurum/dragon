@@ -86,6 +86,11 @@ namespace Dragon
             {
                 Socket.Shutdown(SocketShutdown.Both);
                 Socket.Disconnect(true);
+
+                if (Socket.Connected)
+                {
+                    Console.WriteLine(Socket.Connected);
+                }
             }
             catch (SocketException ex)
             {

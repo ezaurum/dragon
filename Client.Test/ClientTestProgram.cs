@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Net.Sockets;
-using System.Threading;
 using Dragon;
 
 namespace Client.Test
@@ -20,8 +19,6 @@ namespace Client.Test
             c.UpdateMessage += message => { };
 
             c.Connect("127.0.0.1", 10008); 
-
-            
             
             Console.ReadKey();
             c.Disconnect();

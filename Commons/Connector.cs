@@ -44,7 +44,7 @@ namespace Dragon
         private void InitConnectEventArg()
         {
             _connectEventArgs = new SocketAsyncEventArgs {RemoteEndPoint = IpEndpoint};
-            _connectEventArgs.Completed += DefaultConnectSuccess;
+            _connectEventArgs.Completed += DefaultConnectCompleted;
         }
 
         /// <summary>
@@ -53,12 +53,14 @@ namespace Dragon
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void DefaultConnectSuccess(object sender, SocketAsyncEventArgs e)
+        private void DefaultConnectCompleted(object sender, SocketAsyncEventArgs e)
         {
-            Console.WriteLine(e.SocketError);
+            Console.WriteLine("Default connect : "+e.SocketError);
             if (e.SocketError != SocketError.Success) return;
+            
             ConnectSuccess(sender, e);
             _connectTimer.Stop();
+            _connectEventArgs.Dispose();
         }
 
         private EndPoint IpEndpoint { get; set; }
@@ -95,6 +97,7 @@ namespace Dragon
             _connectTimer.Stop();
 
             if (_connectEventArgs.SocketError == SocketError.Success || ConnectFailed == null) return;
+            _connectEventArgs.Dispose();
             ConnectFailed(sender, _connectEventArgs);
         }
 
@@ -123,25 +126,19 @@ namespace Dragon
         }
 
         private void Connect()
-        {
-            if (null == _connectEventArgs)
-                InitConnectEventArg();
+        { 
+            InitConnectEventArg();
 
             // timer set
             RetryCount = 0;
-            _connectTimer.Start();
+            _connectTimer.Start(); 
             ConnectAsync();
         }
 
         private void ConnectAsync()
         {
-            if (_socket.Connected)
-            {
-                Console.WriteLine("fdslfkjds;flj");
-            }
-
             if (_socket.ConnectAsync(_connectEventArgs)) return;
-            DefaultConnectSuccess(null, _connectEventArgs);
+            DefaultConnectCompleted(null, _connectEventArgs);
         }
     }
 }
