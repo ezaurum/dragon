@@ -27,8 +27,6 @@ namespace Server.Test
                 //Something to test
                 var userToken = (ServerDragonSocket<SimpleMessage>) eventArgs.UserToken;
 
-
-
                 userToken.ReadCompleted += message =>
                 {
                     Console.WriteLine("READ " + message);

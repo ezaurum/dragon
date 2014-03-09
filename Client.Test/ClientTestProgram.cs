@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net.Sockets;
 using System.Threading;
 using Dragon;
 
@@ -24,16 +25,19 @@ namespace Client.Test
                 c.Send(new SimpleMessage());
             };
 
+            c.OnDisconnected += OnDisconnected;
+
             c.Connect("127.0.0.1",10008); 
             Console.ReadKey();
-            c.Disconnect(); 
+            c.Disconnect();
+            Console.WriteLine("We're "+c.State);
             Console.ReadKey();
             Console.WriteLine("We're connecting.........");
             c.Connect("127.0.0.1", 10008); 
             Console.ReadKey(); 
         }
 
-        private static void OnDisconnected()
+        private static void OnDisconnected(object sender, SocketAsyncEventArgs socketAsyncEventArgs)
         {
             Console.WriteLine("Disconnected");
         }

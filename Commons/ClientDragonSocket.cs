@@ -82,6 +82,8 @@ namespace Dragon
         {
             _connector = new Connector();
             ConnectSuccess += (sender, args) => Activate();
+            Socket.ReceiveTimeout = 1000;
+            Socket.SendTimeout = 1000;
         }
     }
     #endregion

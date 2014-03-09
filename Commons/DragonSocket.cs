@@ -48,6 +48,8 @@ namespace Dragon
         /// <param name="message"></param>
         private void SendAsync(T message)
         {
+            if (State != SocketState.Active) return;
+
             _sending = true;
             WriteEventArgs.UserToken = message;
             try
@@ -73,38 +75,45 @@ namespace Dragon
         /// <param name="args"></param>
         protected override void OnReadEventArgsOnCompleted(object socket, SocketAsyncEventArgs args)
         {
-            if (args.SocketError != SocketError.Success)
-            {
-                Disconnect(args);
+            if (SocketError.Success != args.SocketError || SocketState.Active != State)
                 return;
-            }
-            if (SocketError.Success != args.SocketError || 0 >= args.BytesTransferred || SocketState.Active != State)
-                return;
+
             _messageConverter.ReceiveBytes(args.Buffer, args.Offset, args.BytesTransferred);
             ReadRepeat();
         }
 
         public event Action WriteCompleted;
 
-        protected override void OnWriteEventArgsOnCompleted(object socket, SocketAsyncEventArgs readEventArgs)
+        protected override void OnWriteEventArgsOnCompleted(object socket,
+            SocketAsyncEventArgs writeEventArgs)
         {
-            if (readEventArgs.SocketError != SocketError.Success)
+            switch (writeEventArgs.SocketError)
             {
-                Disconnect(readEventArgs);
-                return;
-            }
+                case SocketError.Success:
 
-            if (null != WriteCompleted)
-                WriteCompleted();
+                    if (null != WriteCompleted)
+                        WriteCompleted();
 
-            lock (_lock)
-            {
-                _sending = _sendingQueue.Count > 0;
-            }
+                    lock (_lock)
+                    {
+                        _sending = _sendingQueue.Count > 0;
+                    }
 
-            if (_sending)
-            {
-                SendAsync(_sendingQueue.Dequeue());
+                    if (_sending)
+                    {
+                        SendAsync(_sendingQueue.Dequeue());
+                    }
+                    break;
+
+                case SocketError.ConnectionReset:
+                case SocketError.Disconnecting:
+                case SocketError.NotConnected:
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException(
+                        string.Format("writeEventArgs.SocketError {0}",
+                            writeEventArgs));
             }
         }
     }
@@ -202,7 +211,7 @@ namespace Dragon
         /// <param name="socket"></param>
         /// <param name="args"></param>
         protected override void OnReadEventArgsOnCompleted(object socket, SocketAsyncEventArgs args)
-        {
+        { 
             if (args.SocketError != SocketError.Success)
             {
                 Disconnect(args);
