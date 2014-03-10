@@ -93,6 +93,15 @@ namespace Dragon
                 //ignore already disposed
             }
 
+            DisposeInner();
+
+            if (null == Disconnected) return;
+
+            Disconnected(this, e);
+        }
+
+        private void DisposeInner()
+        {
             try
             {
                 _writeEventArgs.Dispose();
@@ -102,10 +111,6 @@ namespace Dragon
             {
                 //ignore some error
             }
-
-            if (null == Disconnected) return;
-
-            Disconnected(this, e);
         }
 
         public virtual void Dispose()
@@ -169,7 +174,6 @@ namespace Dragon
                 case SocketError.Disconnecting:
                 case SocketError.NotConnected:
                 case SocketError.Shutdown:
-                    break;
                 case SocketError.TimedOut:
                     Disconnect(args);
                     break;
