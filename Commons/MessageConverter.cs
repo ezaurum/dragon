@@ -58,7 +58,7 @@ namespace Dragon
 
             while (_offset > 2)
             {
-                short messageLength = BitConverter.ToInt16(_buffer, 0);
+                ushort messageLength = BitConverter.ToUInt16(_buffer, 0);
 
                 if (Stored < messageLength) return;
 
@@ -84,9 +84,9 @@ namespace Dragon
 
         //TODO remove something...
         [Obsolete]
-        private void PullBufferToFront(short messageLength)
+        private void PullBufferToFront(ushort messageLength)
         {
-            Buffer.BlockCopy(_buffer, messageLength, _buffer, 0, _offset - messageLength);
+            Buffer.BlockCopy(_buffer, _offset, _buffer, _initialOffset, Stored - messageLength);
             _offset -= messageLength;
         }
     }
