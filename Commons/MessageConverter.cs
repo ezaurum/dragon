@@ -56,7 +56,7 @@ namespace Dragon
             //add offset
             _offset += bytesTransferred;
 
-            while (_offset > 2)
+            while (Stored > 2)
             {
                 ushort messageLength = BitConverter.ToUInt16(_buffer, 0);
                 
@@ -86,7 +86,7 @@ namespace Dragon
         [Obsolete]
         private void PullBufferToFront(ushort messageLength)
         {
-            Buffer.BlockCopy(_buffer, _offset, _buffer, _initialOffset, Stored - messageLength);
+            Buffer.BlockCopy(_buffer, _initialOffset + messageLength , _buffer, _initialOffset, Stored - messageLength);
             _offset -= messageLength;
         }
     }
