@@ -23,20 +23,21 @@ namespace Dragon
         {
             _converter = converter; 
         }
+        
+        public event Action<int> WriteCompleted;
 
         public void Send(TReq message)
         {
             lock (_lock)
             {
-                _sendingQueue.Enqueue(message); 
-            }
+                _sendingQueue.Enqueue(message);
 
-            if (_sending)
-            {
-                return;
+                if (_sending)
+                {
+                    return;
+                }
+                SendAsyncFromQueue();
             }
-
-            SendAsyncFromQueue();
         }
 
         private void SendAsyncFromQueue()
@@ -45,8 +46,6 @@ namespace Dragon
 
             lock (_lock)
             {
-                _sending = _sendingQueue.Count > 0;
-                if (!_sending) return;
                 message = _sendingQueue.Dequeue();
             }
 
@@ -58,18 +57,29 @@ namespace Dragon
                 WriteCompleted(errorCode);
                 return;
             }
-
-            SendAsync(messageBytes);
-        }
-
-        public event Action<int> WriteCompleted;
+            
+            lock (_lock)
+            {
+                _sending = true;
+                SendAsync(messageBytes);
+            }
+        } 
         
         protected override void WriteEventCompleted(object o, SocketAsyncEventArgs e)
         {
             if (e.SocketError != SocketError.Success) return;
             if (null != WriteCompleted)
                 WriteCompleted(0);
+
+            lock (_lock)
+            {
+                _sending = _sendingQueue.Count > 0;
+            }
+
+            if (!_sending) return;
+
             SendAsyncFromQueue();
+
         }
 
         public virtual event Action<TAck, int> OnReadCompleted

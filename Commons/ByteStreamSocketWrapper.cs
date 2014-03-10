@@ -67,6 +67,7 @@ namespace Dragon
         }
 
         private SocketAsyncEventArgs _writeEventArgs;
+        private readonly object _lock = new object();
 
         protected abstract void WriteEventCompleted(object socket,
             SocketAsyncEventArgs readEventArgs);
@@ -150,13 +151,56 @@ namespace Dragon
             ReadRepeat();
         }
 
+
+
+        /*/// <summary>
+        /// Should Run in lock 
+        /// </summary>
+        /// <param name="message"></param>
+        private void SendAsync(TReq message)
+        {
+            lock (_lock)
+            {
+                _sending = true;
+                byte[] messageBytes;
+                int errorCode;
+                _factory.GetByte(message, out messageBytes, out errorCode);
+                WriteEventArgs.UserToken = errorCode;
+                if (0 != errorCode)
+                {
+                    OnWriteEventArgsOnCompleted(Socket, WriteEventArgs);
+                    return;
+                }
+
+                WriteEventArgs.SetBuffer(messageBytes, 0, messageBytes.Length);
+            }
+            try
+            {
+                if (Socket.SendAsync(WriteEventArgs)) return;
+                OnWriteEventArgsOnCompleted(Socket, WriteEventArgs);
+            }
+            catch (ObjectDisposedException e)
+            {
+                if (State == SocketState.Active)
+                {
+                    throw new InvalidOperationException("Socket State is Active. But socket disposed.", e);
+                }
+            }
+
+        }*/
+
         protected void SendAsync(byte[] byteArray)
         {
             try
             {
-                _writeEventArgs.SetBuffer(byteArray, 0, byteArray.Length);
+                lock (_lock)
+                {
+                    _writeEventArgs.SetBuffer(byteArray, 0, byteArray.Length);
+                }
+
                 if (Socket.SendAsync(_writeEventArgs)) return;
                 WriteEventCompleted(Socket, _writeEventArgs);
+                
             }
             catch (ObjectDisposedException e)
             {
