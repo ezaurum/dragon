@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 using Dragon;
 
 namespace Client.Test
@@ -8,25 +9,28 @@ namespace Client.Test
     {
         static void Main(string[] args)
         {
-            var c = new ClientDragonSocket<SimpleMessage>(new SimpleMessageFactory(), new SimpleMessage());
+            Task.Factory.StartNew(Test);
+            Task.Factory.StartNew(Test);
+            Task.Factory.StartNew(Test);
+            Task.Factory.StartNew(Test);
 
-            c.ConnectSuccess += (sender, eventArgs) => Console.WriteLine("Connected"); 
+            Console.ReadKey();
+        }
 
-            c.OnReadCompleted += (message, i) => Console.WriteLine("Read " +message);
+        private static void Test()
+        {
+            var c = new ClientDragonSocket<SimpleMessage>(new SimpleMessageFactory(),
+                new SimpleMessage());
+
+            c.ConnectSuccess += (sender, eventArgs) => Console.WriteLine("Connected");
+
+            c.OnReadCompleted += (message, i) => Console.WriteLine("Read " + message);
 
             c.Disconnected += Disconnected;
 
             c.UpdateMessage += message => { };
 
-            c.Connect("127.0.0.1", 10008); 
-            
-            Console.ReadKey();
-            c.Disconnect();
-            Console.WriteLine("We're "+c.State);
-            Console.ReadKey();
-            Console.WriteLine("We're connecting.........");
-            c.Connect("127.0.0.1", 10008); 
-            Console.ReadKey(); 
+            c.Connect("127.0.0.1", 10008);
         }
 
         private static void Disconnected(object sender, SocketAsyncEventArgs socketAsyncEventArgs)

@@ -31,7 +31,7 @@ namespace Server.Test
                 userToken.OnReadCompleted += (message, i) => 
                 {
                     Console.WriteLine("READ " + message);
-                    userToken.Send(message);
+                  
                 };
                 userToken.Disconnected += (o, asyncEventArgs) => Console.WriteLine("deiscon");
                 userToken.HeartbeatEnable = true;
@@ -40,6 +40,8 @@ namespace Server.Test
                 {
                     IsHeartBeat = IsHeartBeat
                 };
+
+                userToken.ReceiveHeartbeat += (message, i) => userToken.Send(message);
 
                 userToken.Activate();
             };

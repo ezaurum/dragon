@@ -101,6 +101,10 @@ namespace Dragon
             {
                 //ignore already disposed
             }
+            catch (NullReferenceException ex)
+            {
+                //ignore null
+            }
 
             DisposeInner();
 
@@ -150,44 +154,6 @@ namespace Dragon
 
             ReadRepeat();
         }
-
-
-
-        /*/// <summary>
-        /// Should Run in lock 
-        /// </summary>
-        /// <param name="message"></param>
-        private void SendAsync(TReq message)
-        {
-            lock (_lock)
-            {
-                _sending = true;
-                byte[] messageBytes;
-                int errorCode;
-                _factory.GetByte(message, out messageBytes, out errorCode);
-                WriteEventArgs.UserToken = errorCode;
-                if (0 != errorCode)
-                {
-                    OnWriteEventArgsOnCompleted(Socket, WriteEventArgs);
-                    return;
-                }
-
-                WriteEventArgs.SetBuffer(messageBytes, 0, messageBytes.Length);
-            }
-            try
-            {
-                if (Socket.SendAsync(WriteEventArgs)) return;
-                OnWriteEventArgsOnCompleted(Socket, WriteEventArgs);
-            }
-            catch (ObjectDisposedException e)
-            {
-                if (State == SocketState.Active)
-                {
-                    throw new InvalidOperationException("Socket State is Active. But socket disposed.", e);
-                }
-            }
-
-        }*/
 
         protected void SendAsync(byte[] byteArray)
         {
