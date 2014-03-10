@@ -42,9 +42,11 @@ namespace Dragon
         private void SendAsyncFromQueue()
         {
             TReq message;
+
             lock (_lock)
             {
-                _sending = true;
+                _sending = _sendingQueue.Count > 0;
+                if (!_sending) return;
                 message = _sendingQueue.Dequeue();
             }
 
@@ -67,13 +69,6 @@ namespace Dragon
             if (e.SocketError != SocketError.Success) return;
             if (null != WriteCompleted)
                 WriteCompleted(0);
-
-            lock (_lock)
-            {
-                _sending = _sendingQueue.Count > 0;
-                if (!_sending) return;
-            }
-
             SendAsyncFromQueue();
         }
 
