@@ -28,11 +28,7 @@ namespace Server.Test
                 //Something to test
                 var userToken = (ServerDragonSocket<SimpleMessage>) eventArgs.UserToken;
 
-                userToken.OnReadCompleted += (message, i) => 
-                {
-                    Console.WriteLine("READ " + message);
-                  
-                };
+                userToken.OnReadCompleted += (message, i) => Console.WriteLine("READ " + message);
                 userToken.Disconnected += (o, asyncEventArgs) => Console.WriteLine("deiscon");
                 userToken.HeartbeatEnable = true;
                 
