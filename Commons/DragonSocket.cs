@@ -84,8 +84,8 @@ namespace Dragon
 
         public virtual event Action<TAck, int> OnReadCompleted
         {
-            add { _converter.ReadCompleted += value; }
-            remove { _converter.ReadCompleted -= value; }
+            add { _converter.MessageConverted += value; }
+            remove { _converter.MessageConverted -= value; }
         }
 
         /// <summary>
@@ -99,7 +99,7 @@ namespace Dragon
 
             if (args.BytesTransferred < 1) return;
 
-            _converter.Convert(args.Buffer, args.Offset, args.BytesTransferred);
+            _converter.Read(args.Buffer, args.Offset, args.BytesTransferred);
 
             ReadRepeat();
         }

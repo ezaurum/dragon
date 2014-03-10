@@ -42,9 +42,9 @@ namespace Dragon
             _initialOffset = offset;
         }
 
-        public event Action<TAck, int> ReadCompleted;
+        public event Action<TAck, int> MessageConverted;
         
-        public void Convert(byte[] buffer, int offset, int bytesTransferred)
+        public void Read(byte[] buffer, int offset, int bytesTransferred)
         {
             if (_offset + bytesTransferred > _lastOffset+1)
             {
@@ -59,7 +59,7 @@ namespace Dragon
             while (_offset > 2)
             {
                 ushort messageLength = BitConverter.ToUInt16(_buffer, 0);
-
+                
                 if (Stored < messageLength) return;
 
                 _errorCode = 0;
@@ -68,9 +68,9 @@ namespace Dragon
                         out _errorCode)) return;
 
                 PullBufferToFront(messageLength);
-                if (null != ReadCompleted)
+                if (null != MessageConverted)
                 {
-                    ReadCompleted(message, _errorCode);
+                    MessageConverted(message, _errorCode);
                 }
             } 
         }

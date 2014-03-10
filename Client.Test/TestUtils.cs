@@ -60,23 +60,23 @@ namespace Client.Test
         }
     }
 
-    public class SimpleMessageFactory : IMessageConverter<SimpleMessage, SimpleMessage>
+    public class SimpleMessageFactory : IMessageFactory<SimpleMessage, SimpleMessage>
     {
-        public event Action<SimpleMessage, int> ReadCompleted;
-
-        public void Convert(byte[] buffer, int offset, int bytesTransferred)
-        {
-            var d = new byte[bytesTransferred];
-            Buffer.BlockCopy(buffer, offset, d, 0, bytesTransferred);
-            var simpleMessage = new SimpleMessage();
-            simpleMessage.FromByteArray(d);
-            ReadCompleted(simpleMessage, 0);
-        }
-
         public void GetByte(SimpleMessage message, out byte[] messageBytes, out int errorCode)
         {
             messageBytes = message.ToByteArray();
             errorCode = 0;
+        }
+
+        public bool Read(byte[] bytes, int offset, int length, out SimpleMessage message,
+            out int errorCode)
+        { 
+            var d = new byte[length];
+            Buffer.BlockCopy(bytes, offset, d, 0, length);
+            message = new SimpleMessage();
+            message.FromByteArray(d);
+            errorCode = 0;
+            return true;
         }
     }
 }

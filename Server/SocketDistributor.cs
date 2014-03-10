@@ -29,7 +29,7 @@ namespace Dragon
         public int MaximumConnection { private get; set; }
         public IPEndPoint IpEndpoint { private get; set; }
         private SocketAsyncEventArgsPool _acceptPool;
-        public IMessageConverter<T, T> MessageFactory { get; set; }
+        public Func<IMessageConverter<T, T>> MessageFactoryProvide { get; set; }
         public int Backlog { private get; set; }
         public UInt16 ListeningPortNumber { get; set; }
         public IPAddress AcceptableIpAddress { get; set; }
@@ -76,8 +76,8 @@ namespace Dragon
             }
             
             //check properties
-            if (null == MessageFactory)
-                throw new InvalidOperationException("Message Factory is null.");
+            if (null == MessageFactoryProvide)
+                throw new InvalidOperationException("Message Factory Provide is null.");
 
             _acceptPool = new SocketAsyncEventArgsPool();
             //first sequence. 
@@ -139,7 +139,7 @@ namespace Dragon
         private void DistributeDragonSocket(object sender, SocketAsyncEventArgs e)
         {
             //TODO something... pool
-            var dragonSocket = new ServerDragonSocket<T>(e.AcceptSocket, MessageFactory);
+            var dragonSocket = new ServerDragonSocket<T>(e.AcceptSocket, MessageFactoryProvide());
             e.UserToken = dragonSocket;
         }
 
