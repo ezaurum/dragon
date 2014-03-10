@@ -27,8 +27,57 @@ namespace Dragon
             {
                 Accepted(Socket, null);
             }
+
+            _converter.ReadCompleted += DefaultReadComplete;
+        }
+
+        private event Action<TAck, int> ReadCompleted;
+
+        public override event Action<TAck, int> OnReadCompleted
+        {
+            add { ReadCompleted += value; }
+            remove { ReadCompleted -= value; }
+        }
+
+        private void DefaultReadComplete(TAck arg1, int arg2)
+        {
+            if (HeartbeatEnable && _heartBeatReceiver.IsHeartBeat(arg1))
+            {
+                _heartBeatReceiver.Receive(arg1, arg2);
+                return;
+            }
+
+            if (null != ReadCompleted) ReadCompleted(arg1, arg2);
+        } 
+        
+        private HeartBeatReceiver<TAck> _heartBeatReceiver;
+
+        public bool HeartbeatEnable { get; set; }
+
+        public event Action<TAck, int> ReceiveHeartbeat
+        {
+            add { _heartBeatReceiver.ReceiveHeartbeat += value; }
+            remove { _heartBeatReceiver.ReceiveHeartbeat -= value; }
+        }
+
+        public HeartBeatReceiver<TAck> HeartBeatReceiver
+        {
+            get { return _heartBeatReceiver; }
+            set
+            {
+                if (null != _heartBeatReceiver)
+                    _heartBeatReceiver.OnBeatStop -= Disconnect;
+
+                _heartBeatReceiver = value;
+                _heartBeatReceiver.OnBeatStop += Disconnect;
+            }
         }
 
         public event EventHandler<SocketAsyncEventArgs> Accepted;
+
+        private void Disconnect()
+        {
+            Disconnect(null);
+        }
     }
 }

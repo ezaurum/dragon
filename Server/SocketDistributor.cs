@@ -11,7 +11,7 @@ namespace Dragon
     ///     Accept Connection and Distribute sockets
     ///     Set AccpetPool needed
     /// </summary>
-    public class SocketDistributor<T> where T : IMessage
+    public class SocketDistributor<T>
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof (SocketDistributor<T>));
 

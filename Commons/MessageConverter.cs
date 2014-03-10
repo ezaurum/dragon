@@ -28,8 +28,9 @@ namespace Dragon
             set { _factory = value; }
         }
  
-        public MessageConverter(byte[] buffer, int offset, int bufferSize)
+        public MessageConverter(byte[] buffer, int offset, int bufferSize, IMessageFactory<TReq, TAck> factory)
         {
+            _factory = factory;
             SetBuffer(buffer, offset, bufferSize);
         }
 
@@ -42,10 +43,10 @@ namespace Dragon
         }
 
         public event Action<TAck, int> ReadCompleted;
-
+        
         public void Convert(byte[] buffer, int offset, int bytesTransferred)
         {
-            if (_offset + bytesTransferred > _lastOffset)
+            if (_offset + bytesTransferred > _lastOffset+1)
             {
                 throw new OutOfMemoryException(string.Format("Buffer overflow {2}+{0}/{1}",_offset,_lastOffset,bytesTransferred));
             }
@@ -63,7 +64,7 @@ namespace Dragon
 
                 _errorCode = 0;
                 TAck message;
-                if (!_factory.Read(_buffer, _offset, messageLength, out message,
+                if (!_factory.Read(_buffer, _initialOffset, messageLength, out message,
                         out _errorCode)) return;
 
                 PullBufferToFront(messageLength);

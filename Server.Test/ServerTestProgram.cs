@@ -34,6 +34,12 @@ namespace Server.Test
                     userToken.Send(message);
                 };
                 userToken.Disconnected += (o, asyncEventArgs) => Console.WriteLine("deiscon");
+                userToken.HeartbeatEnable = true;
+                
+                userToken.HeartBeatReceiver = new HeartBeatReceiver<SimpleMessage>()
+                {
+                    IsHeartBeat = IsHeartBeat
+                };
 
                 userToken.Activate();
             };
@@ -41,6 +47,12 @@ namespace Server.Test
             Thread.Sleep(1000);
             s.Start();
             Console.ReadKey();
+        }
+
+        private static bool IsHeartBeat(SimpleMessage arg)
+        {
+            Console.WriteLine("BEAT");
+            return true;
         }
     }
 

@@ -2,9 +2,9 @@ using System;
 
 namespace Dragon
 {
-    public class HeartBeatReceiver : IDisposable
+    public class HeartBeatReceiver<TAck> : IDisposable
     {
-        private static readonly TimeSpan Threshold = TimeSpan.FromSeconds(2);
+        private readonly TimeSpan _threshold = TimeSpan.FromSeconds(2);
         private const byte FailedLimit = 5;
 
         private DateTime _lastTime;
@@ -17,14 +17,9 @@ namespace Dragon
 
         public event Action OnBeatStop;
 
-        public void Beat()
-        {
-            _lastTime = DateTime.Now;
-        }
-
         public void CheckBeat(HeartBeatChecker checker, DateTime time)
         {
-            if (time - _lastTime < Threshold)
+            if (time - _lastTime < _threshold)
             {
                 if (_failed > 0) _failed--;
                 return;
@@ -37,6 +32,18 @@ namespace Dragon
             if (null != OnBeatStop) OnBeatStop();
         }
 
+        // ReSharper disable once MemberCanBePrivate.Global
+        // ReSharper disable once UnassignedField.Global
+        public Func<TAck, bool> IsHeartBeat;
+
+        public event Action<TAck, int> ReceiveHeartbeat;
+
+        public void Receive(TAck beat, int errorCode)
+        {
+            _lastTime = DateTime.Now;
+            if(null != ReceiveHeartbeat) ReceiveHeartbeat(beat, errorCode);
+        }
+
         public void Dispose()
         {
             OnBeatStop = null;
@@ -46,5 +53,5 @@ namespace Dragon
         {
             return string.Format("LastTime: {0}", _lastTime);
         }
-    }
+    } 
 }

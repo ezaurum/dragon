@@ -11,7 +11,7 @@ namespace Dragon
     /// <typeparam name="TAck"></typeparam>
     public abstract class DragonSocket<TReq, TAck> : ByteStreamSocketWrapper, IMessageSender<TReq>
     {
-        private readonly IMessageConverter<TReq, TAck> _converter;
+        protected readonly IMessageConverter<TReq, TAck> _converter;
         private readonly Queue<TReq> _sendingQueue = new Queue<TReq>();
         private readonly object _lock = new object();
 
@@ -53,6 +53,7 @@ namespace Dragon
             _converter.GetByte(message, out messageBytes, out errorCode);
             if (0 != errorCode)
             {
+                WriteCompleted(errorCode);
                 return;
             }
 
@@ -65,7 +66,7 @@ namespace Dragon
         {
             if (e.SocketError != SocketError.Success) return;
             if (null != WriteCompleted)
-                WriteCompleted((int)e.UserToken);
+                WriteCompleted(0);
 
             lock (_lock)
             {
@@ -76,7 +77,7 @@ namespace Dragon
             SendAsyncFromQueue();
         }
 
-        public event Action<TAck, int> OnReadCompleted
+        public virtual event Action<TAck, int> OnReadCompleted
         {
             add { _converter.ReadCompleted += value; }
             remove { _converter.ReadCompleted -= value; }

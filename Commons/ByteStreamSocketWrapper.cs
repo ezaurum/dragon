@@ -11,20 +11,15 @@ namespace Dragon
     /// </summary>
     public abstract class ByteStreamSocketWrapper : ISocketWrapper
     {
+        private readonly byte[] _buffer;
+        private readonly int _offset;
+        private readonly int _bufferSize;
+
         protected ByteStreamSocketWrapper(byte[] buffer, int offset, int bufferSize)
         {
-            _readEventArgs = new SocketAsyncEventArgs();
-     
-            _readEventArgs.SetBuffer(buffer, offset, bufferSize);
-
-            _readEventArgs.Completed += IOCompleted;
-            _readEventArgs.Completed += ReadEventCompleted;
-            _readEventArgs.DisconnectReuseSocket = true;
-
-            _writeEventArgs = new SocketAsyncEventArgs();
-            _writeEventArgs.Completed += IOCompleted;
-            _writeEventArgs.Completed += WriteEventCompleted;
-            _writeEventArgs.DisconnectReuseSocket = true;
+            _buffer = buffer;
+            _offset = offset;
+            _bufferSize = bufferSize; 
 
             State = SocketState.Initialized;
         }
@@ -49,7 +44,7 @@ namespace Dragon
 
         protected Socket Socket { set; get; }
 
-        private readonly SocketAsyncEventArgs _readEventArgs;
+        private SocketAsyncEventArgs _readEventArgs;
 
         protected abstract void ReadEventCompleted(object sender,
             SocketAsyncEventArgs readEventArgs);
@@ -63,7 +58,7 @@ namespace Dragon
             ReadEventCompleted(Socket, _readEventArgs);
         }
 
-        private readonly SocketAsyncEventArgs _writeEventArgs;
+        private SocketAsyncEventArgs _writeEventArgs;
 
         protected abstract void WriteEventCompleted(object socket,
             SocketAsyncEventArgs readEventArgs);
@@ -85,12 +80,7 @@ namespace Dragon
             try
             {
                 Socket.Shutdown(SocketShutdown.Both);
-                Socket.Disconnect(true);
-
-                if (Socket.Connected)
-                {
-                    Console.WriteLine(Socket.Connected);
-                }
+                Socket.Disconnect(false);
             }
             catch (SocketException ex)
             {
@@ -103,17 +93,6 @@ namespace Dragon
                 //ignore already disposed
             }
 
-            if (null == Disconnected) return;
-
-            Disconnected(this, e);
-        }
-
-        public virtual void Dispose()
-        {
-            if (State <= SocketState.Disposed) return;
-
-            Disconnect();
-
             try
             {
                 _writeEventArgs.Dispose();
@@ -124,12 +103,37 @@ namespace Dragon
                 //ignore some error
             }
 
+            if (null == Disconnected) return;
+
+            Disconnected(this, e);
+        }
+
+        public virtual void Dispose()
+        {
+            if (State <= SocketState.Disposed) return;
+
+            Disconnect(); 
+
             State = SocketState.Disposed;
         }
 
         public virtual void Activate()
         {
+            _readEventArgs = new SocketAsyncEventArgs();
+
+            _readEventArgs.SetBuffer(_buffer, _offset, _bufferSize);
+
+            _readEventArgs.Completed += IOCompleted;
+            _readEventArgs.Completed += ReadEventCompleted;
+            _readEventArgs.DisconnectReuseSocket = true;
+
+            _writeEventArgs = new SocketAsyncEventArgs();
+            _writeEventArgs.Completed += IOCompleted;
+            _writeEventArgs.Completed += WriteEventCompleted;
+            _writeEventArgs.DisconnectReuseSocket = true;
+
             State = SocketState.Active;
+
             ReadRepeat();
         }
 
@@ -170,7 +174,7 @@ namespace Dragon
                     Disconnect(args);
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException(String.Format("socket error : {0}", args.SocketError));
+                    throw new ArgumentOutOfRangeException(String.Format("socket error : {0}, lastOperation: {1}", args.SocketError, args.LastOperation));
             }
         }
 

@@ -47,8 +47,7 @@ namespace Dragon
         {
             add { _connector.ConnectSuccess += value; }
             remove { _connector.ConnectSuccess -= value; }
-        }
-
+        } 
 
         public void Connect(IPEndPoint endPoint)
         {
@@ -63,8 +62,7 @@ namespace Dragon
         public ClientDragonSocket(IMessageConverter<TReq, TAck> converter)
             : base(converter)
         {
-            _connector = new Connector();
-            Socket = _connector.Socket;
+            _connector = new Connector(); 
             ConnectSuccess += ActivateOnConnectSuccess;
         }
 
@@ -92,6 +90,8 @@ namespace Dragon
         private void ActivateOnConnectSuccess(object sender,
             SocketAsyncEventArgs e)
         {
+            Socket = _connector.Socket;
+
             Activate();
 
             if (!HeartBeatEnable) return;
