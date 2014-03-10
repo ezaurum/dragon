@@ -101,6 +101,8 @@ namespace Dragon
 
             _converter.Read(args.Buffer, args.Offset, args.BytesTransferred);
 
+            args.SetBuffer(args.Offset,args.Count);
+
             ReadRepeat();
         }
     }

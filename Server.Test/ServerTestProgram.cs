@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Net;
 using System.Threading;
+using System.Threading.Tasks;
 using Client.Test;
 using Dragon;
 using log4net.Config;
+using Timer = System.Timers.Timer;
+
 
 namespace Server.Test
 {
@@ -13,10 +16,13 @@ namespace Server.Test
     public static class ServerTestProgram
     {
         private static int _index;
+        private static int _sendIndex;
 
         static void Main(string[] args)
         {
             BasicConfigurator.Configure();
+
+            Random random = new Random();
 
             var s = new SocketDistributor<SimpleMessage>
             {
@@ -26,6 +32,12 @@ namespace Server.Test
                 MessageFactoryProvide = MessageFactoryProvide
 
             };
+
+            Timer t = new Timer
+            {
+                Interval = 1000
+            };
+
             s.Accepted += (sender, eventArgs) =>
             {
                 //Something to test
@@ -35,6 +47,7 @@ namespace Server.Test
                 {
                     Console.WriteLine(userToken.RemoteEndPoint + ":" + message.BoardType + " - " + message.PlayMode);
                     message.PlayMode = (byte) Interlocked.Increment(ref _index);
+                    Interlocked.Increment(ref _sendIndex);
                     userToken.Send(message);
                 };
                 userToken.Disconnected += (o, asyncEventArgs) => Console.WriteLine("deiscon");
@@ -48,7 +61,21 @@ namespace Server.Test
                 userToken.ReceiveHeartbeat += (message, i) =>
                 {
                     message.PlayMode = (byte) Interlocked.Increment(ref _index);
+                    Interlocked.Increment(ref _sendIndex);
                     userToken.Send(message);
+                };
+
+                t.Elapsed += (o, elapsedEventArgs) =>
+                {
+                    SimpleMessage message = new SimpleMessage
+                    {
+                        PlayType = (char) random.Next(),
+                        BoardType = (byte) random.Next(),
+                        PlayMode = (byte) random.Next(),
+                        PacketTime = DateTime.Now
+                    };
+                    userToken.Send( message);
+                    Console.WriteLine(message);
                 };
 
                 userToken.Activate();
@@ -56,6 +83,8 @@ namespace Server.Test
 
             Thread.Sleep(1000);
             s.Start();
+            t.Start();
+
             Console.ReadKey();
         }
 

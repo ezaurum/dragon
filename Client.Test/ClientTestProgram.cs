@@ -9,13 +9,15 @@ namespace Client.Test
     public static class ClientTestProgram
     {
         private static int _index;
+        private static int _sendIndex;
+        private static int _receiveIndex;
 
         static void Main(string[] args)
         {
             Task.Factory.StartNew(Test);
             Task.Factory.StartNew(Test);
-            /*Task.Factory.StartNew(Test);
-            Task.Factory.StartNew(Test);*/
+            Task.Factory.StartNew(Test);
+            Task.Factory.StartNew(Test);
 
             Console.ReadKey();
         }
@@ -32,7 +34,7 @@ namespace Client.Test
 
             c.ConnectSuccess += (sender, eventArgs) => Console.WriteLine("Connected");
 
-            c.OnReadCompleted += (message, i) => Console.WriteLine(c.LocalEndPoint + ":" + message.BoardType+ " - " + message.PlayMode);
+            c.OnReadCompleted += (message, i) => Console.WriteLine(c.LocalEndPoint +"[" +Interlocked.Increment(ref _receiveIndex)+"] :" + message.BoardType+ " - " + message.PlayMode);
 
             c.Disconnected += Disconnected;
 
