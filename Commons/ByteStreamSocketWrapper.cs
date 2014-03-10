@@ -54,8 +54,16 @@ namespace Dragon
         /// </summary>
         protected void ReadRepeat()
         {
-            if (Socket.ReceiveAsync(_readEventArgs)) return;
-            ReadEventCompleted(Socket, _readEventArgs);
+            try
+            {
+                if (Socket.ReceiveAsync(_readEventArgs)) return;
+                ReadEventCompleted(Socket, _readEventArgs);
+            }
+            catch (ObjectDisposedException e)
+            {
+                //ignore disposed
+                Disconnect();
+            }
         }
 
         private SocketAsyncEventArgs _writeEventArgs;
