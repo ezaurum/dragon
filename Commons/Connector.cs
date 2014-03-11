@@ -54,8 +54,7 @@ namespace Dragon
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void DefaultConnectCompleted(object sender, SocketAsyncEventArgs e)
-        {
-            Console.WriteLine("Default connect : "+e.SocketError);
+        { 
             if (e.SocketError != SocketError.Success) return;
             
             ConnectSuccess(sender, e);

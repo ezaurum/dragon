@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Net;
 using System.Threading;
-using System.Threading.Tasks;
 using Client.Test;
 using Dragon;
 using log4net.Config;
