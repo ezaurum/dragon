@@ -101,7 +101,16 @@ namespace Dragon
 
             _converter.Read(args.Buffer, args.Offset, args.BytesTransferred);
 
-            args.SetBuffer(args.Offset,args.Count);
+            try
+            {
+                args.SetBuffer(args.Offset, args.Count);
+            }
+            catch (ObjectDisposedException ex)
+            {
+                //ignore?
+                Disconnect();
+                return;
+            }
 
             ReadRepeat();
         }
