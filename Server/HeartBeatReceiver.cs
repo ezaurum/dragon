@@ -4,7 +4,7 @@ namespace Dragon
 {
     public class HeartBeatReceiver<TAck> : IDisposable
     {
-        private readonly TimeSpan _threshold = TimeSpan.FromSeconds(2);
+        private static readonly TimeSpan _threshold = TimeSpan.FromSeconds(1);
         private const byte FailedLimit = 5;
 
         private DateTime _lastTime;
