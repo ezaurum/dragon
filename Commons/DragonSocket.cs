@@ -82,7 +82,7 @@ namespace Dragon
 
         }
 
-        public virtual event Action<TAck, int> OnReadCompleted
+        public virtual event Action<TAck,int> OnReadCompleted
         {
             add { _converter.MessageConverted += value; }
             remove { _converter.MessageConverted -= value; }

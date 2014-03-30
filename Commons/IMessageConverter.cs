@@ -1,7 +1,7 @@
 using System;
 
 namespace Dragon
-{
+{ 
     public interface IMessageConverter<in TReq, TAck>
     {
         event Action<TAck, int> MessageConverted;

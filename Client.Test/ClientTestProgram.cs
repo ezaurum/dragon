@@ -34,7 +34,10 @@ namespace Client.Test
 
             c.ConnectSuccess += (sender, eventArgs) => Console.WriteLine("Connected");
 
-            c.OnReadCompleted += (message, i) => Console.WriteLine(c.LocalEndPoint +"[" +Interlocked.Increment(ref _receiveIndex)+"] :" + message.BoardType+ " - " + message.PlayMode);
+            c.OnReadCompleted += (message, code) => Console.WriteLine(c.LocalEndPoint + "[" +
+                                                                                        Interlocked.Increment(ref _receiveIndex) +
+                                                                                        "] :" + message.BoardType + " - " +
+                                                                                        message.PlayMode);
 
             c.Disconnected += Disconnected;
 

@@ -35,7 +35,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ByteStreamSocketWrapper.cs" />
-    <Compile Include="CircularQueue.cs" />
     <Compile Include="ClientDragonSocket.cs" />
     <Compile Include="Connector.cs" />
     <Compile Include="DragonSocket.cs" />
@@ -54,7 +53,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>call c:\tools\nugetbuild $(ProjectDir)$(ProjectFileName) $(TargetDir)</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

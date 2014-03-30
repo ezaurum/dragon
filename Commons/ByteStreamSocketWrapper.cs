@@ -193,6 +193,7 @@ namespace Dragon
                 case SocketError.NotConnected:
                 case SocketError.Shutdown:
                 case SocketError.TimedOut:
+                case SocketError.Interrupted:
                     Disconnect(args);
                     break;
                 default:
