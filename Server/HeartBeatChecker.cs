@@ -8,7 +8,7 @@ namespace Dragon
     { 
         private DateTime _time;
 
-        public HeartBeatChecker(int interval= 750)
+        public HeartBeatChecker(int interval= 1500)
         {
             var timer = new Timer { Interval = interval };
             timer.Elapsed += CheckBeat;
