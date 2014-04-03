@@ -166,7 +166,6 @@ namespace Dragon
 
                 if (Socket.SendAsync(_writeEventArgs)) return;
                 WriteEventCompleted(Socket, _writeEventArgs);
-                
             }
             catch (ObjectDisposedException e)
             {
