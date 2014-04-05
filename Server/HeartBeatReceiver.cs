@@ -3,9 +3,10 @@ using System;
 namespace Dragon
 {
     public class HeartBeatReceiver<TAck> : IDisposable
-    {
-        private static readonly TimeSpan _threshold = TimeSpan.FromSeconds(1);
-        private const byte FailedLimit = 5;
+    { 
+// ReSharper disable once StaticFieldInGenericType
+        private static readonly TimeSpan Threshold = TimeSpan.FromSeconds(0.5);
+        private const byte FailedLimit = 2; 
 
         private DateTime _lastTime;
         private byte _failed;
@@ -19,7 +20,7 @@ namespace Dragon
 
         public void CheckBeat(HeartBeatChecker checker, DateTime time)
         {
-            if (time - _lastTime < _threshold)
+            if (time - _lastTime < Threshold)
             {
                 if (_failed > 0) _failed--;
                 return;
