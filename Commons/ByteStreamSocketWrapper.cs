@@ -180,24 +180,9 @@ namespace Dragon
         // ReSharper disable once InconsistentNaming
         private void IOCompleted(object sender, SocketAsyncEventArgs args)
         {
-            switch (args.SocketError)
-            {
-                case SocketError.Success:
-                    break;
-                case SocketError.IsConnected:
-                case SocketError.NetworkReset:
-                case SocketError.ConnectionAborted:
-                case SocketError.ConnectionReset:
-                case SocketError.Disconnecting:
-                case SocketError.NotConnected:
-                case SocketError.Shutdown:
-                case SocketError.TimedOut:
-                case SocketError.Interrupted:
-                    Disconnect(args);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(String.Format("socket error : {0}, lastOperation: {1}", args.SocketError, args.LastOperation));
-            }
+            if (args.SocketError == SocketError.Success)
+                return;
+            Disconnect(args);
         }
 
 
