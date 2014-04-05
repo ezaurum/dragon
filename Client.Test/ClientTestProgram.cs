@@ -30,7 +30,7 @@ namespace Client.Test
                 new SimpleMessage
                 {
                     PlayType = (char)new Random(Interlocked.Increment(ref _index)).Next()
-                });
+                }, 333);
 
             c.ConnectSuccess += (sender, eventArgs) => Console.WriteLine("Connected");
 

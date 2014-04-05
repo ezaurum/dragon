@@ -18,7 +18,7 @@ namespace Dragon
         }
 
         public ClientDragonSocket(IMessageConverter<T, T> converter,
-            T hearbeatMessage) : base(converter, hearbeatMessage)
+            T hearbeatMessage, int interval) : base(converter, hearbeatMessage, interval)
         {
             
         }
@@ -76,13 +76,14 @@ namespace Dragon
             add { _heartBeatMaker.UpdateMessage += value; }
             remove { _heartBeatMaker.UpdateMessage -= value; }
         }
-    
+
         public ClientDragonSocket(IMessageConverter<TReq, TAck> converter,
-            TReq beatMessage) : this(converter)
+            TReq beatMessage, int interval = 750) : this(converter)
         {
             HeartBeatEnable = true;
             HeartBeatMessage = beatMessage;
-            _heartBeatMaker = new HeartBeatMaker<TReq>(this, HeartBeatMessage);
+            _heartBeatMaker = new HeartBeatMaker<TReq>(this, HeartBeatMessage,
+                interval);
             Disconnected += _heartBeatMaker.Stop;
             ConnectSuccess += _heartBeatMaker.Start;
         }
