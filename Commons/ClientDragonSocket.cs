@@ -77,6 +77,25 @@ namespace Dragon
             remove { _heartBeatMaker.UpdateMessage -= value; }
         }
 
+        public ClientDragonSocket(IMessageConverter<TReq, TAck> converter, bool autoReconnect)
+            : base(converter)
+        {
+            _connector = new Connector();
+            ConnectSuccess += ActivateOnConnectSuccess;
+            HeartBeatEnable = true;
+            
+            if (autoReconnect)
+            {
+                Disconnected += Reconnect;
+            }
+            
+        }
+
+        private void Reconnect(object sender, SocketAsyncEventArgs e)
+        {
+            
+        }
+
         public ClientDragonSocket(IMessageConverter<TReq, TAck> converter,
             TReq beatMessage, int interval = 750) : this(converter)
         {
