@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BlockSender.cs" />
+    <Compile Include="ConcurrentDragonSocket.cs" />
     <Compile Include="HeartBeatChecker.cs" />
     <Compile Include="HeartBeatReceiver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

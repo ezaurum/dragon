@@ -28,7 +28,7 @@ namespace Dragon
                 Accepted(Socket, null);
             }
 
-            _converter.MessageConverted += DefaultReadComplete;
+            Converter.MessageConverted += DefaultReadComplete;
         }
 
         private event Action<TAck, int> ReadCompleted;
