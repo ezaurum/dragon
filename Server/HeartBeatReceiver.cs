@@ -1,15 +1,16 @@
 using System;
+using System.Threading;
 
 namespace Dragon
 {
     public class HeartBeatReceiver<TAck> : IDisposable
     { 
 // ReSharper disable once StaticFieldInGenericType
-        private static readonly TimeSpan Threshold = TimeSpan.FromSeconds(0.5);
-        private const byte FailedLimit = 2; 
+        private static readonly TimeSpan Threshold = TimeSpan.FromSeconds(0.375);
+        private const byte FailedLimit = 3;
 
         private DateTime _lastTime;
-        private byte _failed;
+        private int _failed;
 
         public DateTime LastTime
         {
@@ -22,12 +23,11 @@ namespace Dragon
         {
             if (time - _lastTime < Threshold)
             {
-                if (_failed > 0) _failed--;
+                Interlocked.Exchange(ref _failed, 0);
                 return;
             }
             
-            _failed++;
-            if (_failed < FailedLimit) return;
+            if (Interlocked.Increment(ref _failed) < FailedLimit) return;
 
             checker.OnBeat -= CheckBeat;
             if (null != OnBeatStop) OnBeatStop();
