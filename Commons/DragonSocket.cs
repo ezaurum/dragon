@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
+using System.Threading;
 
 namespace Dragon
 {
@@ -11,81 +12,76 @@ namespace Dragon
     /// <typeparam name="TAck"></typeparam>
     public abstract class DragonSocket<TReq, TAck> : ByteStreamSocketWrapper, IMessageSender<TReq>
     {
-        protected readonly IMessageConverter<TReq, TAck> _converter;
+        protected readonly IMessageConverter<TReq, TAck> Converter;
         private readonly Queue<TReq> _sendingQueue = new Queue<TReq>();
         private readonly object _lock = new object();
 
-        private bool _sending;
+
+        private int _sendingMessages;
 
         protected DragonSocket(IMessageConverter<TReq, TAck> converter,
             byte[] buffer = null, int offset = 0, int bufferSize = 1024*16)
             : base(buffer ?? new byte[bufferSize], offset, bufferSize)
         {
-            _converter = converter; 
+            Converter = converter; 
         }
         
         public event Action<int> WriteCompleted;
 
         public void Send(TReq message)
         {
-            lock (_lock)
+            if (Interlocked.Increment(ref _sendingMessages) > 1)
             {
-                _sendingQueue.Enqueue(message);
-
-                if (_sending)
+                lock (_lock)
                 {
-                    return;
+                    _sendingQueue.Enqueue(message);
                 }
-                SendAsyncFromQueue();
+                return;
             }
+
+            SendAsync(message);
         }
 
         private void SendAsyncFromQueue()
         {
             TReq message;
-
             lock (_lock)
             {
                 message = _sendingQueue.Dequeue();
             }
 
+            SendAsync(message);
+        }
+
+        private void SendAsync(TReq message)
+        {
             byte[] messageBytes;
             int errorCode;
-            _converter.GetByte(message, out messageBytes, out errorCode);
+            Converter.GetByte(message, out messageBytes, out errorCode);
             if (0 != errorCode)
             {
                 WriteCompleted(errorCode);
                 return;
             }
-            
-            lock (_lock)
-            {
-                _sending = true;
-                SendAsync(messageBytes);
-            }
-        } 
-        
+
+            SendAsync(messageBytes);
+        }
+
         protected override void WriteEventCompleted(object o, SocketAsyncEventArgs e)
         {
             if (e.SocketError != SocketError.Success) return;
             if (null != WriteCompleted)
                 WriteCompleted(0);
 
-            lock (_lock)
-            {
-                _sending = _sendingQueue.Count > 0;
-            }
+            if (Interlocked.Decrement(ref _sendingMessages) < 1) return;
 
-            if (!_sending) return;
-
-            SendAsyncFromQueue();
-
+            SendAsyncFromQueue(); 
         }
 
         public virtual event Action<TAck,int> OnReadCompleted
         {
-            add { _converter.MessageConverted += value; }
-            remove { _converter.MessageConverted -= value; }
+            add { Converter.MessageConverted += value; }
+            remove { Converter.MessageConverted -= value; }
         }
 
         /// <summary>
@@ -99,7 +95,7 @@ namespace Dragon
 
             if (args.BytesTransferred < 1) return;
 
-            _converter.Read(args.Buffer, args.Offset, args.BytesTransferred);
+            Converter.Read(args.Buffer, args.Offset, args.BytesTransferred);
 
             try
             {

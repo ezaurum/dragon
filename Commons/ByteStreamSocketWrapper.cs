@@ -159,10 +159,7 @@ namespace Dragon
         {
             try
             {
-                lock (_lock)
-                {
-                    _writeEventArgs.SetBuffer(byteArray, 0, byteArray.Length);
-                }
+                _writeEventArgs.SetBuffer(byteArray, 0, byteArray.Length);
 
                 if (Socket.SendAsync(_writeEventArgs)) return;
                 WriteEventCompleted(Socket, _writeEventArgs);
