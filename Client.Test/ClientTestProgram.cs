@@ -14,10 +14,14 @@ namespace Client.Test
 
         static void Main(string[] args)
         {
+            for (int i = 0; i < 4000; i++)
+            {
+                Task.Factory.StartNew(Test);
+            }
+            
+            /*Task.Factory.StartNew(Test);
             Task.Factory.StartNew(Test);
-            Task.Factory.StartNew(Test);
-            Task.Factory.StartNew(Test);
-            Task.Factory.StartNew(Test);
+            Task.Factory.StartNew(Test);*/
 
             Console.ReadKey();
         }
@@ -26,7 +30,7 @@ namespace Client.Test
         {
             byte[] buffer = new byte[1024];
 
-            var c = new ClientDragonSocket<SimpleMessage>(new MessageConverter<SimpleMessage, SimpleMessage>(buffer, 0, 1024,new SimpleMessageFactory()),
+            var c = new ConcurrentClientDragonSocket<SimpleMessage, SimpleMessage>(new MessageConverter<SimpleMessage, SimpleMessage>(buffer, 0, 1024,new SimpleMessageFactory()),
                 new SimpleMessage
                 {
                     PlayType = (char)new Random(Interlocked.Increment(ref _index)).Next()

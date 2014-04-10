@@ -56,6 +56,10 @@
       <Project>{6a94673f-ae42-4a0d-badc-83933c0976c1}</Project>
       <Name>Commons</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Server\Server.csproj">
+      <Project>{ee7bcf44-88e4-48e6-a821-ef8243aba197}</Project>
+      <Name>Server</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

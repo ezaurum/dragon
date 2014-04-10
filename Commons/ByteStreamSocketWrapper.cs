@@ -67,7 +67,6 @@ namespace Dragon
         }
 
         private SocketAsyncEventArgs _writeEventArgs;
-        private readonly object _lock = new object();
 
         protected abstract void WriteEventCompleted(object socket,
             SocketAsyncEventArgs readEventArgs);

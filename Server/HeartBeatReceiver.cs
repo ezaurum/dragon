@@ -6,8 +6,8 @@ namespace Dragon
     public class HeartBeatReceiver<TAck> : IDisposable
     { 
 // ReSharper disable once StaticFieldInGenericType
-        private static readonly TimeSpan Threshold = TimeSpan.FromSeconds(0.375);
-        private const byte FailedLimit = 3;
+        private static readonly TimeSpan Threshold = TimeSpan.FromSeconds(2);
+        private const byte FailedLimit = 1;
 
         private DateTime _lastTime;
         private int _failed;

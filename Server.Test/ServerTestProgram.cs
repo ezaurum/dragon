@@ -17,16 +17,19 @@ namespace Server.Test
         private static int _index;
         private static int _sendIndex;
 
+
         static void Main(string[] args)
         {
+            int connection = 0;
+
             BasicConfigurator.Configure();
 
             Random random = new Random();
 
             var s = new SocketDistributor<SimpleMessage>
             {
-                Backlog = 20,
-                MaximumConnection = 5,
+                Backlog = 4000,
+                MaximumConnection = 4001,
                 IpEndpoint = new IPEndPoint(IPAddress.Any, 10008),
                 MessageFactoryProvide = MessageFactoryProvide
 
@@ -44,12 +47,18 @@ namespace Server.Test
 
                 userToken.OnReadCompleted += (message, i) =>
                 {
-                    Console.WriteLine(userToken.RemoteEndPoint + ":" + message.BoardType + " - " + message.PlayMode);
+                    //Console.WriteLine(userToken.RemoteEndPoint + ":" + message.BoardType + " - " + message.PlayMode);
                     message.PlayMode = (byte) Interlocked.Increment(ref _index);
                     Interlocked.Increment(ref _sendIndex);
                     userToken.Send(message);
                 };
-                userToken.Disconnected += (o, asyncEventArgs) => Console.WriteLine("deiscon");
+                userToken.Disconnected += (o, asyncEventArgs) =>
+                {
+
+                    Interlocked.Decrement(ref connection);
+
+                    Console.WriteLine("deiscon " + connection);
+                };
                 userToken.HeartbeatEnable = true;
                 
                 userToken.HeartBeatReceiver = new HeartBeatReceiver<SimpleMessage>
@@ -74,10 +83,13 @@ namespace Server.Test
                         PacketTime = DateTime.Now
                     };
                     userToken.Send( message);
-                    Console.WriteLine(message);
+                    //Console.WriteLine(message);
                 };
 
                 userToken.Activate();
+                
+                Interlocked.Increment(ref connection);
+                Console.WriteLine("con " + connection);
             };
 
             Thread.Sleep(1000);
