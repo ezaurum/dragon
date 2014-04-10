@@ -17,6 +17,7 @@ namespace Client.Test
             for (int i = 0; i < 4000; i++)
             {
                 Task.Factory.StartNew(Test);
+                Task.Factory.StartNew(Test);
             }
             
             /*Task.Factory.StartNew(Test);
