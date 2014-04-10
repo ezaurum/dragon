@@ -15,7 +15,7 @@ namespace Dragon
 
         public event Action<T> UpdateMessage;
 
-        public HeartBeatMaker(IMessageSender<T> socket, T message, int interval = 75000)
+        public HeartBeatMaker(IMessageSender<T> socket, T message, int interval = 750)
         {
             _sender = socket;
             _message = message; 

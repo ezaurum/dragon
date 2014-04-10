@@ -14,7 +14,7 @@ namespace Client.Test
 
         static void Main(string[] args)
         {
-            for (int i = 0; i < 4000; i++)
+            for (int i = 0; i < 8000; i++)
             {
                 Task.Factory.StartNew(Test);
                 Task.Factory.StartNew(Test);
@@ -51,7 +51,7 @@ namespace Client.Test
                 message.BoardType = (byte)Interlocked.Increment(ref _index);
             };
 
-            c.Connect("127.0.0.1", 10008);
+            c.Connect("127.0.0.1", 20009);
         }
 
         private static void Disconnected(object sender, SocketAsyncEventArgs socketAsyncEventArgs)

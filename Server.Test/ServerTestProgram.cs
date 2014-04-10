@@ -28,9 +28,9 @@ namespace Server.Test
 
             var s = new SocketDistributor<SimpleMessage>
             {
-                Backlog = 4000,
-                MaximumConnection = 8001,
-                IpEndpoint = new IPEndPoint(IPAddress.Any, 10008),
+                Backlog = 6000,
+                MaximumConnection = 18001,
+                IpEndpoint = new IPEndPoint(IPAddress.Any, 20009),
                 MessageFactoryProvide = MessageFactoryProvide
 
             };
