@@ -14,7 +14,7 @@ namespace Client.Test
 
         static void Main(string[] args)
         {
-            for (int i = 0; i < 8000; i++)
+            for (int i = 0; i < 80; i++)
             {
                 Task.Factory.StartNew(Test);
                 Task.Factory.StartNew(Test);
@@ -39,9 +39,8 @@ namespace Client.Test
 
             c.ConnectSuccess += (sender, eventArgs) => Console.WriteLine("Connected");
 
-            c.OnReadCompleted += (message, code) => Console.WriteLine(c.LocalEndPoint + "[" +
-                                                                                        Interlocked.Increment(ref _receiveIndex) +
-                                                                                        "] :" + message.BoardType + " - " +
+            c.OnReadCompleted += (message, code) => 
+                Console.WriteLine(c.LocalEndPoint + "[" +
                                                                                         message.PlayMode);
 
             c.Disconnected += Disconnected;
