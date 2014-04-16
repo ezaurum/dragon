@@ -156,21 +156,16 @@ namespace Dragon
 
         protected void SendAsync(byte[] byteArray)
         {
+            _writeEventArgs.SetBuffer(byteArray, 0, byteArray.Length);
             try
             {
-                _writeEventArgs.SetBuffer(byteArray, 0, byteArray.Length);
-
                 if (Socket.SendAsync(_writeEventArgs)) return;
-                WriteEventCompleted(Socket, _writeEventArgs);
             }
-            catch (ObjectDisposedException e)
+            catch (Exception e)
             {
-                if (State == SocketState.Active)
-                {
-                    throw new InvalidOperationException(
-                        "Socket State is Active. But socket disposed.", e);
-                }
+                Disconnect(_writeEventArgs);
             }
+            WriteEventCompleted(Socket, _writeEventArgs);
         }
         
         // ReSharper disable once InconsistentNaming
