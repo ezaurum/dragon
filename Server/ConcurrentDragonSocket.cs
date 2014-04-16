@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Dragon
 {
@@ -118,7 +119,7 @@ namespace Dragon
             _sendingQueue.Enqueue(message);
             if (Interlocked.Increment(ref _sendingMessage) == 1)
             {
-                SendAsyncFromQueue();
+                Task.Factory.StartNew(SendAsyncFromQueue);
             }
         }
 
