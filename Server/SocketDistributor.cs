@@ -182,15 +182,12 @@ namespace Dragon
             _state = _currentAcceptedConnections < MaximumConnection
                 ? DistributorState.Acceptable
                 : DistributorState.ExceedMaximumConnection;
-                
-            
-            if (_state == DistributorState.ExceedMaximumConnection)
+
+            if (_state != DistributorState.ExceedMaximumConnection) return;
+            if (Logger.IsDebugEnabled)
             {
-                if (Logger.IsDebugEnabled)
-                {
-                    Logger.DebugFormat("Exceed Maximum Connection {0}/{1}", _currentAcceptedConnections,
-                        MaximumConnection);
-                }
+                Logger.DebugFormat("Exceed Maximum Connection {0}/{1}", _currentAcceptedConnections,
+                    MaximumConnection);
             }
         }
 
@@ -245,6 +242,6 @@ namespace Dragon
             NotAccpetable = 2,
             ExceedMaximumConnection = 3,
             Acceptable = 4,
-        }
+        } 
     }
 }

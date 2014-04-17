@@ -32,6 +32,11 @@ namespace Dragon
             IpEndpoint = ipEndPoint;
         }
 
+        public Connector(int retryLimit) : this()
+        {
+            RetryLimit = retryLimit;
+        }
+
         public Connector(IPEndPoint ipEndPoint, int retryInterval, int retryLimit) : this(ipEndPoint)
         {
             _connectTimer.Interval = retryInterval;
@@ -85,7 +90,7 @@ namespace Dragon
         private void CheckReconnect(object sender, ElapsedEventArgs e)
         {
             //failed. retry
-            if (_connectEventArgs.SocketError != SocketError.Success && RetryCount < RetryLimit)
+            if (_connectEventArgs.SocketError != SocketError.Success && (0 == RetryLimit || RetryCount < RetryLimit))
             {
                 RetryCount++;
                 ConnectAsync();
@@ -124,7 +129,7 @@ namespace Dragon
             Connect();
         }
 
-        private void Connect()
+        public void Connect()
         { 
             InitConnectEventArg();
 

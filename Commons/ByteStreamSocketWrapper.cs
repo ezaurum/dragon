@@ -46,20 +46,17 @@ namespace Dragon
 
         private SocketAsyncEventArgs _readEventArgs;
 
-        protected abstract void ReadEventCompleted(object sender,
-            SocketAsyncEventArgs readEventArgs);
-
         /// <summary>
         ///     Read repeat
         /// </summary>
-        protected void ReadRepeat()
+        private void ReadRepeat()
         {
             try
             {
                 if (Socket.ReceiveAsync(_readEventArgs)) return;
                 ReadEventCompleted(Socket, _readEventArgs);
             }
-            catch (ObjectDisposedException e)
+            catch (Exception e)
             {
                 //ignore disposed
                 Disconnect();
@@ -77,38 +74,24 @@ namespace Dragon
         ///     For reuse, Socket and eventargs are not disposed.
         /// </summary>
         public void Disconnect(SocketAsyncEventArgs e = null)
-        {
+        { 
+            Console.WriteLine("public void Disconnect(SocketAsyncEventArgs e = null)");
+
             var exchange =
                 (SocketState)
                     Interlocked.Exchange(ref _state,
-                        (byte) SocketState.Disconnected);
+                        (byte) SocketState.Disconnected); 
             //run once
             if (exchange <= SocketState.Disconnected) return;
-
-            try
-            {
-                Socket.Shutdown(SocketShutdown.Both);
-                Socket.Disconnect(false);
-            }
-            catch (SocketException ex)
-            {
-                //ignore already disconnected 
-
-                //ignore something else
-            }
-            catch (ObjectDisposedException ex)
-            {
-                //ignore already disposed
-            }
-            catch (NullReferenceException ex)
-            {
-                //ignore null
-            }
+            
+            Socket.Shutdown(SocketShutdown.Send);
+            Socket.Disconnect(false);
 
             DisposeInner();
 
             if (null == Disconnected) return;
 
+            Console.WriteLine("call dis");
             Disconnected(this, e);
         }
 
@@ -116,22 +99,29 @@ namespace Dragon
         {
             try
             {
-                _writeEventArgs.Dispose();
-                _readEventArgs.Dispose();
+                _writeEventArgs.Dispose(); 
             }
             catch (Exception ex)
             {
+                Console.WriteLine("write dispose");
+                //ignore some error
+            }
+            try
+            {
+                _readEventArgs.Dispose();
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("read dispose");
                 //ignore some error
             }
         }
 
         public virtual void Dispose()
         {
-            if (State <= SocketState.Disposed) return;
+            Disconnect();
 
-            Disconnect(); 
-
-            State = SocketState.Disposed;
+            Interlocked.Exchange(ref _state, (int) SocketState.Disposed);
         }
 
         public virtual void Activate()
@@ -142,12 +132,10 @@ namespace Dragon
 
             _readEventArgs.Completed += IOCompleted;
             _readEventArgs.Completed += ReadEventCompleted;
-            _readEventArgs.DisconnectReuseSocket = true;
 
             _writeEventArgs = new SocketAsyncEventArgs();
             _writeEventArgs.Completed += IOCompleted;
             _writeEventArgs.Completed += WriteEventCompleted;
-            _writeEventArgs.DisconnectReuseSocket = true;
 
             State = SocketState.Active;
 
@@ -163,6 +151,7 @@ namespace Dragon
             }
             catch (Exception e)
             {
+                Console.WriteLine("excpetion whil send");
                 Disconnect(_writeEventArgs);
             }
             WriteEventCompleted(Socket, _writeEventArgs);
@@ -170,10 +159,49 @@ namespace Dragon
         
         // ReSharper disable once InconsistentNaming
         private void IOCompleted(object sender, SocketAsyncEventArgs args)
-        {
-            if (args.SocketError == SocketError.Success)
+        { 
+            Console.WriteLine(args.BytesTransferred); 
+            bool poll = Socket.Poll(100, SelectMode.SelectError);
+            Console.WriteLine("err"+poll);
+            bool poll1 = Socket.Poll(100, SelectMode.SelectRead);
+            Console.WriteLine("read " + poll1);
+            bool poll2 = Socket.Poll(100, SelectMode.SelectWrite);
+            Console.WriteLine("write " + poll2); 
+
+            if (0 !=args.BytesTransferred && args.SocketError == SocketError.Success)
                 return;
+
             Disconnect(args);
+        }
+
+        public event EventHandler<SocketAsyncEventArgs> OnReadCompleted;
+        
+        /// <summary>
+        ///     Default receive arg complete event handler
+        /// </summary>
+        /// <param name="socket"></param>
+        /// <param name="args"></param>
+        private void ReadEventCompleted(object socket,
+            SocketAsyncEventArgs args)
+        {
+            if (args.SocketError != SocketError.Success) return;
+
+            if (args.BytesTransferred < 1) return;
+
+            OnReadCompleted(socket, args);
+
+            try
+            {
+                args.SetBuffer(args.Offset, args.Count);
+            }
+            catch (Exception ex)
+            {
+                //ignore?
+                Disconnect();
+                return;
+            }
+
+            ReadRepeat();
         }
 
 

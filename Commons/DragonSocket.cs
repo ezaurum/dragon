@@ -23,9 +23,15 @@ namespace Dragon
             byte[] buffer = null, int offset = 0, int bufferSize = 1024*16)
             : base(buffer ?? new byte[bufferSize], offset, bufferSize)
         {
-            Converter = converter; 
+            Converter = converter;
+            OnReadCompleted += ReadCompleted;
         }
-        
+
+        private void ReadCompleted(object sender, SocketAsyncEventArgs args)
+        {
+            Converter.Read(args.Buffer, args.Offset, args.BytesTransferred);
+        }
+
         public event Action<int> WriteCompleted;
 
         public void Send(TReq message)
@@ -76,39 +82,8 @@ namespace Dragon
             if (Interlocked.Decrement(ref _sendingMessages) < 1) return;
 
             SendAsyncFromQueue(); 
-        }
+        } 
 
-        public virtual event Action<TAck,int> OnReadCompleted
-        {
-            add { Converter.MessageConverted += value; }
-            remove { Converter.MessageConverted -= value; }
-        }
-
-        /// <summary>
-        ///     Default receive arg complete event handler
-        /// </summary>
-        /// <param name="socket"></param>
-        /// <param name="args"></param>
-        protected override void ReadEventCompleted(object socket, SocketAsyncEventArgs args)
-        {
-            if (args.SocketError != SocketError.Success) return;
-
-            if (args.BytesTransferred < 1) return;
-
-            Converter.Read(args.Buffer, args.Offset, args.BytesTransferred);
-
-            try
-            {
-                args.SetBuffer(args.Offset, args.Count);
-            }
-            catch (ObjectDisposedException ex)
-            {
-                //ignore?
-                Disconnect();
-                return;
-            }
-
-            ReadRepeat();
-        }
+                    
     }
 }

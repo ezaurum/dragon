@@ -31,14 +31,6 @@ namespace Dragon
             Converter.MessageConverted += DefaultReadComplete;
         }
 
-        private event Action<TAck, int> ReadCompleted;
-
-        public override event Action<TAck, int> OnReadCompleted
-        {
-            add { ReadCompleted += value; }
-            remove { ReadCompleted -= value; }
-        }
-
         private void DefaultReadComplete(TAck arg1, int arg2)
         {
             if (HeartbeatEnable && _heartBeatReceiver.IsHeartBeat(arg1))
@@ -47,8 +39,10 @@ namespace Dragon
                 return;
             }
 
-            if (null != ReadCompleted) ReadCompleted(arg1, arg2);
-        } 
+            if (null != OnReadCompleted) OnReadCompleted(arg1, arg2);
+        }
+
+        public event Action<TAck, int> OnReadCompleted;
         
         private HeartBeatReceiver<TAck> _heartBeatReceiver;
 
@@ -73,11 +67,11 @@ namespace Dragon
             }
         }
 
-        public event EventHandler<SocketAsyncEventArgs> Accepted;
-
         private void Disconnect()
         {
-            Disconnect(null);
+            base.Disconnect();
         }
+
+        public event EventHandler<SocketAsyncEventArgs> Accepted; 
     }
 }

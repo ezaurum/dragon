@@ -46,6 +46,7 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConcurrentClientDragonSocket.cs" />
     <Compile Include="ConcurrentDragonSocket.cs" />
     <Compile Include="HeartBeatChecker.cs" />
     <Compile Include="HeartBeatReceiver.cs" />

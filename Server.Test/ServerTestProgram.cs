@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading;
 using Client.Test;
@@ -26,13 +27,14 @@ namespace Server.Test
 
             Random random = new Random();
 
+            var ss = new Stack<ServerDragonSocket<SimpleMessage>>();
+ 
             var s = new SocketDistributor<SimpleMessage>
             {
                 Backlog = 6000,
                 MaximumConnection = 18001,
                 IpEndpoint = new IPEndPoint(IPAddress.Any, 20009),
-                MessageFactoryProvide = MessageFactoryProvide
-
+                MessageFactoryProvide = MessageFactoryProvide 
             };
 
             Timer t = new Timer
@@ -54,10 +56,9 @@ namespace Server.Test
                 };
                 userToken.Disconnected += (o, asyncEventArgs) =>
                 {
-
                     Interlocked.Decrement(ref connection);
 
-                    Console.WriteLine("deiscon " + connection);
+                    Console.WriteLine("discon " + connection);
                 };
                 userToken.HeartbeatEnable = true;
                 
@@ -73,7 +74,7 @@ namespace Server.Test
                     userToken.Send(message);
                 };
 
-                t.Elapsed += (o, elapsedEventArgs) =>
+/*                t.Elapsed += (o, elapsedEventArgs) =>
                 {
                     SimpleMessage message = new SimpleMessage
                     {
@@ -84,17 +85,26 @@ namespace Server.Test
                     };
                     userToken.Send( message);
                     //Console.WriteLine(message);
-                };
+                };*/
 
                 userToken.Activate();
                 
                 Interlocked.Increment(ref connection);
                 Console.WriteLine("con " + connection);
+                ss.Push(userToken);
             };
 
             Thread.Sleep(1000);
             s.Start();
             t.Start();
+
+            Console.ReadKey();
+            
+            foreach (ServerDragonSocket<SimpleMessage> dragonSocket in ss)
+            {
+                Console.WriteLine("dd");
+                dragonSocket.Disconnect();
+            }
 
             Console.ReadKey();
         }

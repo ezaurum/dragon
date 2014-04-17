@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Dragon;
+using Timer = System.Timers.Timer;
 
 namespace Client.Test
 {
@@ -14,18 +16,23 @@ namespace Client.Test
 
         static void Main(string[] args)
         {
-            for (int i = 0; i < 80; i++)
+            for (int i = 0; i < 1; i++)
             {
                 Task.Factory.StartNew(Test);
                 Task.Factory.StartNew(Test);
             }
-            
-            /*Task.Factory.StartNew(Test);
-            Task.Factory.StartNew(Test);
-            Task.Factory.StartNew(Test);*/
+
+            Console.ReadKey();
+
+            foreach (ConcurrentClientDragonSocket<SimpleMessage, SimpleMessage> socket in a)
+            {
+                socket.Disconnect();
+            }
 
             Console.ReadKey();
         }
+
+        private static Stack<ConcurrentClientDragonSocket<SimpleMessage, SimpleMessage>> a = new Stack<ConcurrentClientDragonSocket<SimpleMessage, SimpleMessage>>();
 
         private static void Test()
         {
@@ -39,19 +46,26 @@ namespace Client.Test
 
             c.ConnectSuccess += (sender, eventArgs) => Console.WriteLine("Connected");
 
-            c.OnReadCompleted += (message, code) => 
-                Console.WriteLine(c.LocalEndPoint + "[" +
-                                                                                        message.PlayMode);
+            c.ReadCompleted += (message, code) => Console.WriteLine(c.LocalEndPoint + "[" +message.PlayMode);
 
             c.Disconnected += Disconnected;
 
-            c.UpdateMessage += message =>
-            {
-                message.BoardType = (byte)Interlocked.Increment(ref _index);
-            };
+            c.UpdateMessage += message => { message.BoardType = (byte)Interlocked.Increment(ref _index);};
 
             c.Connect("127.0.0.1", 20009);
-        }
+
+            Timer t = new Timer();
+
+            t.Elapsed += (o, elapsedEventArgs) =>
+            {
+                SimpleMessage message = new SimpleMessage
+                {
+                    
+                };
+                c.Send(message);
+            };
+
+            }
 
         private static void Disconnected(object sender, SocketAsyncEventArgs socketAsyncEventArgs)
         {
