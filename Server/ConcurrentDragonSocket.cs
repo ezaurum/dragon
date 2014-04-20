@@ -86,7 +86,7 @@ namespace Dragon
             }
         }
 
-        private readonly IMessageConverter<TReq, TAck> _converter;
+        protected readonly IMessageConverter<TReq, TAck> _converter;
 
         public void MessageConvert(object socket, SocketAsyncEventArgs args) 
         {

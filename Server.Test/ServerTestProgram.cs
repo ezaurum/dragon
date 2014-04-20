@@ -47,7 +47,7 @@ namespace Server.Test
                 //Something to test
                 var userToken = (ServerDragonSocket<SimpleMessage>) eventArgs.UserToken;
 
-                userToken.OnReadCompleted += (message, i) =>
+                userToken.ReadCompleted += (message, i) =>
                 {
                     //Console.WriteLine(userToken.RemoteEndPoint + ":" + message.BoardType + " - " + message.PlayMode);
                     message.PlayMode = (byte) Interlocked.Increment(ref _index);

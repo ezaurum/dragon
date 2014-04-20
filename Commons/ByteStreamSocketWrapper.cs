@@ -159,15 +159,7 @@ namespace Dragon
         
         // ReSharper disable once InconsistentNaming
         private void IOCompleted(object sender, SocketAsyncEventArgs args)
-        { 
-            Console.WriteLine(args.BytesTransferred); 
-            bool poll = Socket.Poll(100, SelectMode.SelectError);
-            Console.WriteLine("err"+poll);
-            bool poll1 = Socket.Poll(100, SelectMode.SelectRead);
-            Console.WriteLine("read " + poll1);
-            bool poll2 = Socket.Poll(100, SelectMode.SelectWrite);
-            Console.WriteLine("write " + poll2); 
-
+        {
             if (0 !=args.BytesTransferred && args.SocketError == SocketError.Success)
                 return;
 

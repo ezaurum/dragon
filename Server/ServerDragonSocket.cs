@@ -15,7 +15,7 @@ namespace Dragon
         }
     }
 
-    public class ServerDragonSocket<TReq, TAck> : DragonSocket<TReq, TAck>
+    public class ServerDragonSocket<TReq, TAck> : ConcurrentDragonSocket<TReq, TAck>
     {
         public ServerDragonSocket(Socket acceptSocket, IMessageConverter<TReq, TAck> converter)
             : base(converter)
@@ -28,21 +28,15 @@ namespace Dragon
                 Accepted(Socket, null);
             }
 
-            Converter.MessageConverted += DefaultReadComplete;
+            _converter.MessageConverted += DefaultReadComplete;
         }
 
         private void DefaultReadComplete(TAck arg1, int arg2)
         {
-            if (HeartbeatEnable && _heartBeatReceiver.IsHeartBeat(arg1))
-            {
-                _heartBeatReceiver.Receive(arg1, arg2);
+            if (!HeartbeatEnable || !_heartBeatReceiver.IsHeartBeat(arg1))
                 return;
-            }
-
-            if (null != OnReadCompleted) OnReadCompleted(arg1, arg2);
+            _heartBeatReceiver.Receive(arg1, arg2);
         }
-
-        public event Action<TAck, int> OnReadCompleted;
         
         private HeartBeatReceiver<TAck> _heartBeatReceiver;
 

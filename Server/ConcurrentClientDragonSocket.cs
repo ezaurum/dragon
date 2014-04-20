@@ -13,19 +13,7 @@ namespace Dragon
         ConcurrentDragonSocket<TReq, TAck>,
         IConnectable
     {
-        private readonly Connector _connector;
-        private readonly Task _reconnectTask;
-
-        private void Reconnect()
-        {
-            Console.WriteLine("reconnect");
-            _connector.Connect();
-        }
-
-        private void ReconnectTask(object sender, SocketAsyncEventArgs e)
-        {
-            _reconnectTask.Start();
-        }
+        private readonly Connector _connector; 
 
         public event EventHandler<SocketAsyncEventArgs> ConnectFailed
         {
@@ -54,9 +42,7 @@ namespace Dragon
             : base(converter)
         {
             _connector = new Connector(0);
-            _reconnectTask = new Task(Reconnect);
             ConnectSuccess += ActivateOnConnectSuccess;
-            Disconnected += ReconnectTask;
         }
 
         private HeartBeatMaker<TReq> _heartBeatMaker;

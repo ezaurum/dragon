@@ -47,7 +47,13 @@ namespace Dragon
         {
             add { _connector.ConnectSuccess += value; }
             remove { _connector.ConnectSuccess -= value; }
-        } 
+        }
+
+        public event Action<TAck, int> ReadCompleted
+        {
+            add { Converter.MessageConverted += value; }
+            remove { Converter.MessageConverted -= value; }
+        }
 
         public void Connect(IPEndPoint endPoint)
         {
