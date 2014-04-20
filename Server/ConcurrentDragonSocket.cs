@@ -2,7 +2,6 @@
 using System.Collections.Concurrent;
 using System.Net.Sockets;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Dragon
 {
@@ -17,7 +16,7 @@ namespace Dragon
         private readonly ConcurrentQueue<TReq> _sendingQueue =
             new ConcurrentQueue<TReq>();
 
-        private int _sendingMessage; 
+        private int _sendingMessage;
 
         protected ConcurrentDragonSocket(
             IMessageConverter<TReq, TAck> converter,
@@ -35,7 +34,7 @@ namespace Dragon
             _sendingQueue.Enqueue(message);
             if (Interlocked.Increment(ref _sendingMessage) == 1)
             {
-                Task.Factory.StartNew(SendAsyncFromQueue);
+                SendAsyncFromQueue();
             }
         }
 
