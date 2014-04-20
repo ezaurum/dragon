@@ -17,9 +17,7 @@ namespace Dragon
         private readonly ConcurrentQueue<TReq> _sendingQueue =
             new ConcurrentQueue<TReq>();
 
-        private int _sendingMessage;
-
-        private readonly Task _sendTask;
+        private int _sendingMessage; 
 
         protected ConcurrentDragonSocket(
             IMessageConverter<TReq, TAck> converter,
@@ -27,7 +25,6 @@ namespace Dragon
             : base(buffer ?? new byte[bufferSize], offset, bufferSize)
         {
             _converter = converter;
-            _sendTask = new Task(SendAsyncFromQueue);
             OnReadCompleted += MessageConvert;
         }
 
@@ -38,7 +35,7 @@ namespace Dragon
             _sendingQueue.Enqueue(message);
             if (Interlocked.Increment(ref _sendingMessage) == 1)
             {
-               _sendTask.Start(); 
+                Task.Factory.StartNew(SendAsyncFromQueue);
             }
         }
 
