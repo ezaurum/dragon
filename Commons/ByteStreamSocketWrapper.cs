@@ -97,8 +97,7 @@ namespace Dragon
             DisposeInner();
 
             if (null == Disconnected) return;
-
-            Console.WriteLine("call dis");
+            
             Disconnected(this, e);
         }
 
@@ -110,7 +109,6 @@ namespace Dragon
             }
             catch (Exception ex)
             {
-                Console.WriteLine("write dispose");
                 //ignore some error
             }
             try
@@ -119,7 +117,6 @@ namespace Dragon
             }
             catch (Exception)
             {
-                Console.WriteLine("read dispose");
                 //ignore some error
             }
         }
@@ -158,7 +155,6 @@ namespace Dragon
             }
             catch (Exception e)
             {
-                Console.WriteLine("excpetion whil send");
                 Disconnect(_writeEventArgs);
             }
             WriteEventCompleted(Socket, _writeEventArgs);
