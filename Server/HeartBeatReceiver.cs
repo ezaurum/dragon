@@ -4,11 +4,9 @@ using System.Threading;
 namespace Dragon
 {
     public class HeartBeatReceiver<TAck> : IDisposable
-    { 
-// ReSharper disable once StaticFieldInGenericType
-        private static readonly TimeSpan Threshold = TimeSpan.FromSeconds(2);
-        private const byte FailedLimit = 1;
-
+    {
+        public TimeSpan Threshold { get; set; }
+        public byte FailedLimit { get; set; }
         private DateTime _lastTime;
         private int _failed;
 
@@ -19,6 +17,18 @@ namespace Dragon
 
         public event Action OnBeatStop;
 
+        public HeartBeatReceiver()
+        {
+            Threshold = TimeSpan.FromSeconds(2);
+            FailedLimit = 1;
+        }
+
+        public HeartBeatReceiver(TimeSpan threshold, byte failedLimit)
+        {
+            Threshold = threshold;
+            FailedLimit = failedLimit;
+        }
+
         public void CheckBeat(HeartBeatChecker checker, DateTime time)
         {
             if (time - _lastTime < Threshold)
@@ -26,7 +36,7 @@ namespace Dragon
                 Interlocked.Exchange(ref _failed, 0);
                 return;
             }
-            
+
             if (Interlocked.Increment(ref _failed) < FailedLimit) return;
 
             checker.OnBeat -= CheckBeat;
@@ -42,7 +52,7 @@ namespace Dragon
         public void Receive(TAck beat, int errorCode)
         {
             _lastTime = DateTime.Now;
-            if(null != ReceiveHeartbeat) ReceiveHeartbeat(beat, errorCode);
+            if (null != ReceiveHeartbeat) ReceiveHeartbeat(beat, errorCode);
         }
 
         public void Dispose()
@@ -54,5 +64,5 @@ namespace Dragon
         {
             return string.Format("LastTime: {0}", _lastTime);
         }
-    } 
+    }
 }
