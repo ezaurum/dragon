@@ -83,9 +83,16 @@ namespace Dragon
                         (byte) SocketState.Disconnected); 
             //run once
             if (exchange <= SocketState.Disconnected) return;
-            
-            Socket.Shutdown(SocketShutdown.Send);
-            Socket.Disconnect(false);
+
+            try
+            {
+                Socket.Shutdown(SocketShutdown.Send);
+                Socket.Disconnect(false);
+            }
+            catch (Exception ex)
+            {
+                //ignore
+            }
 
             DisposeInner();
 
@@ -143,10 +150,10 @@ namespace Dragon
         }
 
         protected void SendAsync(byte[] byteArray)
-        {
-            _writeEventArgs.SetBuffer(byteArray, 0, byteArray.Length);
+        {   
             try
             {
+                _writeEventArgs.SetBuffer(byteArray, 0, byteArray.Length);
                 if (Socket.SendAsync(_writeEventArgs)) return;
             }
             catch (Exception e)
