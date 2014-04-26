@@ -14,10 +14,10 @@ namespace Dragon
     public class SocketDistributor<T>
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof (SocketDistributor<T>));
+        
+        private Socket _listenSocket; 
 
-        private int _currentAcceptedConnections;
-        private Socket _listenSocket;
-        private DistributorState _state = DistributorState.BeforeInitialized;
+        private Semaphore _maxConnectionLimit; 
 
         public SocketDistributor()
         {
@@ -27,6 +27,7 @@ namespace Dragon
         public event EventHandler<SocketAsyncEventArgs> Accepted;
 
         public int MaximumConnection { private get; set; }
+
         public IPEndPoint IpEndpoint { private get; set; }
         private SocketAsyncEventArgsPool _acceptPool;
         public Func<IMessageConverter<T, T>> MessageFactoryProvide { get; set; }
@@ -47,12 +48,9 @@ namespace Dragon
                 Logger.FatalFormat("Port {0} is Binded already. Abort Starting.",IpEndpoint.Port);
                 return;
             }
-            _state = DistributorState.NotAccpetable;
             
             // start the server with a listen backlog
             _listenSocket.Listen(Backlog);
-
-            _state = DistributorState.Acceptable;
 
             // post accepts on the listening socket
             WaitForAccept();
@@ -60,21 +58,6 @@ namespace Dragon
 
         private void Init()
         {
-            //check states
-            if (_state > DistributorState.BeforeInitialized)
-            {
-                string message = string.Format("Initialized already. Current state is {0}.", _state);
-                Logger.Fatal(message);
-                throw new InvalidOperationException(message);
-            }
-
-            if (_currentAcceptedConnections > 0)
-            {
-                string message = string.Format("Accepted {0} Connections is exist.",_currentAcceptedConnections);
-                Logger.Fatal(message);
-                throw new InvalidOperationException(message);
-            }
-            
             //check properties
             if (null == MessageFactoryProvide)
                 throw new InvalidOperationException("Message Factory Provide is null.");
@@ -92,16 +75,18 @@ namespace Dragon
 
             if (Backlog < 1)
             {
-                var message = string.Format("Backlog must be greater than 0. Current value is {0},", Backlog);
-                Logger.Fatal(message);
-                throw new InvalidOperationException(message);
+                Logger.FatalFormat("Backlog must be greater than 0. Current value is {0},", Backlog);
+                return;
             }
 
             if (MaximumConnection < 2)
             {
-                throw new InvalidOperationException(
-                    string.Format("MaximumConnection must be greater than 1. Current value is {0},", MaximumConnection));
+                Logger.FatalFormat("MaximumConnection must be greater than 1. Current value is {0},", MaximumConnection);
+                return;
             }
+
+            //use semaphore for connection limit
+            _maxConnectionLimit = new Semaphore(MaximumConnection, MaximumConnection);
 
             if (null == IpEndpoint)
             {
@@ -126,9 +111,7 @@ namespace Dragon
             {
                 // create the socket which listens for incoming connections
                 _listenSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            }
-
-            _state = DistributorState.Initialized;
+            } 
         }
 
         /// <summary>
@@ -140,6 +123,7 @@ namespace Dragon
         {
             //TODO something... pool
             var dragonSocket = new ServerDragonSocket<T>(e.AcceptSocket, MessageFactoryProvide());
+            dragonSocket.Disconnected += SubtractCurrentConnection;
             e.UserToken = dragonSocket;
         }
 
@@ -150,55 +134,17 @@ namespace Dragon
             
             //return used event args
             _acceptPool.Push(e);
-
-            //check successfully accept
-            if (e.SocketError == SocketError.Success)
-            {
-                //add connection number
-                Interlocked.Increment(ref _currentAcceptedConnections);
-                
-                //check connection max number
-                CheckMaxNumber();
-            }
-
-            if (Logger.IsDebugEnabled)
-            {
-                Logger.DebugFormat("SocketError:{0}",e.SocketError);
-                Logger.DebugFormat("Current Connection:{0}", _currentAcceptedConnections);
-            }
-
-            if (_state < DistributorState.Acceptable)
-            {
-                string message = string.Format("Not initialized. Current State is {0}", _state);
-                Logger.Fatal(message);
-                throw new InvalidOperationException(message);
-            }
+            
+            Logger.DebugFormat("SocketError:{0}",e.SocketError);
 
             WaitForAccept();
-        }
-
-        private void CheckMaxNumber()
-        {
-            _state = _currentAcceptedConnections < MaximumConnection
-                ? DistributorState.Acceptable
-                : DistributorState.ExceedMaximumConnection;
-
-            if (_state != DistributorState.ExceedMaximumConnection) return;
-            if (Logger.IsDebugEnabled)
-            {
-                Logger.DebugFormat("Exceed Maximum Connection {0}/{1}", _currentAcceptedConnections,
-                    MaximumConnection);
-            }
         }
 
         // Begins an operation to accept a connection request from the client  
         private void WaitForAccept()
         {
-            if (_state < DistributorState.Acceptable)
-            {
-                Logger.DebugFormat("Not Acceptable. Current state : {0}",_state);
-                return;
-            }
+            //stops when excess max connection
+            _maxConnectionLimit.WaitOne();
 
             Logger.Debug("Wait for Accpet");
 
@@ -208,40 +154,21 @@ namespace Dragon
             {
                 ReturnToPool(null, socketAsyncEventArgs);
             }
-            
         }
 
         /// <summary>
         ///     when
         /// </summary>
-        public void SubtractCurrentConnection()
+        private void SubtractCurrentConnection(object sender, SocketAsyncEventArgs socketAsyncEventArgs)
         {
-            Interlocked.Decrement(ref _currentAcceptedConnections);
+#if DEBUG
+            int release = 
+#endif
+                _maxConnectionLimit.Release();
 
-            if (Logger.IsDebugEnabled)
-            {
-                Logger.DebugFormat("Current Connection:{0}", _currentAcceptedConnections);
-            }
-
-            if (_currentAcceptedConnections < 0)
-            {
-                throw new InvalidOperationException(string.Format("Current Connection is {0}. ",
-                    _currentAcceptedConnections));
-            }
-
-            if (_state == DistributorState.ExceedMaximumConnection)
-            {
-                CheckMaxNumber();
-            }
+#if DEBUG
+            Logger.DebugFormat("disconnected. current connection : {0}", release-1);
+#endif
         }
-
-        private enum DistributorState
-        {
-            BeforeInitialized = 0,
-            Initialized = 1,
-            NotAccpetable = 2,
-            ExceedMaximumConnection = 3,
-            Acceptable = 4,
-        } 
     }
 }
