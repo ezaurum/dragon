@@ -15,26 +15,25 @@ namespace Dragon
     {
         private static readonly ILog Logger = LogManager.GetLogger(typeof (SocketDistributor<T>));
         
-        private Socket _listenSocket; 
-
-        private Semaphore _maxConnectionLimit; 
-
-        public SocketDistributor()
-        {
-            MaximumConnection = int.MaxValue;
-        }
+        private Socket _listenSocket;
 
         public event EventHandler<SocketAsyncEventArgs> Accepted;
 
-        public int MaximumConnection { private get; set; }
-
         public IPEndPoint IpEndpoint { private get; set; }
         private SocketAsyncEventArgsPool _acceptPool;
+
         public Func<IMessageConverter<T, T>> MessageFactoryProvide { get; set; }
         public int Backlog { private get; set; }
         public UInt16 ListeningPortNumber { get; set; }
         public IPAddress AcceptableIpAddress { get; set; }
-        
+
+        public long CurrentConnection
+        {
+            get { return Interlocked.Read(ref _currentConnection); }
+            set { _currentConnection = value; }
+        }
+        private long _currentConnection;
+
         public void Start()
         {
             Init();
@@ -65,6 +64,7 @@ namespace Dragon
             _acceptPool = new SocketAsyncEventArgsPool();
             //first sequence. 
             _acceptPool.Completed += DistributeDragonSocket;
+            _acceptPool.Completed += (sender, args) => Interlocked.Increment(ref _currentConnection);
 
             if (null != Accepted )
                 _acceptPool.Completed += Accepted;
@@ -78,15 +78,6 @@ namespace Dragon
                 Logger.FatalFormat("Backlog must be greater than 0. Current value is {0},", Backlog);
                 return;
             }
-
-            if (MaximumConnection < 2)
-            {
-                Logger.FatalFormat("MaximumConnection must be greater than 1. Current value is {0},", MaximumConnection);
-                return;
-            }
-
-            //use semaphore for connection limit
-            _maxConnectionLimit = new Semaphore(MaximumConnection, MaximumConnection);
 
             if (null == IpEndpoint)
             {
@@ -143,9 +134,7 @@ namespace Dragon
         // Begins an operation to accept a connection request from the client  
         private void WaitForAccept()
         {
-            //stops when excess max connection
-            _maxConnectionLimit.WaitOne();
-
+            //stops when excess max connection 
             Logger.Debug("Wait for Accpet");
 
             SocketAsyncEventArgs socketAsyncEventArgs = _acceptPool.Pop();
@@ -161,13 +150,9 @@ namespace Dragon
         /// </summary>
         private void SubtractCurrentConnection(object sender, SocketAsyncEventArgs socketAsyncEventArgs)
         {
+            long release = Interlocked.Decrement(ref _currentConnection);
 #if DEBUG
-            int release = 
-#endif
-                _maxConnectionLimit.Release();
-
-#if DEBUG
-            Logger.DebugFormat("disconnected. current connection : {0}", release-1);
+            Logger.DebugFormat("disconnected. current connection : {0}", release);
 #endif
         }
     }

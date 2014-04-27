@@ -31,8 +31,7 @@ namespace Server.Test
  
             var s = new SocketDistributor<SimpleMessage>
             {
-                Backlog = 6000,
-                MaximumConnection = 18001,
+                Backlog = 1000,
                 IpEndpoint = new IPEndPoint(IPAddress.Any, 20009),
                 MessageFactoryProvide = MessageFactoryProvide 
             };
