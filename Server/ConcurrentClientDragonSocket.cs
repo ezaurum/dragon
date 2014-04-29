@@ -12,7 +12,9 @@ namespace Dragon
         ConcurrentDragonSocket<TReq, TAck>,
         IConnectable
     {
-        private readonly Connector _connector; 
+        private readonly Connector _connector;
+        private readonly TReq _acitvateMessage;
+        private bool _activateMessageEnable;
 
         public event EventHandler<SocketAsyncEventArgs> ConnectFailed
         {
@@ -37,51 +39,37 @@ namespace Dragon
         }
 
         public ConcurrentClientDragonSocket(
-            IMessageConverter<TReq, TAck> converter)
+            IMessageConverter<TReq, TAck> converter, TReq acitvateMessage)
             : base(converter)
         {
+            _activateMessageEnable = true;
+            _acitvateMessage = acitvateMessage;
             _connector = new Connector(0);
             ConnectSuccess += ActivateOnConnectSuccess;
-        }
-
-        private HeartBeatMaker<TReq> _heartBeatMaker;
-
-        public bool HeartBeatEnable { get; set; }
-        public TReq HeartBeatMessage { get; set; }
-
-        public event Action<TReq> UpdateMessage
-        {
-            add { _heartBeatMaker.UpdateMessage += value; }
-            remove { _heartBeatMaker.UpdateMessage -= value; }
-        }
-
-        public ConcurrentClientDragonSocket(
-            IMessageConverter<TReq, TAck> converter,
-            TReq beatMessage, int interval = 750) : this(converter)
-        {
-            InitHeartBeatMaker(beatMessage, interval);
-        }
-
-        private void InitHeartBeatMaker(TReq beatMessage, int interval)
-        {
-            HeartBeatEnable = true;
-            HeartBeatMessage = beatMessage;
-            _heartBeatMaker = new HeartBeatMaker<TReq>(this, HeartBeatMessage,
-                interval);
-
-            Disconnected += _heartBeatMaker.Stop;
-            ConnectSuccess += _heartBeatMaker.Start;
-        }
+        } 
 
         private void ActivateOnConnectSuccess(object sender,
             SocketAsyncEventArgs e)
         {
             Socket = _connector.Socket;
 
+            if (_activateMessageEnable)
+            {
+                Activate(_acitvateMessage);
+            }
+            else
+            {
+                Activate();
+            }
+
+        }
+
+        private void Activate(TReq message)
+        {
             Activate();
 
-            if (!HeartBeatEnable) return;
-            _heartBeatMaker.Start();
+            //just send first
+            SendAsync(message);
         }
     }
 }

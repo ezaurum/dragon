@@ -45,7 +45,7 @@ namespace Dragon
                 SendAsync(message); 
         }
 
-        private void SendAsync(TReq message)
+        protected void SendAsync(TReq message)
         {
             byte[] messageBytes;
             int errorCode;

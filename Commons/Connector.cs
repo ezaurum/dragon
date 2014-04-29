@@ -13,12 +13,8 @@ namespace Dragon
     public class Connector
     {
         private readonly Timer _connectTimer;
-        private Socket _socket;
-        public Socket Socket
-        {
-            get { return _socket; }
-        }
-        
+        public Socket Socket { get; private set; }
+
         public Connector()
         {
             IpEndpoint = EndPointStorage.DefaultDestination;
@@ -45,7 +41,7 @@ namespace Dragon
 
         private void InitConnectEventArg()
         {
-            _socket = new Socket(AddressFamily.InterNetwork,
+            Socket = new Socket(AddressFamily.InterNetwork,
             SocketType.Stream, ProtocolType.Tcp) { NoDelay = true };
 
             _connectEventArgs = new SocketAsyncEventArgs {RemoteEndPoint = IpEndpoint};
@@ -130,7 +126,9 @@ namespace Dragon
         }
 
         public void Connect()
-        { 
+        {
+            if (_connectTimer.Enabled) return;
+
             InitConnectEventArg();
 
             // timer set
@@ -141,7 +139,7 @@ namespace Dragon
 
         private void ConnectAsync()
         {
-            if (_socket.ConnectAsync(_connectEventArgs)) return;
+            if (Socket.ConnectAsync(_connectEventArgs)) return;
             DefaultConnectCompleted(null, _connectEventArgs);
         }
     }

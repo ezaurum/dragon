@@ -75,8 +75,6 @@ namespace Dragon
         /// </summary>
         public void Disconnect(SocketAsyncEventArgs e = null)
         { 
-            Console.WriteLine("public void Disconnect(SocketAsyncEventArgs e = null)");
-
             var exchange =
                 (SocketState)
                     Interlocked.Exchange(ref _state,

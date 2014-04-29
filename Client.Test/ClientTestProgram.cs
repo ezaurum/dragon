@@ -38,19 +38,13 @@ namespace Client.Test
         {
             byte[] buffer = new byte[1024];
 
-            var c = new ConcurrentClientDragonSocket<SimpleMessage, SimpleMessage>(new MessageConverter<SimpleMessage, SimpleMessage>(buffer, 0, 1024,new SimpleMessageFactory()),
-                new SimpleMessage
-                {
-                    PlayType = (char)new Random(Interlocked.Increment(ref _index)).Next()
-                }, 333);
+            var c = new ConcurrentClientDragonSocket<SimpleMessage, SimpleMessage>(new MessageConverter<SimpleMessage, SimpleMessage>(buffer, 0, 1024,new SimpleMessageFactory()), new SimpleMessage());
 
             c.ConnectSuccess += (sender, eventArgs) => Console.WriteLine("Connected");
 
             c.ReadCompleted += (message, code) => Console.WriteLine(c.LocalEndPoint + "[" +message.PlayMode);
 
-            c.Disconnected += Disconnected;
-
-            c.UpdateMessage += message => { message.BoardType = (byte)Interlocked.Increment(ref _index);};
+            c.Disconnected += Disconnected; 
 
             c.Connect("127.0.0.1", 20009);
 
