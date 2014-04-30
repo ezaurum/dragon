@@ -16,7 +16,7 @@ namespace Dragon
         private readonly ConcurrentQueue<TReq> _sendingQueue =
             new ConcurrentQueue<TReq>();
 
-        private int _sendingMessage;
+        private long _sendingMessage;
 
         protected ConcurrentDragonSocket(
             IMessageConverter<TReq, TAck> converter,
@@ -73,8 +73,15 @@ namespace Dragon
 
             //remove sended message
             TReq message;
-            _sendingQueue.TryDequeue(out message);
             
+            //when not queued message sending
+            if (!_sendingQueue.TryDequeue(out message))
+            {
+                if (Interlocked.Read(ref _sendingMessage) < 1) return;
+                SendAsyncFromQueue();
+                return;
+            }
+
             //if remaineded, send next
             if (Interlocked.Decrement(ref _sendingMessage) > 0)
             {
