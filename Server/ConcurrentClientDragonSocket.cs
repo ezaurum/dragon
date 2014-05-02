@@ -14,7 +14,7 @@ namespace Dragon
     {
         private readonly Connector _connector;
         private readonly TReq _acitvateMessage;
-        private bool _activateMessageEnable;
+        private readonly bool _activateMessageEnable;
 
         public event EventHandler<SocketAsyncEventArgs> ConnectFailed
         {
@@ -67,9 +67,17 @@ namespace Dragon
         private void Activate(TReq message)
         {
             Activate();
+            //just send first in block
+            byte[] result;
+            int code;
+            _converter.GetByte(message, out result, out code);
+            Socket.Send(result);
+            ContinueSendingIfExist();
+        }
 
-            //just send first
-            SendAsync(message);
+        private void ContinueSendingIfExist()
+        {
+            SendAsyncFromQueue();
         }
     }
 }

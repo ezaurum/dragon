@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
-using System.Threading;
 using System.Threading.Tasks;
 using Dragon;
 using Timer = System.Timers.Timer;
@@ -38,17 +37,24 @@ namespace Client.Test
         {
             byte[] buffer = new byte[1024];
 
-            var c = new ConcurrentClientDragonSocket<SimpleMessage, SimpleMessage>(new MessageConverter<SimpleMessage, SimpleMessage>(buffer, 0, 1024,new SimpleMessageFactory()), new SimpleMessage());
+            var c = new ConcurrentClientDragonSocket<SimpleMessage, SimpleMessage>(new MessageConverter<SimpleMessage, SimpleMessage>(buffer, 0, 1024,new SimpleMessageFactory()), new SimpleMessage()
+            {
+                BoardType = 32,
+                PlayMode = 53,
+                PlayType = 'A',
+            });
 
             c.ConnectSuccess += (sender, eventArgs) => Console.WriteLine("Connected");
 
             c.ReadCompleted += (message, code) => Console.WriteLine(c.LocalEndPoint + "[" +message.PlayMode);
 
             c.Disconnected += Disconnected; 
+            c.Disconnected += (sender, args) => c.Connect("127.0.0.1", 20009);
 
-            c.Connect("127.0.0.1", 20009);
-
-            Timer t = new Timer();
+            Timer t = new Timer
+            {
+                Interval = 1000
+            };
 
             t.Elapsed += (o, elapsedEventArgs) =>
             {
@@ -58,6 +64,10 @@ namespace Client.Test
                 };
                 c.Send(message);
             };
+
+            c.Connect("127.0.0.1", 20009);
+
+            t.Start();
 
             }
 

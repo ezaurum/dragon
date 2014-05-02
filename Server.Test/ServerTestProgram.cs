@@ -48,7 +48,7 @@ namespace Server.Test
 
                 userToken.ReadCompleted += (message, i) =>
                 {
-                    //Console.WriteLine(userToken.RemoteEndPoint + ":" + message.BoardType + " - " + message.PlayMode);
+                    Console.WriteLine(userToken.RemoteEndPoint + ":" + message.BoardType + " - " + _index);
                     message.PlayMode = (byte) Interlocked.Increment(ref _index);
                     Interlocked.Increment(ref _sendIndex);
                     userToken.Send(message);
@@ -58,6 +58,7 @@ namespace Server.Test
                     Interlocked.Decrement(ref connection);
 
                     Console.WriteLine("discon " + connection);
+                    
                 };
                 userToken.HeartbeatEnable = true;
                 
@@ -90,6 +91,7 @@ namespace Server.Test
                 
                 Interlocked.Increment(ref connection);
                 Console.WriteLine("con " + connection);
+                
                 ss.Push(userToken);
             };
 
@@ -98,8 +100,36 @@ namespace Server.Test
             t.Start();
 
             Console.ReadKey();
-            
-            foreach (ServerDragonSocket<SimpleMessage> dragonSocket in ss)
+
+            ServerDragonSocket<SimpleMessage>[] serverDragonSockets = ss.ToArray();
+            foreach (ServerDragonSocket<SimpleMessage> dragonSocket in serverDragonSockets)
+            {
+                Console.WriteLine("dd");
+                dragonSocket.Disconnect();
+            }
+
+            Console.ReadKey();
+
+            serverDragonSockets = ss.ToArray();
+            foreach (ServerDragonSocket<SimpleMessage> dragonSocket in serverDragonSockets)
+            {
+                Console.WriteLine("dd");
+                dragonSocket.Disconnect();
+            }
+
+            Console.ReadKey();
+
+            serverDragonSockets = ss.ToArray();
+            foreach (ServerDragonSocket<SimpleMessage> dragonSocket in serverDragonSockets)
+            {
+                Console.WriteLine("dd");
+                dragonSocket.Disconnect();
+            }
+
+            Console.ReadKey();
+
+            serverDragonSockets = ss.ToArray();
+            foreach (ServerDragonSocket<SimpleMessage> dragonSocket in serverDragonSockets)
             {
                 Console.WriteLine("dd");
                 dragonSocket.Disconnect();

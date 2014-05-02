@@ -57,9 +57,10 @@ namespace Dragon
         private void DefaultConnectCompleted(object sender, SocketAsyncEventArgs e)
         { 
             if (e.SocketError != SocketError.Success) return;
+            _connectTimer.Stop();
             
             ConnectSuccess(sender, e);
-            _connectTimer.Stop();
+            
             _connectEventArgs.Dispose();
         }
 
@@ -67,12 +68,7 @@ namespace Dragon
 
         public int RetryLimit { get; set; }
         public int RetryCount { get; private set; }
-        public double RetryInterval
-        {
-            get { return _connectTimer.Interval; }
-            set { _connectTimer.Interval = value; }
-        }
-
+        
         private SocketAsyncEventArgs _connectEventArgs;
 
         public event EventHandler<SocketAsyncEventArgs> ConnectFailed;
