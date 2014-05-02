@@ -35,6 +35,11 @@ namespace Client.Test
 
         private static void Test()
         {
+            byte[] buf = new byte[1024];
+            var d = new ClientDragonSocket<SimpleMessage>(new MessageConverter<SimpleMessage, SimpleMessage>(buf,0,1024,new SimpleMessageFactory()));
+            d.ConnectSuccess +=
+                (sender, args) => Console.WriteLine("connected.  fsfsdfsd");
+
             byte[] buffer = new byte[1024];
 
             var c = new ConcurrentClientDragonSocket<SimpleMessage, SimpleMessage>(new MessageConverter<SimpleMessage, SimpleMessage>(buffer, 0, 1024,new SimpleMessageFactory()), new SimpleMessage()
@@ -66,6 +71,8 @@ namespace Client.Test
             };
 
             c.Connect("127.0.0.1", 20009);
+
+            d.Connect("127.0.0.1",20009);
 
             t.Start();
 
