@@ -36,11 +36,27 @@ namespace Client.Test
         private static void Test()
         {
             byte[] buf = new byte[1024];
-            var d = new ClientDragonSocket<SimpleMessage>(new MessageConverter<SimpleMessage, SimpleMessage>(buf,0,1024,new SimpleMessageFactory()));
-            d.ConnectSuccess +=
+
+            ClientDragonSocket<SimpleMessage> d = null;
+            try
+            {
+                d =
+                    new ClientDragonSocket<SimpleMessage>(
+                        new MessageConverter<SimpleMessage, SimpleMessage>(buf,
+                            0, 1024, new SimpleMessageFactory()));
+                d.ConnectSuccess +=
                 (sender, args) => Console.WriteLine("connected.  fsfsdfsd");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+            
+            
 
             byte[] buffer = new byte[1024];
+
+            
 
             var c = new ConcurrentClientDragonSocket<SimpleMessage, SimpleMessage>(new MessageConverter<SimpleMessage, SimpleMessage>(buffer, 0, 1024,new SimpleMessageFactory()), new SimpleMessage()
             {
@@ -54,7 +70,6 @@ namespace Client.Test
             c.ReadCompleted += (message, code) => Console.WriteLine(c.LocalEndPoint + "[" +message.PlayMode);
 
             c.Disconnected += Disconnected; 
-            c.Disconnected += (sender, args) => c.Connect("127.0.0.1", 20009);
 
             Timer t = new Timer
             {
@@ -69,10 +84,20 @@ namespace Client.Test
                 };
                 c.Send(message);
             };
+            try
+            {
+                Console.WriteLine("connect?>");
+                c.Connect("127.0.0.1", 20009);
 
-            c.Connect("127.0.0.1", 20009);
+                d.Connect("127.0.0.1", 20009);
 
-            d.Connect("127.0.0.1",20009);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("WTF??????????" +e);
+            }
+
+            
 
             t.Start();
 

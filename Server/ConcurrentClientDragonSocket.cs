@@ -46,6 +46,7 @@ namespace Dragon
             _acitvateMessage = acitvateMessage;
             _connector = new Connector(0);
             ConnectSuccess += ActivateOnConnectSuccess;
+            Disconnected += _connector.Reconnect;
         } 
 
         private void ActivateOnConnectSuccess(object sender,
