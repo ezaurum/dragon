@@ -39,14 +39,14 @@ namespace Dragon
         }
 
         public ConcurrentClientDragonSocket(
-            IMessageConverter<TReq, TAck> converter, TReq acitvateMessage)
+            IMessageConverter<TReq, TAck> converter, TReq acitvateMessage, bool autoReconnect = true)
             : base(converter)
         {
             _activateMessageEnable = true;
             _acitvateMessage = acitvateMessage;
             _connector = new Connector(0);
             ConnectSuccess += ActivateOnConnectSuccess;
-            Disconnected += _connector.Reconnect;
+            if (autoReconnect) Disconnected += _connector.Reconnect;
         } 
 
         private void ActivateOnConnectSuccess(object sender,
@@ -72,7 +72,17 @@ namespace Dragon
             byte[] result;
             int code;
             _converter.GetByte(message, out result, out code);
-            Socket.Send(result);
+            try
+            {
+                Socket.Send(result);
+            }
+            catch (Exception e)
+            {
+                //if error
+                Disconnect();
+                return;
+            }
+            
             ContinueSendingIfExist();
         }
 
