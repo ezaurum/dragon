@@ -61,8 +61,7 @@ namespace Dragon
         private void DefaultConnectCompleted(object sender, SocketAsyncEventArgs e)
         {
             if (e.SocketError != SocketError.Success)
-            {
-                Interlocked.CompareExchange(ref _connecting, 1, 2);
+            { 
                 return;
             }
             _connectTimer.Stop();
@@ -70,7 +69,6 @@ namespace Dragon
             RetryCount = 0;
             
             ConnectSuccess(sender, e);
-
             Interlocked.Exchange(ref _connecting, 0);
         }
 
@@ -144,7 +142,7 @@ namespace Dragon
 
         public void Connect()
         {
-            if (Interlocked.Exchange(ref _connecting, 1) == 1) return;
+            if (Interlocked.CompareExchange(ref _connecting, 1,0) > 0) return;
             if (_connectTimer.Enabled) return;
             
             InitSocket();
@@ -154,7 +152,6 @@ namespace Dragon
 
         private void ConnectAsync()
         {
-            if (Interlocked.CompareExchange(ref _connecting, 2, 1) == 2) return;
             if(!Socket.ConnectAsync(_connectEventArgs))
                 DefaultConnectCompleted(null, _connectEventArgs);
         }

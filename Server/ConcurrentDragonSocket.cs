@@ -70,6 +70,7 @@ namespace Dragon
             if (e.SocketError != SocketError.Success)
             {
                 if (null != WriteCompleted) WriteCompleted(-1);
+                Disconnect(e);
                 return;
             }
             if (null != WriteCompleted)
