@@ -3,7 +3,9 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Timers;
+using Timer = System.Timers.Timer;
 
 namespace Dragon
 {
@@ -42,8 +44,6 @@ namespace Dragon
         {
             _connectTimer.Interval = retryInterval;
             RetryLimit = retryLimit;
-
-         
         }
 
         private void InitSocket()
@@ -60,12 +60,18 @@ namespace Dragon
         /// <param name="e"></param>
         private void DefaultConnectCompleted(object sender, SocketAsyncEventArgs e)
         {
-            if (e.SocketError != SocketError.Success) return;
+            if (e.SocketError != SocketError.Success)
+            {
+                Interlocked.CompareExchange(ref _connecting, 1, 2);
+                return;
+            }
             _connectTimer.Stop();
             // timer set
             RetryCount = 0;
             
             ConnectSuccess(sender, e);
+
+            Interlocked.Exchange(ref _connecting, 0);
         }
 
         private EndPoint IpEndpoint
@@ -83,6 +89,7 @@ namespace Dragon
         
         private readonly SocketAsyncEventArgs _connectEventArgs;
         private EndPoint _ipEndpoint;
+        private int _connecting;
 
         public event EventHandler<SocketAsyncEventArgs> ConnectFailed;
         public event EventHandler<SocketAsyncEventArgs> ConnectSuccess;
@@ -106,7 +113,9 @@ namespace Dragon
             _connectTimer.Stop();
 
             if (_connectEventArgs.SocketError == SocketError.Success || ConnectFailed == null) return;
+            
             ConnectFailed(sender, _connectEventArgs);
+            Interlocked.Exchange(ref _connecting, 0);
         }
 
         public void Connect(IPEndPoint endPoint)
@@ -135,6 +144,7 @@ namespace Dragon
 
         public void Connect()
         {
+            if (Interlocked.Exchange(ref _connecting, 1) == 1) return;
             if (_connectTimer.Enabled) return;
             
             InitSocket();
@@ -144,6 +154,7 @@ namespace Dragon
 
         private void ConnectAsync()
         {
+            if (Interlocked.CompareExchange(ref _connecting, 2, 1) == 2) return;
             if(!Socket.ConnectAsync(_connectEventArgs))
                 DefaultConnectCompleted(null, _connectEventArgs);
         }
