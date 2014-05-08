@@ -181,10 +181,10 @@ namespace Dragon
 
             if (args.BytesTransferred < 1) return;
 
-            OnReadCompleted(socket, args);
-
             try
             {
+                OnReadCompleted(socket, args);
+
                 args.SetBuffer(args.Offset, args.Count);
             }
             catch (Exception ex)
