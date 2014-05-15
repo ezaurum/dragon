@@ -71,7 +71,7 @@ namespace Dragon
             //just send first in block
             byte[] result;
             int code;
-            _converter.GetByte(message, out result, out code);
+            Converter.GetByte(message, out result, out code);
             try
             {
                 Socket.Send(result);

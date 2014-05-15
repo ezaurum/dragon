@@ -23,7 +23,7 @@ namespace Dragon
             byte[] buffer = null, int offset = 0, int bufferSize = 1024*16)
             : base(buffer ?? new byte[bufferSize], offset, bufferSize)
         {
-            _converter = converter;
+            Converter = converter;
             OnReadCompleted += MessageConvert;
         }
 
@@ -49,7 +49,7 @@ namespace Dragon
         {
             byte[] messageBytes;
             int errorCode;
-            _converter.GetByte(message, out messageBytes, out errorCode);
+            Converter.GetByte(message, out messageBytes, out errorCode);
             if (0 != errorCode)
             {
                 WriteCompleted(errorCode);
@@ -60,8 +60,8 @@ namespace Dragon
 
         public event Action<TAck, int> ReadCompleted
         {
-            add { _converter.MessageConverted += value; }
-            remove { _converter.MessageConverted -= value; }
+            add { Converter.MessageConverted += value; }
+            remove { Converter.MessageConverted -= value; }
         }
 
         protected override void WriteEventCompleted(object o,
@@ -87,11 +87,11 @@ namespace Dragon
             }
         }
 
-        protected readonly IMessageConverter<TReq, TAck> _converter;
+        protected readonly IMessageConverter<TReq, TAck> Converter;
 
         public void MessageConvert(object socket, SocketAsyncEventArgs args) 
         {
-            _converter.Read(args.Buffer, args.Offset, args.BytesTransferred);
+            Converter.Read(args.Buffer, args.Offset, args.BytesTransferred);
         }
     }
 }

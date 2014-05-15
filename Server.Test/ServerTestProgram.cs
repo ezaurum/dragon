@@ -16,8 +16,7 @@ namespace Server.Test
     public static class ServerTestProgram
     {
         private static int _index;
-        private static int _sendIndex;
-
+        private static int _sendIndex; 
 
         static void Main(string[] args)
         {

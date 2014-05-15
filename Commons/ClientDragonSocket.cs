@@ -97,7 +97,6 @@ namespace Dragon
         private void ActivateOnConnectSuccess(object sender,
             SocketAsyncEventArgs e)
         {
-            Console.WriteLine("WTF?");
             Socket = _connector.Socket;
 
             Activate();

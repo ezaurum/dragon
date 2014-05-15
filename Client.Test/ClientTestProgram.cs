@@ -87,7 +87,7 @@ namespace Client.Test
             try
             {
                 Console.WriteLine("connect?>");
-                c.Connect("127.0.0.1", 20009);
+                c.Connect("localhost", 20009);
 
                 d.Connect("127.0.0.1", 20009);
 
