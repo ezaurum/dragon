@@ -26,7 +26,7 @@ namespace Server.Test
 
             Random random = new Random();
 
-            var ss = new Stack<ServerDragonSocket<SimpleMessage>>();
+            var ss = new List<ServerDragonSocket<SimpleMessage>>();
  
             var s = new SocketDistributor<SimpleMessage>
             {
@@ -73,25 +73,12 @@ namespace Server.Test
                     userToken.Send(message);
                 };
 
-/*                t.Elapsed += (o, elapsedEventArgs) =>
-                {
-                    SimpleMessage message = new SimpleMessage
-                    {
-                        PlayType = (char) random.Next(),
-                        BoardType = (byte) random.Next(),
-                        PlayMode = (byte) random.Next(),
-                        PacketTime = DateTime.Now
-                    };
-                    userToken.Send( message);
-                    //Console.WriteLine(message);
-                };*/
-
                 userToken.Activate();
                 
                 Interlocked.Increment(ref connection);
                 Console.WriteLine("con " + connection);
                 
-                ss.Push(userToken);
+                ss.Add(userToken);
             };
 
             Thread.Sleep(1000);
@@ -105,6 +92,7 @@ namespace Server.Test
             {
                 Console.WriteLine("dd");
                 dragonSocket.Disconnect();
+                ss.Remove(dragonSocket);
             }
 
             Console.ReadKey();
@@ -114,6 +102,7 @@ namespace Server.Test
             {
                 Console.WriteLine("dd");
                 dragonSocket.Disconnect();
+                ss.Remove(dragonSocket);
             }
 
             Console.ReadKey();
@@ -123,6 +112,7 @@ namespace Server.Test
             {
                 Console.WriteLine("dd");
                 dragonSocket.Disconnect();
+                ss.Remove(dragonSocket);
             }
 
             Console.ReadKey();
@@ -132,6 +122,7 @@ namespace Server.Test
             {
                 Console.WriteLine("dd");
                 dragonSocket.Disconnect();
+                ss.Remove(dragonSocket);
             }
 
             Console.ReadKey();
