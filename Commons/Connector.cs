@@ -17,6 +17,9 @@ namespace Dragon
         private readonly Timer _connectTimer;
         public Socket Socket { get; private set; }
 
+        public const int DefaultRetryLimit = 10;
+        public const int DefaultInterval = 1500;
+
         public Connector()
         {
             _connectEventArgs = new SocketAsyncEventArgs { RemoteEndPoint = IpEndpoint };
@@ -25,8 +28,8 @@ namespace Dragon
             //ip endpoint set _connect event args property
             IpEndpoint = EndPointStorage.DefaultDestination;
 
-            RetryLimit = 10;
-            _connectTimer = new Timer {Interval = 1500, AutoReset = true};
+            RetryLimit = DefaultRetryLimit;
+            _connectTimer = new Timer {Interval = DefaultInterval, AutoReset = true};
             _connectTimer.Elapsed += CheckReconnect;
         }
 
@@ -88,6 +91,7 @@ namespace Dragon
         private readonly SocketAsyncEventArgs _connectEventArgs;
         private EndPoint _ipEndpoint;
         private int _connecting;
+        
 
         public event EventHandler<SocketAsyncEventArgs> ConnectFailed;
         public event EventHandler<SocketAsyncEventArgs> ConnectSuccess;
