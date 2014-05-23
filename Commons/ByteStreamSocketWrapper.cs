@@ -24,12 +24,12 @@ namespace Dragon
             State = SocketState.Initialized;
         }
 
-        private int _state;
+        private SocketState _state;
 
         public SocketState State
         {
-            get { return (SocketState) _state; }
-            set { _state = (int) value; }
+            get { return _state; }
+            set { _state = value; }
         }
 
         public IPEndPoint RemoteEndPoint
@@ -64,30 +64,55 @@ namespace Dragon
         }
 
         private SocketAsyncEventArgs _writeEventArgs;
+        private readonly object _stateLock = new object();
 
         protected abstract void WriteEventCompleted(object socket,
             SocketAsyncEventArgs readEventArgs);
 
         public event EventHandler<SocketAsyncEventArgs> Disconnected;
 
+        protected bool OffState(SocketState state)
+        {
+            lock (_stateLock)
+            {
+                if ((_state & state) == 0)
+                    return false;
+                _state ^= state;
+                return true;
+            } 
+        }
+
+        protected bool OnState(SocketState state)
+        {
+            lock (_stateLock)
+            {
+                if ((_state & state) != 0)
+                    return false;
+                _state |= state;
+                return true;
+            }
+        }
+
+        protected bool IsState(SocketState state)
+        {
+            lock (_stateLock)
+            {
+                return (_state & state) != 0;
+            }
+        }
+
         /// <summary>
         ///     For reuse, Socket and eventargs are not disposed.
         /// </summary>
         public void Disconnect(SocketAsyncEventArgs e = null)
-        { 
-            var exchange =
-                (SocketState)
-                    Interlocked.Exchange(ref _state,
-                        (byte) SocketState.Disconnected); 
-            //run once
-            if (exchange <= SocketState.Disconnected) return;
-
+        {
+            if (!OffState(SocketState.Connected)) return;
             try
             {
                 Socket.Shutdown(SocketShutdown.Send);
                 Socket.Disconnect(false);
             }
-            catch (Exception ex)
+            catch
             {
                 //ignore
             }
@@ -105,7 +130,7 @@ namespace Dragon
             {
                 _writeEventArgs.Dispose(); 
             }
-            catch (Exception ex)
+            catch
             {
                 //ignore some error
             }
@@ -113,7 +138,7 @@ namespace Dragon
             {
                 _readEventArgs.Dispose();
             }
-            catch (Exception)
+            catch
             {
                 //ignore some error
             }
@@ -123,7 +148,10 @@ namespace Dragon
         {
             Disconnect();
 
-            Interlocked.Exchange(ref _state, (int) SocketState.Disposed);
+            lock (_stateLock)
+            {
+                _state = SocketState.Disposed;
+            }
         }
 
         public virtual void Activate()
@@ -161,6 +189,8 @@ namespace Dragon
         // ReSharper disable once InconsistentNaming
         private void IOCompleted(object sender, SocketAsyncEventArgs args)
         {
+            Console.WriteLine("tr : {1}/{0}", args.BytesTransferred, args.SocketError);
+
             if (0 !=args.BytesTransferred && args.SocketError == SocketError.Success)
                 return;
 

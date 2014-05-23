@@ -1,10 +1,14 @@
-﻿namespace Dragon
+﻿using System;
+
+namespace Dragon
 {
-    public enum SocketState
+    [Flags]
+    public enum SocketState : byte
     { 
         Disposed = 0,
-        Disconnected = 0x1,
-        Initialized = 0x2,
-        Active = 0x4, 
+        Connectiong = 0x1,
+        Connected = 0x2,
+        Initialized = 0x4,
+        Active = Connected | Initialized, 
     }
 }
