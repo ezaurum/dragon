@@ -132,6 +132,8 @@ namespace Dragon
         /// <param name="e"></param>
         private void CheckReconnect(object sender, ElapsedEventArgs e)
         {
+            Console.WriteLine("check reconnect " + _connectEventArgs.SocketError);
+
             //failed. retry
             if (_connectEventArgs.SocketError != SocketError.Success && (0 == RetryLimit || RetryCount < RetryLimit))
             {
@@ -176,12 +178,12 @@ namespace Dragon
         {
             if (IsState(SocketState.Connectiong | SocketState.Connected))
                 return;
-
+            
             if (!OnState(SocketState.Connectiong))
                 return;
 
             if (_connectTimer.Enabled) return;
-            
+
             InitSocket();
             _connectTimer.Start();
             ConnectAsync();
@@ -195,6 +197,7 @@ namespace Dragon
 
         private void Reconnect(object sender, SocketAsyncEventArgs e)
         {
+            _connectEventArgs.SocketError = SocketError.ConnectionReset;
             Connect(); 
         }
     }
