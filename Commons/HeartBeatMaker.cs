@@ -55,10 +55,5 @@ namespace Dragon
         {
             Stop();
         }
-
-        public void Start(object sender, SocketAsyncEventArgs e)
-        {
-            Start();
-        }
     } 
 }

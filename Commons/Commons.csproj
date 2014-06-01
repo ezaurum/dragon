@@ -36,7 +36,6 @@
   <ItemGroup>
     <Compile Include="ByteStreamSocketWrapper.cs" />
     <Compile Include="ClientDragonSocket.cs" />
-    <Compile Include="Connector.cs" />
     <Compile Include="DragonSocket.cs" />
     <Compile Include="IBeatable.cs" />
     <Compile Include="IConnectable.cs" />

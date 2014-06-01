@@ -10,5 +10,6 @@ namespace Dragon
         event EventHandler<SocketAsyncEventArgs> ConnectSuccess;
         void Connect(IPEndPoint endPoint);
         void Connect(string ipAddress, int port);
+        void Connect();
     }
 }
