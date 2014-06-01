@@ -132,8 +132,6 @@ namespace Dragon
         /// <param name="e"></param>
         private void CheckReconnect(object sender, ElapsedEventArgs e)
         {
-            Console.WriteLine("check reconnect " + _connectEventArgs.SocketError);
-
             //failed. retry
             if (_connectEventArgs.SocketError != SocketError.Success && (0 == RetryLimit || RetryCount < RetryLimit))
             {
