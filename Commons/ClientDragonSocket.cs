@@ -70,15 +70,14 @@ namespace Dragon
 
             Activate();
 
-            if (!HeartBeatEnable) return;
-            _heartBeatMaker.Start(); 
+            if (HeartBeatEnable) _heartBeatMaker.Start();
 
             if (null != ConnectSuccess) ConnectSuccess(sender, e);
 
             Interlocked.Exchange(ref _connecting, 0);
         }
 
-        private EndPoint IpEndpoint
+        public EndPoint IpEndpoint
         {
             get { return _ipEndpoint; }
             set
@@ -93,8 +92,7 @@ namespace Dragon
         
         private readonly SocketAsyncEventArgs _connectEventArgs;
         private EndPoint _ipEndpoint;
-        private int _connecting;
-        
+        private int _connecting; 
 
         public event EventHandler<SocketAsyncEventArgs> ConnectFailed;
         public event EventHandler<SocketAsyncEventArgs> ConnectSuccess;
@@ -167,8 +165,6 @@ namespace Dragon
         {
            Connect(); 
         }
-
-        
 
         #endregion
 

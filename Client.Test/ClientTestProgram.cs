@@ -69,7 +69,7 @@ namespace Client.Test
             c.ReadCompleted += (message, code) => Console.WriteLine(c.LocalEndPoint + "[" +message.PlayMode);
 
             c.Disconnected += Disconnected;
-
+            
             Timer t = new Timer
             {
                 Interval = 1000
@@ -88,7 +88,8 @@ namespace Client.Test
                 Console.WriteLine("connect?>");
 //                c.Connect("localhost", 20009);
 
-                c.Connect("127.0.0.1", 20009);
+//                c.Connect("127.0.0.1", 20009);
+                d.Connect("127.0.0.1", 20009);
 
             }
             catch (Exception e)
