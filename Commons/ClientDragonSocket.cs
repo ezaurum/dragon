@@ -208,12 +208,6 @@ namespace Dragon
                 interval);
             Disconnected += _heartBeatMaker.Stop;
         }
-
-        private void ActivateOnConnectSuccess(object sender,
-            SocketAsyncEventArgs e)
-        { 
-            
-        }
     }
 
     #endregion
