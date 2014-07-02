@@ -64,7 +64,7 @@ namespace Dragon
             byte[] messageBytes;
             int errorCode;
             Converter.GetByte(message, out messageBytes, out errorCode);
-            if (0 != errorCode)
+            if (0 != errorCode && null != WriteCompleted)
             {
                 WriteCompleted(errorCode);
                 return;
@@ -82,8 +82,6 @@ namespace Dragon
             if (Interlocked.Decrement(ref _sendingMessages) < 1) return;
 
             SendAsyncFromQueue(); 
-        } 
-
-                    
+        }
     }
 }
