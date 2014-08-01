@@ -222,10 +222,7 @@ namespace Dragon
             }
 
             ReadRepeat();
-        }
-
-
-#if DEBUG
+        } 
 
         /// <summary>
         ///     debug event args for log or something
@@ -244,11 +241,5 @@ namespace Dragon
             add { _writeEventArgs.Completed += value; }
             remove { _writeEventArgs.Completed -= value; }
         }
-
-        /// <summary>
-        ///     debug event args for log or something
-        /// </summary>
-        public event EventHandler<SocketAsyncEventArgs> DebugEvent;
-#endif
     }
 }

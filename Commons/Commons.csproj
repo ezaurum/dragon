@@ -52,6 +52,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>nuget pack $(ProjectPath) -OutputDirectory c:\LocalNuGetFeed</PostBuildEvent>
+    <PostBuildEvent>nuget pack $(ProjectPath) -Prop Configuration=$(ConfigurationName) -OutputDirectory c:\LocalNuGetFeed</PostBuildEvent>
   </PropertyGroup>
 </Project>

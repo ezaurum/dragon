@@ -51,6 +51,25 @@ namespace Dragon
                 throw new OutOfMemoryException(string.Format("Buffer overflow {2}+{0}/{1}",_offset,_lastOffset,bytesTransferred));
             }
 
+            //ignore when not teering
+            if (Stored < 1)
+            {
+                ushort messageLength = BitConverter.ToUInt16(buffer, offset);
+                if (bytesTransferred == messageLength)
+                {
+                    _errorCode = 0;
+                    TAck message;
+                    if (!_factory.Read(buffer, offset, messageLength, out message,
+                            out _errorCode)) return;
+
+                    if (null != MessageConverted)
+                    {
+                        MessageConverted(message, _errorCode);
+                    }
+                    return;
+                }
+            }
+
             Buffer.BlockCopy(buffer, offset, _buffer, _offset, bytesTransferred);
 
             //add offset
